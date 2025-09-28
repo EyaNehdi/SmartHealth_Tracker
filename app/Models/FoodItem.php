@@ -9,7 +9,7 @@ class FoodItem extends Model
      protected $table = 'food_items';
 
     protected $fillable = [
-        'name', 'description', 'calories', 'protein', 'fat', 'carbs', 'serving_size',
+        'name', 'description', 'calories', 'protein', 'fat', 'carbs', 'serving_size', 'image',
     ];
 
     public function meals()

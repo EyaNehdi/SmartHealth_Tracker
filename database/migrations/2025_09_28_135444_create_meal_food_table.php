@@ -20,6 +20,7 @@ return new class extends Migration
             $table->float('fat');         // grams of fat per serving
             $table->float('carbs');       // grams of carbohydrates per serving
             $table->string('serving_size')->nullable(); // e.g., "100g", "1 cup"
+            $table->string('image')->nullable(); //e.g, img_url
             $table->timestamps();
         });
 

@@ -7,11 +7,20 @@ use Illuminate\Http\Request;
 
 class FoodItemController extends Controller
 {
-    public function index()
+    // For JSON API
+    public function apiIndex()
     {
         $foods = FoodItem::all();
         return response()->json($foods);
     }
+
+    // For Blade view display
+    public function foodList()
+    {
+        $foods = FoodItem::all();
+        return view('admin.food.food-list', compact('foods'));
+    }
+
 
     public function show($id)
     {
@@ -29,10 +38,17 @@ class FoodItemController extends Controller
             'fat' => 'required|numeric',
             'carbs' => 'required|numeric',
             'serving_size' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
+        // Check if image uploaded
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('food_images', 'public');
+            $data['image'] = $imagePath; // store path in db
+        }
+
         $food = FoodItem::create($data);
-        return response()->json($food, 201);
+        return redirect()->route('admin.food.list')->with('success', 'Food item added successfully.');
     }
 
     public function update(Request $request, $id)
@@ -52,6 +68,7 @@ class FoodItemController extends Controller
         $food->update($data);
         return response()->json($food);
     }
+
 
     public function destroy($id)
     {
