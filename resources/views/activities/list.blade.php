@@ -91,7 +91,7 @@
                                         </li>
                                         <li><a href="contact.html">Contact</a></li>
                                     </ul>
-                                    
+
                                 </div>
                                 <div class="tgmenu__action">
                                     <ul class="list-wrap">
@@ -421,7 +421,7 @@
     <div class="container">
         <!-- Affichage des messages flash -->
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -454,13 +454,20 @@
                                     <!-- Informations sous l'image -->
                                     <div class="card-body">
                                         <h2 class="card-title">{{ $activity->nom }}</h2>
-                                        <p class="card-text">{{ $activity->description ?? 'Aucune description' }}</p>
                                         <p class="card-text"><strong>Date :</strong> {{ $activity->date ? $activity->date->format('d/m/Y H:i') : 'Non défini' }}</p>
                                         <p class="card-text"><strong>Durée :</strong> {{ $activity->duree ? $activity->duree . ' minutes' : 'Non définie' }}</p>
                                         <p class="card-text"><strong>Catégorie :</strong> {{ $activity->category ? $activity->category->nom : 'Aucune' }}</p>
-                                        <p class="card-text"><strong>Terminé :</strong> {{ $activity->completed ? 'Oui' : 'Non' }}</p>
-                                        <!-- Actions (icônes de modification et suppression) -->
-                                        <div class="actions mt-2">
+<p class="card-text">
+    @if ($activity->equipments->isNotEmpty())
+        <ul class="list-unstyled">
+            @foreach ($activity->equipments as $equipment)
+                <li><strong>Équipement :</strong> {{ $equipment->nom }} ({{ $equipment->type }}) </li>
+            @endforeach
+        </ul>
+    @else
+        Aucune
+    @endif
+</p>                                        <div class="actions mt-2">
                                             <!-- Icône de modification (vert) -->
                                             <a href="{{ route('activities.edit', $activity->id) }}" title="Modifier">
                                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

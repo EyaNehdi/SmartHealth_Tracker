@@ -7,6 +7,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\EquipmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard', function () {
@@ -26,14 +27,7 @@ Route::get('/admin', function () {
 
 //Route de Category
 
-Route::get('/catActivity/create', function () {
-    return view('categories.ajout');
-})->name('categories.create');
-Route::get('/catActivity/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
-Route::put('/catActivity/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
-Route::delete('/catActivity/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
-Route::get('/list', [CategoryActivityController::class, 'index'])->name('categories.list');
-Route::post('/catActivity', [CategoryActivityController::class, 'store'])->name('categories.store');
+
 
 
 
@@ -60,15 +54,20 @@ Route::prefix('admin')
 
 
 
+
+
+    
         // Food routes
         Route::get('/food/add', function () {
             return view('admin.food.add-food');
         })->name('food.add');
+
         Route::get('/food/list', [FoodItemController::class, 'foodList'])->name('food.list');
         Route::post('/food/store', [FoodItemController::class, 'store'])->name('food.store');
         Route::get('/food/{food}', [FoodItemController::class, 'show'])->name('food.show');
         Route::get('/food/{food}/edit', [FoodItemController::class, 'edit'])->name('food.edit');
         Route::delete('/food/{food}', [FoodItemController::class, 'destroy'])->name('food.destroy');
+<<<<<<< HEAD
         // ----------------- Catégorie routes -----------------
         Route::get('/categories/add', [CategorieController::class, 'create'])->name('categories.add');
         Route::get('/categories/list', [CategorieController::class, 'index'])->name('categories.list');
@@ -86,7 +85,31 @@ Route::prefix('admin')
         Route::get('/produits/{produit}/edit', [ProduitController::class, 'edit'])->name('produits.edit');
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
+=======
+    
+
+ 
+Route::get('/catActivity/create', function () {
+            return view('admin.Categories.ajoute');
+        })->name('categories.create');
+        Route::post('/catActivity', [CategoryActivityController::class, 'store'])->name('categories.store');
+        Route::get('/catActivity/list', [CategoryActivityController::class, 'index'])->name('categories.list');
+        Route::get('/catActivity/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
+        Route::put('/catActivity/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
+        Route::delete('/catActivity/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
+
+
+
+         // Equipment routes
+        Route::get('/equipments/create', [EquipmentController::class, 'create'])->name('equipments.create');
+        Route::post('/equipments', [EquipmentController::class, 'store'])->name('equipments.store');
+        Route::get('/equipments/list', [EquipmentController::class, 'index'])->name('equipments.list');
+        Route::get('/equipments/{equipment}/edit', [EquipmentController::class, 'edit'])->name('equipments.edit');
+        Route::put('/equipments/{equipment}', [EquipmentController::class, 'update'])->name('equipments.update');
+        Route::delete('/equipments/{equipment}', [EquipmentController::class, 'destroy'])->name('equipments.destroy');
+>>>>>>> a6495f6 (activity/equipments)
     });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

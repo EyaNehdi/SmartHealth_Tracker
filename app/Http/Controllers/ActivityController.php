@@ -3,118 +3,138 @@
 namespace App\Http\Controllers;
 use App\Models\CategoryActivity;
 use App\Models\Activity;
-
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityController extends Controller
 {
-       public function create()
-       {
-           $categories = CategoryActivity::all();
-           return view('activities.Ajout', compact('categories'));
-       }
+    public function create()
+    {
+        $categories = CategoryActivity::all();
+        $equipments = Equipment::all(); // Ajouter les équipements
+        return view('activities.Ajout', compact('categories', 'equipments')); // Passer equipments à la vue
+    }
 
-       public function index(Request $request)
-       {
-           $query = Activity::where('user_id', Auth::id())->with('category');
+    public function index(Request $request)
+    {
+        $query = Activity::where('user_id', Auth::id())->with(['category', 'equipments']); // Inclure equipments
 
-           if ($search = $request->query('search')) {
-               $query->where(function ($q) use ($search) {
-                   $q->where('nom', 'like', '%' . $search . '%')
-                     ->orWhere('description', 'like', '%' . $search . '%');
-               });
-           }
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
 
-           if ($category_id = $request->query('category_id')) {
-               $query->where('categorie_activity_id', $category_id);
-           }
+        if ($category_id = $request->query('category_id')) {
+            $query->where('categorie_activity_id', $category_id);
+        }
 
-           if ($date = $request->query('date')) {
-               $query->whereDate('date', $date);
-           }
+        if ($date = $request->query('date')) {
+            $query->whereDate('date', $date);
+        }
 
-           $activities = $query->get();
-           $categories = CategoryActivity::all();
+        $activities = $query->get();
+        $categories = CategoryActivity::all();
 
-           return view('activities.list', compact('activities', 'categories'));
-       }
+        return view('activities.list', compact('activities', 'categories'));
+    }
 
-       public function store(Request $request)
-       {
-           $request->validate([
-               'nom' => 'required|string|max:255',
-               'description' => 'nullable|string',
-               'date' => 'required|date',
-               'duree' => 'nullable|integer|min:0',
-               'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
-               'completed' => 'boolean',
-           ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'required|date',
+            'duree' => 'nullable|integer|min:0',
+            'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
+            'equipments' => 'nullable|array',
+            'equipments.*' => 'exists:equipments,id', // Valider que chaque équipement existe
+            'equipment_comment' => 'nullable|string',
+        ]);
 
-           $activity = new Activity;
-           $activity->nom = $request->nom;
-           $activity->description = $request->description;
-           $activity->date = $request->date;
-           $activity->duree = $request->duree;
-           $activity->categorie_activity_id = $request->categorie_activity_id;
-           $activity->user_id = Auth::id();
-           $activity->completed = $request->filled('completed');
-           $activity->save();
+        $activity = new Activity;
+        $activity->nom = $request->nom;
+        $activity->description = $request->description;
+        $activity->date = $request->date;
+        $activity->duree = $request->duree;
+        $activity->categorie_activity_id = $request->categorie_activity_id;
+        $activity->user_id = Auth::id();
+        $activity->save();
 
-           if ($request->expectsJson()) {
-               return response()->json([
-                   'success' => true,
-                   'message' => 'Activité ajoutée avec succès !',
-                   'activity' => $activity
-               ]);
-           }
+        // Associer les équipements à l'activité via la table pivot
+        if ($request->has('equipments')) {
+            $activity->equipments()->attach($request->equipments, [
+                'commentaire' => $request->equipment_comment,
+            ]);
+        }
 
-           return redirect()->route('activities.create')->with('success', 'Activité ajoutée avec succès !');
-       }
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Activité ajoutée avec succès !',
+                'activity' => $activity->load('equipments'),
+            ]);
+        }
 
-       public function edit(Activity $activity)
-       {
-           if ($activity->user_id !== Auth::id()) {
-               abort(403, 'Non autorisé');
-           }
+        return redirect()->route('activities.index')->with('success', 'Activité ajoutée avec succès !');
+    }
 
-           $categories = CategoryActivity::all();
-           return view('activities.edit', compact('activity', 'categories'));
-       }
+    public function edit(Activity $activity)
+    {
+        if ($activity->user_id !== Auth::id()) {
+            abort(403, 'Non autorisé');
+        }
 
-       public function update(Request $request, Activity $activity)
-       {
-           if ($activity->user_id !== Auth::id()) {
-               abort(403, 'Non autorisé');
-           }
+        $categories = CategoryActivity::all();
+        $equipments = Equipment::all(); // Ajouter les équipements pour l'édition
+        return view('activities.edit', compact('activity', 'categories', 'equipments')); // Passer equipments
+    }
 
-           $request->validate([
-               'nom' => 'required|string|max:255',
-               'description' => 'nullable|string',
-               'date' => 'required|date',
-               'duree' => 'nullable|integer|min:0',
-               'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
-               'completed' => 'boolean',
-           ]);
+    public function update(Request $request, Activity $activity)
+    {
+        if ($activity->user_id !== Auth::id()) {
+            abort(403, 'Non autorisé');
+        }
 
-           $activity->nom = $request->nom;
-           $activity->description = $request->description;
-           $activity->date = $request->date;
-           $activity->duree = $request->duree;
-           $activity->categorie_activity_id = $request->categorie_activity_id;
-           $activity->completed = $request->filled('completed');
-           $activity->save();
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'required|date',
+            'duree' => 'nullable|integer|min:0',
+            'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
+            'equipments' => 'nullable|array',
+            'equipments.*' => 'exists:equipments,id',
+            'equipment_comment' => 'nullable|string',
+        ]);
 
-           return redirect()->route('activities.index')->with('updated', 'Activité mise à jour avec succès.');
-       }
+        $activity->nom = $request->nom;
+        $activity->description = $request->description;
+        $activity->date = $request->date;
+        $activity->duree = $request->duree;
+        $activity->categorie_activity_id = $request->categorie_activity_id;
+        $activity->save();
 
-       public function destroy(Activity $activity)
-       {
-           if ($activity->user_id !== Auth::id()) {
-               abort(403, 'Non autorisé');
-           }
+        // Mettre à jour les équipements associés
+        if ($request->has('equipments')) {
+            $activity->equipments()->sync($request->equipments, [
+                'commentaire' => $request->equipment_comment,
+            ]);
+        } else {
+            $activity->equipments()->detach(); // Supprimer les associations si aucun équipement n'est sélectionné
+        }
 
-           $activity->delete();
-           return redirect()->route('activities.index')->with('success', 'Activité supprimée avec succès.');
-       }
-   }
+        return redirect()->route('activities.index')->with('updated', 'Activité mise à jour avec succès.');
+    }
+
+    public function destroy(Activity $activity)
+    {
+        if ($activity->user_id !== Auth::id()) {
+            abort(403, 'Non autorisé');
+        }
+
+        $activity->delete();
+        return redirect()->route('activities.index')->with('success', 'Activité supprimée avec succès.');
+    }
+}
