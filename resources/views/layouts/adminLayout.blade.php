@@ -37,7 +37,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
 </head>
-
+@yield('scripts')
 <body class="ms-body ms-aside-left-open ms-primary-theme ms-has-quickbar">
     <!-- Setting Panel -->
     <div class="ms-toggler ms-settings-toggle ms-d-block-lg">

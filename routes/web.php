@@ -26,14 +26,14 @@ Route::get('/admin', function () {
 
 //Route de Category
 
-Route::get('/categories/create', function () {
-    return view('categories.ajout');
-})->name('categories.create');
-Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-Route::get('/list', [CategoryController::class, 'index'])->name('categories.list');
-Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+// Route::get('/categories/create', function () {
+//     return view('categories.ajout');
+// })->name('categories.create');
+// Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+// Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+// Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+// Route::get('/list', [CategoryController::class, 'index'])->name('categories.list');
+// Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 
 
 
