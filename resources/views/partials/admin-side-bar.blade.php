@@ -20,6 +20,7 @@
             </a>
         </li>
 
+        {{-- Food --}}
         @php
         $isFoodActive = request()->routeIs('admin.food.add') || request()->routeIs('admin.food.list');
         @endphp
@@ -44,6 +45,55 @@
             </ul>
         </li>
 
+        {{-- Categories --}}
+        @php
+        $isCategoryActive = request()->routeIs('admin.categories.add') || request()->routeIs('admin.categories.list');
+        @endphp
+        <li class="menu-item">
+            <a href="#" class="has-chevron {{ $isCategoryActive ? 'active' : '' }}"
+                data-toggle="collapse" data-target="#categories"
+                aria-expanded="{{ $isCategoryActive ? 'true' : 'false' }}"
+                aria-controls="categories">
+                <span><i class="fas fa-tags"></i>Categories</span>
+            </a>
+            <ul id="categories" class="collapse {{ $isCategoryActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+                <li>
+                    <a href="{{ route('admin.categories.add') }}" class="{{ request()->routeIs('admin.categories.add') ? 'active' : '' }}">
+                        <i class="fas fa-plus-circle"></i> Add Category
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.list') ? 'active' : '' }}">
+                        <i class="fas fa-list"></i> Categories List
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        {{-- Produits --}}
+        @php
+        $isProduitActive = request()->routeIs('admin.produits.add') || request()->routeIs('admin.produits.list');
+        @endphp
+        <li class="menu-item">
+            <a href="#" class="has-chevron {{ $isProduitActive ? 'active' : '' }}"
+                data-toggle="collapse" data-target="#produits"
+                aria-expanded="{{ $isProduitActive ? 'true' : 'false' }}"
+                aria-controls="produits">
+                <span><i class="fas fa-box"></i>Produits</span>
+            </a>
+            <ul id="produits" class="collapse {{ $isProduitActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+                <li>
+                    <a href="{{ route('admin.produits.add') }}" class="{{ request()->routeIs('admin.produits.add') ? 'active' : '' }}">
+                        <i class="fas fa-plus-circle"></i> Add Produit
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.produits.list') }}" class="{{ request()->routeIs('admin.produits.list') ? 'active' : '' }}">
+                        <i class="fas fa-list"></i> Produits List
+                    </a>
+                </li>
+            </ul>
+        </li>
 
         <!-- Event (Placeholder) -->
 

@@ -45,6 +45,7 @@ Route::get('/admin', function () {
 
 //Route de Category
 
+
 Route::get('/catActivity/create', function () {
     return view('categories.ajout');
 })->name('categories.create');
@@ -53,6 +54,7 @@ Route::put('/catActivity/{category}', [CategoryActivityController::class, 'updat
 Route::delete('/catActivity/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
 Route::get('/list', [CategoryActivityController::class, 'index'])->name('categories.list');
 Route::post('/catActivity', [CategoryActivityController::class, 'store'])->name('categories.store');
+
 
 
 

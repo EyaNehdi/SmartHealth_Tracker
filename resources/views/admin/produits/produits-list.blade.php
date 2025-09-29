@@ -1,7 +1,6 @@
 @extends('layouts.adminLayout')
 
 @section('content')
-
 <div class="ms-content-wrapper">
     <div class="row">
         <div class="col-md-12">
@@ -13,50 +12,90 @@
             </nav>
         </div>
 
-        @forelse ($produits as $produit)
-        <div class="col-lg-6 col-md-6 col-sm-6">
-            <div class="ms-card">
-                <div class="ms-card-body">
-                    <div class="media fs-14">
-                        <div class="mr-2 align-self-center">
-                            <img src="{{ $produit->image ? asset('storage/' . $produit->image) : asset('assets2/img/placeholder.png') }}" 
-                                 alt="{{ $produit->nom }}" class="ms-img-round" style="width:80px; height:80px; object-fit:cover;">
-                        </div>
-                        <div class="media-body">
-                            <h6>{{ $produit->nom }}</h6>
-                            <p class="fs-12 my-1 text-disabled">{{ Str::limit($produit->description, 80) }}</p>
-                            <p class="mb-0">Category: {{ $produit->categorie->nom ?? 'N/A' }}</p>
-                            <p class="mb-0">Price: ${{ number_format($produit->prix, 2) }} | Stock: {{ $produit->stock }}</p>
+        {{-- Filtres --}}
+        <div class="col-12 mb-3">
+            <div class="form-inline">
+                <input id="search" class="form-control mr-2" placeholder="Recherche...">
 
-                            <div class="dropdown float-right">
-                                <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="material-icons">more_vert</i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-right">
-                                    <li class="ms-dropdown-list">
-                                        <a class="media p-2" href="{{ route('admin.produits.edit', $produit->id) }}">
-                                            <div class="media-body"><span>Edit</span></div>
-                                        </a>
-                                        <form action="{{ route('admin.produits.destroy', $produit->id) }}" method="POST" class="media p-2" onsubmit="return confirm('Are you sure?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-link p-0 m-0">
-                                                <div class="media-body"><span>Delete</span></div>
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <select id="category" class="form-control mr-2">
+                    <option value="">Toutes catégories</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}">{{ $cat->nom }}</option>
+                    @endforeach
+                </select>
+
+                <select id="sort" class="form-control mr-2">
+                    <option value="">Trier</option>
+                    <option value="newest">Plus récents</option>
+                    <option value="oldest">Plus anciens</option>
+                    <option value="price_asc">Prix ↑</option>
+                    <option value="price_desc">Prix ↓</option>
+                    <option value="name_asc">Nom A→Z</option>
+                    <option value="name_desc">Nom Z→A</option>
+                </select>
             </div>
         </div>
-        @empty
-        <p>No products available.</p>
-        @endforelse
 
+        {{-- Container dynamique --}}
+        <div class="col-12" id="products-container">
+            @include('admin.produits.partials.list', ['produits' => $produits])
+        </div>
     </div>
 </div>
+@endsection
 
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('products-container');
+    const searchInput = document.getElementById('search');
+    const sortSelect = document.getElementById('sort');
+    const categorySelect = document.getElementById('category');
+    const baseUrl = @json(route('admin.produits.list'));
+    let debounceTimeout = null;
+
+    function getFilters() {
+        const filters = {};
+        if (searchInput.value.trim()) filters.search = searchInput.value.trim();
+        if (categorySelect.value) filters.category = categorySelect.value;
+        if (sortSelect.value) filters.sort = sortSelect.value;
+        return filters;
+    }
+
+    async function fetchProducts(pageUrl = null) {
+        const filters = getFilters();
+        const url = pageUrl || (baseUrl + '?' + new URLSearchParams(filters).toString());
+
+        container.innerHTML = '<div class="text-center p-4">Chargement...</div>';
+
+        try {
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!res.ok) throw new Error('Network response was not ok');
+            const json = await res.json();
+            container.innerHTML = json.html || '<div class="alert alert-info">Aucun résultat</div>';
+        } catch (err) {
+            container.innerHTML = '<div class="alert alert-danger">Erreur: ' + err.message + '</div>';
+            console.error(err);
+        }
+    }
+
+    // 🔹 Recherche instantanée avec debounce
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => fetchProducts(), 300);
+    });
+
+    // 🔹 Tri et catégorie instantané
+    [sortSelect, categorySelect].forEach(el => el.addEventListener('change', () => fetchProducts()));
+
+    // 🔹 Pagination AJAX
+    container.addEventListener('click', function(e) {
+        const a = e.target.closest('a.page-link');
+        if (!a) return;
+        e.preventDefault();
+        const url = a.getAttribute('href');
+        if (url) fetchProducts(url);
+    });
+});
+</script>
 @endsection
