@@ -55,6 +55,7 @@
                                             </ul>
                                         </li>
 
+
                                         <li><a href="#ingredient" class="section-link">Magasin</a></li>
                                         <li><a href="/activities" class="section-link">Activities</a></li>
 
@@ -63,6 +64,7 @@
 
 
                                         <li><a href="/evenements" class="section-link">Event</a></li>
+
                                     </ul>
                                 </div>
                                 <div class="tgmenu__action">
