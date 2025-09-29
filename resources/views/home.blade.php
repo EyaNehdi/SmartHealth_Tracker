@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Oxinex - Health Supplement HTML Template</title>
+    <title>Oxinex </title>
     <meta name="description" content="Oxinex - Health Supplement HTML Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -85,10 +85,10 @@
                                             </ul>
                                         </li>
                                         <li><a href="#pricing" class="section-link">Pricing</a></li>
-                                        <li class="menu-item-has-children"><a href="#">News</a>
+                                       <li class="menu-item-has-children"><a href="#">Activities</a>
                                             <ul class="sub-menu">
-                                                <li><a href="blog.html">Blog Page</a></li>
-                                                <li><a href="blog-details.html">Blog Details</a></li>
+                                                <li><a href="/activities">Activities</a></li>
+                                                <li><a href="/list">Categories</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="contact.html">Contact</a></li>
