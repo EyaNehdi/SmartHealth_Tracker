@@ -69,7 +69,7 @@ Exemples de champs :
 
 Exemple si ton projet utilise Laravel :
 
-- **Backend** : Laravel 10 / PHP 8+
+- **Backend** : Laravel 12 / PHP 8+
 - **Base de données** : MySQL ou SQLite
 - **Frontend** : Blade / Vue.js / React (selon ton projet)
 - **Authentification** : Laravel Breeze / Jetstream / Sanctum
