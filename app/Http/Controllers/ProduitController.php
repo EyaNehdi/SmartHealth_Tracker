@@ -6,6 +6,7 @@ use App\Models\Produit;
 use App\Models\Categorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProduitController extends Controller
 {
@@ -51,6 +52,47 @@ public function index(Request $request)
 
     $categories = Categorie::all();
     return view('admin.produits.produits-list', compact('produits', 'categories'));
+}
+
+// Magasin front office
+public function storeFront(Request $request)
+{
+    $perPage = 8;
+    $query = Produit::with('categorie');
+
+    // Recherche
+    if ($search = $request->input('search')) {
+        $query->where(function($q) use ($search) {
+            $q->where('nom', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    // Filtre catégorie
+    if ($cat = $request->input('category')) {
+        $query->where('categorie_id', $cat);
+    }
+
+    // Tri
+    switch ($request->input('sort')) {
+        case 'price_asc': $query->orderBy('prix', 'asc'); break;
+        case 'price_desc': $query->orderBy('prix', 'desc'); break;
+        case 'name_asc': $query->orderBy('nom', 'asc'); break;
+        case 'name_desc': $query->orderBy('nom', 'desc'); break;
+        case 'oldest': $query->orderBy('created_at', 'asc'); break;
+        case 'newest':
+        default: $query->orderBy('created_at', 'desc'); break;
+    }
+
+    $produits = $query->paginate($perPage);
+    $categories = Categorie::all();
+
+    // Si c'est une requête AJAX, retourner uniquement le partial
+    if ($request->ajax()) {
+        return view('produits.partials.list', compact('produits'))->render();
+    }
+
+    return view('produits.index', compact('produits', 'categories'));
 }
 
 
@@ -100,12 +142,21 @@ public function index(Request $request)
     /**
      * Afficher un produit spécifique
      */
-    public function show(Produit $produit)
-    {
-        $produit->load('categorie');
-        return view('produits.show', compact('produit'));
-    }
+   // Afficher un produit spécifique
+public function show($id)
+{
+    $produit = Produit::with('categorie')->findOrFail($id);
+    $categories = Categorie::all(); // si tu veux afficher la sidebar identique
 
+    return view('produits.show', compact('produit', 'categories'));
+}
+
+//pdf 
+public function downloadPdf(Produit $produit)
+{
+    $pdf = Pdf::loadView('produits.pdf', compact('produit'));
+    return $pdf->download($produit->nom . '.pdf');
+}
     /**
      * Afficher le formulaire d’édition
      */

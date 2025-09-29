@@ -57,16 +57,7 @@
                                         <li><a href="#features" class="section-link">Features</a></li>
                                         <li><a href="#ingredient" class="section-link">Ingredient</a></li>
                                         <li><a href="#products" class="section-link">Products</a></li>
-                                        <li class="menu-item-has-children"><a href="#">Shop</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="shop.html">Shop Page</a></li>
-                                                <li><a href="shop-details.html">Shop Details</a></li>
-                                                <li><a href="cart.html">Cart Page</a></li>
-                                                <li><a href="checkout.html">Checkout Page</a></li>
-                                                <li><a href="login.html">Login Page</a></li>
-                                                <li><a href="register.html">Register Page</a></li>
-                                                <li><a href="reset.html">Reset Page</a></li>
-                                            </ul>
+                                        <li class="menu-item-has-children"><a href="/magasin">Shop</a>
                                         </li>
                                         <li><a href="#pricing" class="section-link">Pricing</a></li>
                                         <li class="menu-item-has-children"><a href="#">News</a>

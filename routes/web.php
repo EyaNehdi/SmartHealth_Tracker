@@ -75,6 +75,11 @@ Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])-
 Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->middleware(['auth', 'verified'])->name('activities.edit');
 Route::put('/activities/{activity}', [ActivityController::class, 'update'])->middleware(['auth', 'verified'])->name('activities.update');
 
+//Route de produits front 
+// Route front office pour afficher les produits
+Route::get('/magasin', [ProduitController::class, 'storeFront'])->name('produits.index');
+Route::get('/magasin/{produit}', [ProduitController::class, 'show'])->name('produits.show');
+Route::get('/produits/{produit}/pdf', [ProduitController::class, 'downloadPdf'])->name('produits.pdf');
 
 // admin protected routes
 Route::prefix('admin')
