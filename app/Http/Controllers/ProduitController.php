@@ -12,11 +12,33 @@ class ProduitController extends Controller
     /**
      * Afficher la liste des produits
      */
-    public function index()
-    {
-        $produits = Produit::with('categorie')->get();
-        return view('admin.produits.produits-list', compact('produits'));
+   public function index(Request $request)
+{
+    $query = Produit::with('categorie');
+
+    // Recherche par nom
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where('nom', 'like', "%{$search}%");
     }
+
+    // Tri par prix
+    if ($request->filled('sort')) {
+        $sort = $request->input('sort');
+        if (in_array($sort, ['asc', 'desc'])) {
+            $query->orderBy('prix', $sort);
+        }
+    } else {
+        // Tri par défaut (optionnel)
+        $query->orderBy('created_at', 'desc');
+    }
+
+    // Pagination
+    $produits = $query->paginate(10); // 10 produits par page
+
+    return view('admin.produits.produits-list', compact('produits'));
+}
+
 
     /**
      * Afficher le formulaire de création

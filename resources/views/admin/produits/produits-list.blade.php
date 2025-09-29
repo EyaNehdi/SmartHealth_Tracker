@@ -13,6 +13,22 @@
             </nav>
         </div>
 
+        <!-- Formulaire de recherche et tri -->
+        <div class="col-md-12 mb-3">
+            <form method="GET" action="{{ route('admin.produits.list') }}" class="form-inline">
+                <input type="text" name="search" class="form-control mr-2" placeholder="Search product" value="{{ request('search') }}">
+                
+                <select name="sort" class="form-control mr-2">
+                    <option value="">Sort by Price</option>
+                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Low to High</option>
+                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>High to Low</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+        </div>
+
+        <!-- Liste des produits -->
         @forelse ($produits as $produit)
         <div class="col-lg-6 col-md-6 col-sm-6">
             <div class="ms-card">
@@ -23,7 +39,12 @@
                                  alt="{{ $produit->nom }}" class="ms-img-round" style="width:80px; height:80px; object-fit:cover;">
                         </div>
                         <div class="media-body">
-                            <h6>{{ $produit->nom }}</h6>
+                            <h6>
+                                {{ $produit->nom }}
+                                @if($produit->stock == 0)
+                                    <span class="badge badge-danger ml-2">Out of Stock</span>
+                                @endif
+                            </h6>
                             <p class="fs-12 my-1 text-disabled">{{ Str::limit($produit->description, 80) }}</p>
                             <p class="mb-0">Category: {{ $produit->categorie->nom ?? 'N/A' }}</p>
                             <p class="mb-0">Price: ${{ number_format($produit->prix, 2) }} | Stock: {{ $produit->stock }}</p>
@@ -34,6 +55,9 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-right">
                                     <li class="ms-dropdown-list">
+                                        <a class="media p-2" href="{{ route('admin.produits.show', $produit->id) }}">
+                                            <div class="media-body"><span>View Details</span></div>
+                                        </a>
                                         <a class="media p-2" href="{{ route('admin.produits.edit', $produit->id) }}">
                                             <div class="media-body"><span>Edit</span></div>
                                         </a>
@@ -55,6 +79,11 @@
         @empty
         <p>No products available.</p>
         @endforelse
+
+        <!-- Pagination -->
+        <div class="col-md-12">
+            {{ $produits->withQueryString()->links() }}
+        </div>
 
     </div>
 </div>
