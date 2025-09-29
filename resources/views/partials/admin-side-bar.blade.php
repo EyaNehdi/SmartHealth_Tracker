@@ -46,11 +46,61 @@
 
 
         <!-- Event (Placeholder) -->
-        <li class="menu-item">
-            <a href="#" class="has-chevron disabled" tabindex="-1" aria-disabled="true">
-                <span><i class="fas fa-calendar-alt"></i>Event <small>(Coming Soon)</small></span>
+
+
+@php
+    $isTypeEventActive = request()->routeIs('admin.type_events.*');
+@endphp
+<li class="menu-item">
+    <a href="#" class="has-chevron {{ $isTypeEventActive ? 'active' : '' }}"
+       data-toggle="collapse" data-target="#type-events"
+       aria-expanded="{{ $isTypeEventActive ? 'true' : 'false' }}"
+       aria-controls="type-events">
+        <span><i class="fas fa-tags"></i> Type Events</span>
+    </a>
+    <ul id="type-events" class="collapse {{ $isTypeEventActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+       
+
+        <li>
+            <a href="{{ route('admin.type_events.index') }}" class="{{ request()->routeIs('admin.type_events.index') ? 'active' : '' }}">
+                <i class="fas fa-list"></i> Types List
             </a>
         </li>
+    </ul>
+</li>
+
+
+
+
+        @php
+    $isEventActive = request()->routeIs('admin.events.*');
+@endphp
+<li class="menu-item">
+    <a href="#" class="has-chevron {{ $isEventActive ? 'active' : '' }}"
+       data-toggle="collapse" data-target="#events"
+       aria-expanded="{{ $isEventActive ? 'true' : 'false' }}"
+       aria-controls="events">
+        <span><i class="fas fa-calendar-alt"></i> Events</span>
+    </a>
+    <ul id="events" class="collapse {{ $isEventActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+        <li>
+            <a href="{{ route('admin.events.create') }}" class="{{ request()->routeIs('admin.events.create') ? 'active' : '' }}">
+                <i class="fas fa-plus-circle"></i> Add Event
+            </a>
+        </li>
+
+        
+        <li>
+            
+            <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.index') ? 'active' : '' }}">
+                <i class="fas fa-list"></i> Events List
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
 
         <!-- Activité (Placeholder) -->
         <li class="menu-item">

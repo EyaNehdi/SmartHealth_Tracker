@@ -81,6 +81,7 @@
                                                 <li><a href="login.html">Login Page</a></li>
                                                 <li><a href="register.html">Register Page</a></li>
                                                 <li><a href="reset.html">Reset Page</a></li>
+                                                 
                                             </ul>
                                         </li>
                                         <li><a href="#pricing" class="section-link">Pricing</a></li>

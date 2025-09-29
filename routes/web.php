@@ -13,7 +13,26 @@ Route::get('/dashboard', function () {
     return view('home');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Public home route
+
+
+
+use App\Http\Controllers\TypeEventController;
+use App\Http\Controllers\EventController;
+use Illuminate\Support\Carbon;
+use App\Models\Event;
+
+Route::get('/upcoming-events', function () {
+    $date = Carbon::now()->addDays(3)->toDateString();
+    $events = Event::whereDate('date', $date)->get();
+    return response()->json($events);
+})->middleware('auth'); // uniquement pour les utilisateurs connectés
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('events', EventController::class);
+    Route::resource('type_events', TypeEventController::class);
+});
+
+
 Route::get('/', function () {
     return view('home');
 })->name('home');
@@ -69,6 +88,7 @@ Route::prefix('admin')
         Route::get('/food/{food}', [FoodItemController::class, 'show'])->name('food.show');
         Route::get('/food/{food}/edit', [FoodItemController::class, 'edit'])->name('food.edit');
         Route::delete('/food/{food}', [FoodItemController::class, 'destroy'])->name('food.destroy');
+
         // ----------------- Catégorie routes -----------------
         Route::get('/categories/add', [CategorieController::class, 'create'])->name('categories.add');
         Route::get('/categories/list', [CategorieController::class, 'index'])->name('categories.list');
@@ -86,7 +106,9 @@ Route::prefix('admin')
         Route::get('/produits/{produit}/edit', [ProduitController::class, 'edit'])->name('produits.edit');
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
+
     });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
