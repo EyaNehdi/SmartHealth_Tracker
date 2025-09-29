@@ -393,18 +393,7 @@
                                 @enderror
                             </div>
 
-                            <div class="form-grp mb-3">
-                                <label for="categorie_activity_id" class="form-label">Catégorie</label>
-                                <select name="categorie_activity_id" id="categorie_activity_id" class="form-control @error('categorie_activity_id') is-invalid @enderror">
-                                    <option value="">Sélectionner une catégorie</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('categorie_activity_id') == $category->id ? 'selected' : '' }}>{{ $category->nom }}</option>
-                                    @endforeach
-                                </select>
-                                @error('categorie_activity_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        
 
                             <div class="form-grp mb-3">
                                 <label for="equipments" class="form-label">
