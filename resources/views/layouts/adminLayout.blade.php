@@ -37,7 +37,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
 </head>
-
+@yield('scripts')
 <body class="ms-body ms-aside-left-open ms-primary-theme ms-has-quickbar">
     <!-- Setting Panel -->
     <div class="ms-toggler ms-settings-toggle ms-d-block-lg">
@@ -686,6 +686,40 @@
             </div>
         </div>
     </div>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Vérifie que le navigateur supporte les notifications
+    if (!("Notification" in window)) return;
+
+    // Demande la permission si elle n'est pas déjà accordée
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    // Récupère les événements à venir
+    fetch('/upcoming-events')
+        .then(res => res.json())
+        .then(events => {
+            events.forEach(event => {
+                if (Notification.permission === "granted") {
+                    new Notification(`Rappel d'événement dans 3 jours`, {
+                        body: `${event.title} à ${event.location} le ${event.date}`,
+                        icon: '/path/to/icon.png' // facultatif, tu peux mettre un logo
+                    });
+                }
+            });
+        })
+        .catch(err => console.error(err));
+});
+</script>
+
+
+
+
 
     <!-- SCRIPTS -->
     <!-- Global Required Scripts Start -->
