@@ -37,36 +37,34 @@
                             <nav class="tgmenu__nav">
                                 <div class="logo">
                                     <a href="index-2.html"><img
-                                            src="{{ Vite::asset('resources/assets/img/logo/logo.svg') }}"
+                                            src="{{ Vite::asset('resources/assets/img/images/imagee.png') }}"
                                             alt="Logo"></a>
                                 </div>
                                 <div class="logo d-none">
                                     <a href="index-2.html"><img
-                                            src="{{ Vite::asset('resources/assets/img/logo/logo02.svg') }}"
+                                            src="{{ Vite::asset('resources/assets/img/images/logo02.svg') }}"
                                             alt="Logo"></a>
                                 </div>
                                 <div class="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                     <ul class="navigation">
-                                        <li class="active menu-item-has-children"><a href="#">Home</a>
+                                        <li><a href="/" class="section-link">Home</a></li>
+                                         <li class="menu-item-has-children"><a href="#">Objectifs</a>
                                             <ul class="sub-menu">
-                                                <li class="active"><a href="index-2.html">Home One</a></li>
-                                                <li><a href="index-3.html">Home Two</a></li>
-                                                <li><a href="index-4.html">Home Three</a></li>
+                                                <li><a href="/challenges">Tous les objectifs</a></li>
+                                                <li><a href="/challenges/create">notre objectif/ajouter</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="#features" class="section-link">Features</a></li>
-                                        <li><a href="#ingredient" class="section-link">Ingredient</a></li>
-                                        <li><a href="#products" class="section-link">Products</a></li>
-                                        <li class="menu-item-has-children"><a href="/magasin">Shop</a>
-                                        </li>
-                                        <li><a href="#pricing" class="section-link">Pricing</a></li>
-                                        <li class="menu-item-has-children"><a href="#">News</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="blog.html">Blog Page</a></li>
-                                                <li><a href="blog-details.html">Blog Details</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
+
+
+                                        <li><a href="#ingredient" class="section-link">Magasin</a></li>
+                                        <li><a href="/activities" class="section-link">Activities</a></li>
+
+                                        <li><a href="/magasin" class="section-link">Magasin</a></li>
+
+
+
+                                        <li><a href="/evenements" class="section-link">Event</a></li>
+
                                     </ul>
                                 </div>
                                 <div class="tgmenu__action">
@@ -162,7 +160,7 @@
             <nav class="tgmobile__menu-box">
                 <div class="close-btn"><i class="tg-flaticon-close-1"></i></div>
                 <div class="nav-logo">
-                    <a href="index-2.html"><img src="{{ Vite::asset('resources/assets/img/logo/logo02.svg') }}"
+                    <a href="index-2.html"><img src="{{ Vite::asset('resources/assets/img/images/imagee.png') }}"
                             alt="Logo"></a>
                 </div>
                 <div class="tgmobile__search">

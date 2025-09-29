@@ -59,4 +59,18 @@ class EventController extends Controller
         $event->delete();
         return redirect()->route('admin.events.index')->with('success', 'Événement supprimé');
     }
+
+
+    public function frontIndex()
+{
+    // Charger les événements avec leur type
+    $events = Event::with('typeEvent')
+                    ->orderBy('date', 'desc')
+                    ->paginate(6); // pagination pour front
+
+    return view('front.index', compact('events'));
+
 }
+
+}
+

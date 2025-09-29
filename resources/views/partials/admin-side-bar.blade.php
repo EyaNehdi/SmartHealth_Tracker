@@ -58,6 +58,7 @@
         </li>
 
 
+
         {{-- Categories --}}
         @php
         $isCategoryActive = request()->routeIs('admin.categories.add') || request()->routeIs('admin.categories.list');
@@ -79,13 +80,14 @@
                 <li>
                     <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.list') ? 'active' : '' }}">
 
-                        <i class="fas fa-list"></i> ActivitieCategories List
+                        
 
                         <i class="fas fa-list"></i> Categories List
                     </a>
                 </li>
             </ul>
         </li>
+
 
 
         <!-- Equipments -->
@@ -108,6 +110,11 @@
                 <li>
                     <a href="{{ route('admin.equipments.list') }}" class="{{ request()->routeIs('admin.equipments.list') ? 'active' : '' }}">
                         <i class="fas fa-list"></i> Liste des Équipements
+                         </a>
+                </li>
+            </ul>
+        </li>
+
 
         {{-- Produits --}}
         @php
@@ -150,7 +157,7 @@
         <span><i class="fas fa-tags"></i> Type Events</span>
     </a>
     <ul id="type-events" class="collapse {{ $isTypeEventActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
-       
+
 
         <li>
             <a href="{{ route('admin.type_events.index') }}" class="{{ request()->routeIs('admin.type_events.index') ? 'active' : '' }}">
@@ -180,9 +187,9 @@
             </a>
         </li>
 
-        
+
         <li>
-            
+
             <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.index') ? 'active' : '' }}">
                 <i class="fas fa-list"></i> Events List
             </a>
