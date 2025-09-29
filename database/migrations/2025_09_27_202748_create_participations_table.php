@@ -6,17 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::create('participations', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('challenge_id')->constrained('challenges')->onDelete('cascade');
-            $table->date('dateInscription')->nullable();
-            $table->string('statut')->default('en cours'); // En cours / Terminé
-            $table->timestamps();
-        });
-    }
+   public function up()
+{
+    Schema::create('participations', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('challenge_id');
+        $table->unsignedBigInteger('user_id');
+        $table->string('comment')->nullable();
+        $table->string('image')->nullable();
+        $table->timestamps();
+
+        $table->foreign('challenge_id')->references('id')->on('challenges')->onDelete('cascade');
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    });
+}
+
 
     public function down(): void
     {
