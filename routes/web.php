@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryActivityController;
 use App\Http\Controllers\FoodItemController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ProduitController;
+use App\Http\Controllers\MealController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\EquipmentController;
@@ -81,25 +82,20 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // Admin dashboard/homepage
         Route::get('/', function () {
             return view('admin.homeadmin');
         })->name('adminPanel');
 
 
-
-
-
-    
-        // Food routes
         Route::get('/food/add', function () {
             return view('admin.food.add-food');
         })->name('food.add');
-
+        //fooditems routes
         Route::get('/food/list', [FoodItemController::class, 'foodList'])->name('food.list');
         Route::post('/food/store', [FoodItemController::class, 'store'])->name('food.store');
-        Route::get('/food/{food}', [FoodItemController::class, 'show'])->name('food.show');
+        Route::get('/food/{food}', [FoodItemController::class, 'showView'])->name('food.show');
         Route::get('/food/{food}/edit', [FoodItemController::class, 'edit'])->name('food.edit');
+        Route::put('/food/{food}', [FoodItemController::class, 'update'])->name('food.update');
         Route::delete('/food/{food}', [FoodItemController::class, 'destroy'])->name('food.destroy');
 
         // ----------------- Catégorie routes -----------------
@@ -120,7 +116,16 @@ Route::prefix('admin')
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
 
-    
+
+        // Meal routes
+        Route::get('/meals', [MealController::class, 'listView'])->name('meals.list');
+        Route::get('/meals/create', [MealController::class, 'create'])->name('meals.create');
+        Route::post('/meals/store', [MealController::class, 'store'])->name('meals.store');
+        Route::get('/meals/{meal}', [MealController::class, 'showView'])->name('meals.show');
+        Route::get('/meals/{meal}/edit', [MealController::class, 'edit'])->name('meals.edit');
+        Route::put('/meals/{meal}', [MealController::class, 'update'])->name('meals.update');
+        Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('meals.destroy');
+
 
  
 Route::get('/catActivity/create', function () {

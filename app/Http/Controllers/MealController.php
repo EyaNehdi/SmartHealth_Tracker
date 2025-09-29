@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreMealRequest;
+use App\Http\Requests\UpdateMealRequest;
+use App\Models\FoodItem;
 use App\Models\Meal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MealController extends Controller
 {
@@ -14,26 +18,61 @@ class MealController extends Controller
         return response()->json($meals);
     }
 
-    // Show a specific meal
-    public function show($id)
+    public function listView(Request $request)
     {
-        $meal = Meal::with('foodItems')->findOrFail($id);
-        return response()->json($meal);
+        $query = Meal::with('foodItems');
+
+        if ($search = $request->query('search')) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        $meals = $query->get();
+
+        if ($request->ajax()) {
+            return view('admin.meals.partials.meals-table-rows', compact('meals'));
+        }
+
+        return view('admin.meals.list', compact('meals'));
     }
 
-    // Create new meal
-    public function store(Request $request)
+
+    public function showView($id)
     {
-        $data = $request->validate([
-            'created_by' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'meal_date' => 'required|date',
-            'food_items' => 'array',
-            'food_items.*.food_id' => 'required|exists:food_items,id',
-            'food_items.*.quantity' => 'required|numeric',
-            'food_items.*.unit' => 'nullable|string',
-        ]);
+        $meal = Meal::with('foodItems')->findOrFail($id);
+
+        if (request()->ajax()) {
+            return view('admin.meals.partials.food-items-list', compact('meal'));
+        }
+
+        return view('admin.meals.show', compact('meal'));
+    }
+
+    // Show form to create a new meal
+    public function create()
+    {
+        $foodItems = FoodItem::all();
+        return view('admin.meals.create', compact('foodItems'));
+    }
+
+
+
+    // Show edit form
+    public function edit($id)
+    {
+        $meal = Meal::with('foodItems')->findOrFail($id);
+        $foodItems = FoodItem::all();
+        return view('admin.meals.edit', compact('meal', 'foodItems'));
+    }
+
+    public function store(StoreMealRequest $request)
+    {
+        $data = $request->validated();
+
+        $data['created_by'] = Auth::id();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('meal_images', 'public');
+        }
 
         $meal = Meal::create($data);
 
@@ -46,29 +85,24 @@ class MealController extends Controller
             }
         }
 
-        return response()->json($meal->load('foodItems'), 201);
+        return redirect()->route('admin.meals.list')->with('success', 'Meal created successfully.');
     }
 
-    // Update meal info and food items
-    public function update(Request $request, $id)
+    public function update(UpdateMealRequest $request, $id)
     {
         $meal = Meal::findOrFail($id);
 
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'meal_date' => 'sometimes|required|date',
-            'food_items' => 'array',
-            'food_items.*.food_id' => 'required|exists:food_items,id',
-            'food_items.*.quantity' => 'required|numeric',
-            'food_items.*.unit' => 'nullable|string',
-        ]);
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('meal_images', 'public');
+        }
 
         $meal->update($data);
 
-        if (isset($data['food_items'])) {
-            $meal->foodItems()->detach();
+        $meal->foodItems()->detach();
 
+        if (isset($data['food_items'])) {
             foreach ($data['food_items'] as $item) {
                 $meal->foodItems()->attach($item['food_id'], [
                     'quantity' => $item['quantity'],
@@ -77,7 +111,7 @@ class MealController extends Controller
             }
         }
 
-        return response()->json($meal->load('foodItems'));
+        return redirect()->route('admin.meals.show', $meal->id)->with('success', 'Meal updated successfully.');
     }
 
     // Delete a meal
@@ -86,6 +120,6 @@ class MealController extends Controller
         $meal = Meal::findOrFail($id);
         $meal->foodItems()->detach();
         $meal->delete();
-        return response()->json(null, 204);
+        return redirect()->route('admin.meals.list')->with('success', 'Meal deleted successfully.');
     }
 }

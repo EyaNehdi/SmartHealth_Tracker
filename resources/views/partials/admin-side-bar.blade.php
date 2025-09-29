@@ -33,23 +33,25 @@
 
         @php
         $isFoodActive = request()->routeIs('admin.food.add') || request()->routeIs('admin.food.list');
+        $isMealActive = request()->routeIs('admin.meals.list') || request()->routeIs('admin.meals.create') || request()->routeIs('admin.meals.edit') || request()->routeIs('admin.meals.show');
         @endphp
+
         <li class="menu-item">
             <a href="#" class="has-chevron {{ $isFoodActive ? 'active' : '' }}"
                 data-toggle="collapse" data-target="#food"
                 aria-expanded="{{ $isFoodActive ? 'true' : 'false' }}"
                 aria-controls="food">
-                <span><i class="fas fa-utensils"></i>Food</span>
+                <span><i class="fas fa-utensils"></i> Food</span>
             </a>
             <ul id="food" class="collapse {{ $isFoodActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
                 <li>
-                    <a href="{{ route('admin.food.add') }}" class="{{ request()->routeIs('admin.food.add') ? 'active' : '' }}">
-                        <i class="fas fa-plus-circle"></i> Add Food Item
+                    <a href="{{ route('admin.food.list') }}" class="{{ request()->routeIs('admin.food.list') ? 'active' : '' }}">
+                        <i class="fas fa-list"></i> Food Items List
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.food.list') }}" class="{{ request()->routeIs('admin.food.list') ? 'active' : '' }}">
-                        <i class="fas fa-list"></i> Food Items List
+                    <a href="{{ route('admin.meals.list') }}" class="{{ request()->routeIs('admin.meals.list') ? 'active' : '' }}">
+                        <i class="fas fa-utensils"></i> Meals
                     </a>
                 </li>
             </ul>

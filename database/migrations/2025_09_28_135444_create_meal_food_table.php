@@ -24,17 +24,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Migration for Meal Table
         Schema::create('meals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // if user-specific meals
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->date('meal_date');  // date of the meal
+            $table->string('meal_type')->nullable();
+            $table->text('notes')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
 
-        // 3. Migration for Meal_Food Pivot Table
         Schema::create('meal_food', function (Blueprint $table) {
             $table->id();
             $table->foreignId('meal_id')->constrained('meals')->onDelete('cascade');
