@@ -14,9 +14,7 @@
                $table->text('description')->nullable();
                $table->dateTime('date');
                $table->integer('duree')->nullable();
-               $table->unsignedBigInteger('categorie_activity_id')->nullable();
                $table->unsignedBigInteger('user_id');
-               $table->foreign('categorie_activity_id')->references('id')->on('categorie_activity')->onDelete('set null');
                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
                $table->timestamps();
            });
