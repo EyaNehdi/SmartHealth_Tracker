@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\TypeEventController;
 use App\Http\Controllers\EventController;
+
+Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
+
 use Illuminate\Support\Carbon;
 use App\Models\Event;
 
@@ -18,10 +21,8 @@ Route::get('/upcoming-events', function () {
     return response()->json($events);
 })->middleware('auth'); // uniquement pour les utilisateurs connectés
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('events', EventController::class);
-    Route::resource('type_events', TypeEventController::class);
-});
+Route::resource('type_events', TypeEventController::class);
+Route::resource('events', EventController::class);
 
 Route::get('/', function () {
     return view('home');
