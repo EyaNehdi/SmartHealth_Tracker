@@ -687,6 +687,40 @@
         </div>
     </div>
 
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Vérifie que le navigateur supporte les notifications
+    if (!("Notification" in window)) return;
+
+    // Demande la permission si elle n'est pas déjà accordée
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    // Récupère les événements à venir
+    fetch('/upcoming-events')
+        .then(res => res.json())
+        .then(events => {
+            events.forEach(event => {
+                if (Notification.permission === "granted") {
+                    new Notification(`Rappel d'événement dans 3 jours`, {
+                        body: `${event.title} à ${event.location} le ${event.date}`,
+                        icon: '/path/to/icon.png' // facultatif, tu peux mettre un logo
+                    });
+                }
+            });
+        })
+        .catch(err => console.error(err));
+});
+</script>
+
+
+
+
+
     <!-- SCRIPTS -->
     <!-- Global Required Scripts Start -->
     <script src="{{ asset('assets2/js/jquery-3.3.1.min.js') }}"></script>
