@@ -47,35 +47,18 @@
                                 </div>
                                 <div class="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                     <ul class="navigation">
-                                        <li class="active menu-item-has-children"><a href="#">Home</a>
+                                        <li><a href="/" class="section-link">Home</a></li>
+                                         <li class="menu-item-has-children"><a href="#">Objectifs</a>
                                             <ul class="sub-menu">
-                                                <li class="active"><a href="index-2.html">Home One</a></li>
-                                                <li><a href="index-3.html">Home Two</a></li>
-                                                <li><a href="index-4.html">Home Three</a></li>
+                                                <li><a href="/challenges">Tous les objectifs</a></li>
+                                                <li><a href="/challenges/create">notre objectif/ajouter</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="#features" class="section-link">Features</a></li>
-                                        <li><a href="#ingredient" class="section-link">Ingredient</a></li>
-                                        <li><a href="#products" class="section-link">Products</a></li>
-                                        <li class="menu-item-has-children"><a href="#">Shop</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="shop.html">Shop Page</a></li>
-                                                <li><a href="shop-details.html">Shop Details</a></li>
-                                                <li><a href="cart.html">Cart Page</a></li>
-                                                <li><a href="checkout.html">Checkout Page</a></li>
-                                                <li><a href="login.html">Login Page</a></li>
-                                                <li><a href="register.html">Register Page</a></li>
-                                                <li><a href="reset.html">Reset Page</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="#pricing" class="section-link">Pricing</a></li>
-                                        <li class="menu-item-has-children"><a href="#">News</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="blog.html">Blog Page</a></li>
-                                                <li><a href="blog-details.html">Blog Details</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
+                                        <li><a href="#ingredient" class="section-link">Magasin</a></li>
+                                        <li><a href="#products" class="section-link">Activite</a></li>
+
+
+                                        <li><a href="contact.html">Event</a></li>
                                     </ul>
                                 </div>
                                 <div class="tgmenu__action">
