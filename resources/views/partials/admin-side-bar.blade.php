@@ -58,6 +58,7 @@
         </li>
 
 
+
         {{-- Categories --}}
         @php
         $isCategoryActive = request()->routeIs('admin.categories.add') || request()->routeIs('admin.categories.list');
@@ -86,6 +87,7 @@
                 </li>
             </ul>
         </li>
+
 
 
         <!-- Equipments -->

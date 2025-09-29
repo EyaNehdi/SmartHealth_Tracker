@@ -48,7 +48,6 @@ class ActivityController extends Controller
             'description' => 'nullable|string',
             'date' => 'required|date',
             'duree' => 'nullable|integer|min:0',
-            'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
             'equipments' => 'nullable|array',
             'equipments.*' => 'exists:equipments,id', // Valider que chaque équipement existe
             'equipment_comment' => 'nullable|string',
@@ -59,7 +58,6 @@ class ActivityController extends Controller
         $activity->description = $request->description;
         $activity->date = $request->date;
         $activity->duree = $request->duree;
-        $activity->categorie_activity_id = $request->categorie_activity_id;
         $activity->user_id = Auth::id();
         $activity->save();
 
@@ -103,7 +101,6 @@ class ActivityController extends Controller
             'description' => 'nullable|string',
             'date' => 'required|date',
             'duree' => 'nullable|integer|min:0',
-            'categorie_activity_id' => 'nullable|exists:categorie_activity,id',
             'equipments' => 'nullable|array',
             'equipments.*' => 'exists:equipments,id',
             'equipment_comment' => 'nullable|string',
@@ -113,7 +110,6 @@ class ActivityController extends Controller
         $activity->description = $request->description;
         $activity->date = $request->date;
         $activity->duree = $request->duree;
-        $activity->categorie_activity_id = $request->categorie_activity_id;
         $activity->save();
 
         // Mettre à jour les équipements associés

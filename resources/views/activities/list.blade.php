@@ -421,7 +421,7 @@
     <div class="container">
         <!-- Affichage des messages flash -->
         @if (session('success'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -456,7 +456,6 @@
                                         <h2 class="card-title">{{ $activity->nom }}</h2>
                                         <p class="card-text"><strong>Date :</strong> {{ $activity->date ? $activity->date->format('d/m/Y H:i') : 'Non défini' }}</p>
                                         <p class="card-text"><strong>Durée :</strong> {{ $activity->duree ? $activity->duree . ' minutes' : 'Non définie' }}</p>
-                                        <p class="card-text"><strong>Catégorie :</strong> {{ $activity->category ? $activity->category->nom : 'Aucune' }}</p>
 <p class="card-text">
     @if ($activity->equipments->isNotEmpty())
         <ul class="list-unstyled">
@@ -521,19 +520,7 @@
                             </div>
                             <button type="submit" class="tg-btn tg-btn-three black-btn mt-2">Rechercher</button>
                         </form>
-                        <!-- Formulaire de filtrage par catégorie -->
-                        <form action="{{ route('activities.index') }}" method="GET" class="mb-4">
-                            <div class="form-grp">
-                                <label for="category_id">Catégorie</label>
-                                <select name="category_id" id="category_id" class="form-control">
-                                    <option value="">Toutes les catégories</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->nom }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <button type="submit" class="tg-btn tg-btn-three black-btn mt-2">Filtrer par catégorie</button>
-                        </form>
+                        
                         <!-- Formulaire de filtrage par date -->
                         <form action="{{ route('activities.index') }}" method="GET">
                             <div class="form-grp">
