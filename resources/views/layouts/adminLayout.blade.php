@@ -301,9 +301,7 @@
         </nav>
         <!-- Body Content Wrapper -->
         <div class="ms-content-wrapper">
-            <div class="row">
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
     </main>
     <!-- MODALS -->
