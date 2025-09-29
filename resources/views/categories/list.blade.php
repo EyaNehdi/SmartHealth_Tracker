@@ -420,7 +420,7 @@
     <div class="container">
         <!-- Affichage des messages flash -->
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -438,14 +438,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-6 col-sm-7">
                             <div class="shop__top-left">
-                                <p>Affichage de {{ count($activities) }} activité(s)</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="shop-item-wrap">
                     <div class="row gutter-y-30 gutter-20">
-                        @forelse ($activities as $activity)
+                        @forelse ($categories as $activity)
                             <div class="col-lg-4 col-6">
                                 <div class="card">
                                     <!-- Image en haut de la carte -->
@@ -529,7 +528,7 @@
             </div>
         </div>
     </div>
-    
+
 </section>
         <!-- categories-area-end -->
 

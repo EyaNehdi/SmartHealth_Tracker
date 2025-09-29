@@ -334,7 +334,7 @@
                     </div>
                 </div>
             </div>
-            
+
            
             <div class="section__bg-shape">
                 <span class="bottom-shape" data-background="{{ Vite::asset('resources/assets/img/bg/section_bg_shape02.svg') }}"></span>
@@ -393,18 +393,18 @@
                 @enderror
             </div>
 
-            <div class="form-grp">
-                <label for="category_id">Catégorie</label>
-                <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
-                    <option value="">Sélectionner une catégorie</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->nom }}</option>
-                    @endforeach
-                </select>
-                @error('category_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+           <div class="form-grp">
+                                <label for="categorie_activity_id">Catégorie</label>
+                                <select name="categorie_activity_id" id="categorie_activity_id" class="form-control @error('categorie_activity_id') is-invalid @enderror">
+                                    <option value="">Sélectionner une catégorie</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('categorie_activity_id') == $category->id ? 'selected' : '' }}>{{ $category->nom }}</option>
+                                    @endforeach
+                                </select>
+                                @error('categorie_activity_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
             <div class="form-grp">
                 <label for="completed">
@@ -430,6 +430,7 @@
                 </div>
             </div>
         </section>
+        
         <!-- contact-area-end -->
 
       
