@@ -7,22 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     
-       protected $fillable = ['nom', 'description', 'date', 'duree', 'categorie_activity_id', 'user_id', 'completed'];
+         protected $fillable = ['nom', 'description', 'date', 'duree', 'categorie_activity_id', 'user_id', 'completed'];
 
-       protected $casts = [
-           'date' => 'datetime',
-           'completed' => 'boolean',
-           'created_at' => 'datetime',
-           'updated_at' => 'datetime',
-       ];
+    protected $casts = [
+        'date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-       public function category()
-       {
-           return $this->belongsTo(CategoryActivity::class, 'categorie_activity_id');
-       }
+    public function category()
+    {
+        return $this->belongsTo(CategoryActivity::class, 'categorie_activity_id');
+    }
 
-       public function user()
-       {
-           return $this->belongsTo(User::class);
-       }
-   }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function equipments()
+    {
+        return $this->belongsToMany(Equipment::class, 'activity_equipment')
+                    ->withPivot('commentaire')
+                    ->withTimestamps();
+    }
+}

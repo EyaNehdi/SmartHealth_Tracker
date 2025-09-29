@@ -1,3 +1,4 @@
+
 <aside id="ms-side-nav" class="side-nav fixed ms-aside-scrollable ms-aside-left">
     <!-- Logo -->
     <div class="logo-sn ms-d-block-lg">
@@ -13,6 +14,13 @@
 
     <!-- Navigation -->
     <ul class="accordion ms-main-aside fs-14" id="side-nav-accordion">
+        <!-- Dashboard -->
+        <li class="menu-item">
+            <a href="{{ route('admin.adminPanel') }}" class="{{ request()->routeIs('admin.adminPanel') ? 'active' : '' }}">
+                <span><i class="material-icons">dashboard</i> Dashboard</span>
+            </a>
+        </li>
+
         <!-- Store (Placeholder) -->
         <li class="menu-item">
             <a href="#" class="has-chevron disabled" tabindex="-1" aria-disabled="true">
@@ -20,7 +28,9 @@
             </a>
         </li>
 
+
         {{-- Food --}}
+
         @php
         $isFoodActive = request()->routeIs('admin.food.add') || request()->routeIs('admin.food.list');
         @endphp
@@ -45,6 +55,7 @@
             </ul>
         </li>
 
+
         {{-- Categories --}}
         @php
         $isCategoryActive = request()->routeIs('admin.categories.add') || request()->routeIs('admin.categories.list');
@@ -54,6 +65,7 @@
                 data-toggle="collapse" data-target="#categories"
                 aria-expanded="{{ $isCategoryActive ? 'true' : 'false' }}"
                 aria-controls="categories">
+
                 <span><i class="fas fa-tags"></i>Categories</span>
             </a>
             <ul id="categories" class="collapse {{ $isCategoryActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
@@ -64,11 +76,36 @@
                 </li>
                 <li>
                     <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.list') ? 'active' : '' }}">
+
+                        <i class="fas fa-list"></i> ActivitieCategories List
+
                         <i class="fas fa-list"></i> Categories List
                     </a>
                 </li>
             </ul>
         </li>
+
+
+        <!-- Equipments -->
+        @php
+        $isEquipmentActive = request()->routeIs('admin.equipments.create') || request()->routeIs('admin.equipments.list') || request()->routeIs('admin.equipments.edit');
+        @endphp
+        <li class="menu-item">
+            <a href="#" class="has-chevron {{ $isEquipmentActive ? 'active' : '' }}"
+                data-toggle="collapse" data-target="#equipments"
+                aria-expanded="{{ $isEquipmentActive ? 'true' : 'false' }}"
+                aria-controls="equipments">
+                <span><i class="fas fa-dumbbell"></i>Équipements</span>
+            </a>
+            <ul id="equipments" class="collapse {{ $isEquipmentActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+                <li>
+                    <a href="{{ route('admin.equipments.create') }}" class="{{ request()->routeIs('admin.equipments.create') ? 'active' : '' }}">
+                        <i class="fas fa-plus-circle"></i> Ajouter un Équipement
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.equipments.list') }}" class="{{ request()->routeIs('admin.equipments.list') ? 'active' : '' }}">
+                        <i class="fas fa-list"></i> Liste des Équipements
 
         {{-- Produits --}}
         @php
@@ -90,10 +127,12 @@
                 <li>
                     <a href="{{ route('admin.produits.list') }}" class="{{ request()->routeIs('admin.produits.list') ? 'active' : '' }}">
                         <i class="fas fa-list"></i> Produits List
+
                     </a>
                 </li>
             </ul>
         </li>
+
 
         <!-- Event (Placeholder) -->
 
@@ -155,7 +194,7 @@
         <!-- Activité (Placeholder) -->
         <li class="menu-item">
             <a href="#" class="has-chevron disabled" tabindex="-1" aria-disabled="true">
-                <span><i class="fas fa-running"></i>Activité <small>(Coming Soon)</small></span>
+                <span><i class="fas fa-calendar-alt"></i>Event <small>(Coming Soon)</small></span>
             </a>
         </li>
 

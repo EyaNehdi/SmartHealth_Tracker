@@ -343,58 +343,58 @@
         <!-- breadcrumb-area-end -->
 
         <!-- contact-area -->
-        <section class="contact__area">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="contact__form-wrap">
-                             <div class="container mt-5">
-        <h2>Ajouter une Activité</h2>
+       <section class="contact__area">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="contact__form-wrap">
+                    <div class="container mt-5">
+                        <h2 class="mb-4 text-center">Ajouter une Activité</h2>
 
-        <!-- Affichage du message flash -->
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-       <form method="POST" action="{{ route('activities.store') }}">
-            @csrf
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-            <div class="form-grp">
-                <label for="nom">Nom *</label>
-                <input type="text" name="nom" id="nom" class="form-control @error('nom') is-invalid @enderror" value="{{ old('nom') }}" required>
-                @error('nom')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                        <form method="POST" action="{{ route('activities.store') }}">
+                            @csrf
 
-            <div class="form-grp">
-                <label for="description">Description</label>
-                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
-                @error('description')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                            <div class="form-grp mb-3">
+                                <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                <input type="text" name="nom" id="nom" class="form-control @error('nom') is-invalid @enderror" value="{{ old('nom') }}" required>
+                                @error('nom')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-            <div class="form-grp">
-                <label for="date">Date *</label>
-                <input type="datetime-local" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date', now()->format('Y-m-d\TH:i')) }}" required>
-                @error('date')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                            <div class="form-grp mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="4">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-            <div class="form-grp">
-                <label for="duree">Durée (en minutes)</label>
-                <input type="number" name="duree" id="duree" class="form-control @error('duree') is-invalid @enderror" value="{{ old('duree') }}" min="0">
-                @error('duree')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                            <div class="form-grp mb-3">
+                                <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                                <input type="datetime-local" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date', now()->format('Y-m-d\TH:i')) }}" required>
+                                @error('date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-           <div class="form-grp">
-                                <label for="categorie_activity_id">Catégorie</label>
+                            <div class="form-grp mb-3">
+                                <label for="duree" class="form-label">Durée (en minutes)</label>
+                                <input type="number" name="duree" id="duree" class="form-control @error('duree') is-invalid @enderror" value="{{ old('duree') }}" min="0">
+                                @error('duree')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-grp mb-3">
+                                <label for="categorie_activity_id" class="form-label">Catégorie</label>
                                 <select name="categorie_activity_id" id="categorie_activity_id" class="form-control @error('categorie_activity_id') is-invalid @enderror">
                                     <option value="">Sélectionner une catégorie</option>
                                     @foreach ($categories as $category)
@@ -406,30 +406,47 @@
                                 @enderror
                             </div>
 
-            <div class="form-grp">
-                <label for="completed">
-                    <!-- Icône SVG de coche devant "Terminé" -->
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 5px;">
-                        <path d="M15 4.5L6.75 12.75L3 9" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Terminé
-                </label>
-                <div class="form-check">
-                    <input type="checkbox" name="completed" id="completed" value="1" class="form-check-input @error('completed') is-invalid @enderror" {{ old('completed', 0) ? 'checked' : '' }}>
-                    @error('completed')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
+                            <div class="form-grp mb-3">
+                                <label for="equipments" class="form-label">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 5px;">
+                                        <path d="M3 9h12" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M9 3v12" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Équipements utilisés
+                                </label>
+                                <select name="equipments[]" id="equipments" class="form-control @error('equipments') is-invalid @enderror" multiple>
+                                    <option value="">Sélectionner des équipements</option>
+                                    @foreach ($equipments as $equipment)
+                                        <option value="{{ $equipment->id }}" {{ in_array($equipment->id, old('equipments', [])) ? 'selected' : '' }}>{{ $equipment->nom }} ({{ $equipment->type }})</option>
+                                    @endforeach
+                                </select>
+                                @error('equipments')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-            <button type="submit" class="tg-btn tg-btn-three black-btn">Ajouter</button>
-        </form>
-        <p class="ajax-response mb-0"></p>
-    </div>
+                            <div class="form-grp mb-3">
+                                <label for="equipment_comment" class="form-label">Commentaire sur l’utilisation des équipements</label>
+                                <textarea name="equipment_comment" id="equipment_comment" class="form-control @error('equipment_comment') is-invalid @enderror" rows="4">{{ old('equipment_comment') }}</textarea>
+                                @error('equipment_comment')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                          
+
+                            <div class="text-center">
+                                <button type="submit" class="tg-btn tg-btn-three black-btn">Ajouter</button>
+                            </div>
+                        </form>
+                        <p class="ajax-response mb-0 text-center"></p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
+
+   
         
         <!-- contact-area-end -->
 

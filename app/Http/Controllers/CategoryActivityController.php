@@ -21,7 +21,7 @@ class CategoryActivityController extends Controller
 
            $categories = $query->get();
 
-           return view('categories.list', compact('categories'));
+        return view('admin.Categories.list', compact('categories'));
        }
 
        public function store(Request $request)
@@ -40,12 +40,12 @@ class CategoryActivityController extends Controller
            $category->statut = $request->statut;
            $category->save();
 
-           return redirect()->route('categories.create')->with('message', 'Catégorie ajoutée avec succès !');
+           return redirect()->route('admin.categories.list')->with('message', 'Catégorie ajoutée avec succès ');
        }
 
        public function edit(CategoryActivity $category)
        {
-           return view('categories.edit', compact('category'));
+           return view('admin.categories.edit', compact('category'));
        }
 
        public function update(Request $request, CategoryActivity $category)
@@ -59,13 +59,13 @@ class CategoryActivityController extends Controller
 
            $category->update($request->all());
 
-           return redirect()->route('categories.index')->with('updated', 'Catégorie modifiée avec succès.');
+           return redirect()->route('admin.categories.list')->with('updated', 'Catégorie modifiée avec succès.');
        }
 
        public function destroy(CategoryActivity $category)
        {
            $category->delete();
-           return redirect()->route('categories.index')->with('success', 'Catégorie supprimée avec succès.');
+           return redirect()->route('admin.categories.list')->with('success', 'Catégorie supprimée avec succès.');
        }
    }
    
