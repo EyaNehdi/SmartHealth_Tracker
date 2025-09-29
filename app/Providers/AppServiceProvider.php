@@ -3,8 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+
 use Illuminate\Support\Facades\View;
 use App\Models\Participation;
+
+
+use Illuminate\Pagination\Paginator;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
        View::composer('*', function ($view) {
         if (auth()->check()) {
             $participations = auth()->user()
@@ -36,5 +41,8 @@ class AppServiceProvider extends ServiceProvider
 
         $view->with('participations', $participations);
     });
+
+        Paginator::useBootstrap();
+
     }
 }

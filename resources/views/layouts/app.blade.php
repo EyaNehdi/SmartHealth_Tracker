@@ -487,6 +487,7 @@
                 </div>
             </div>
         </div>
+
         <div class="footer__bottom">
             <div class="container">
                 <div class="row aling-items-center">
@@ -529,5 +530,6 @@
     @vite(['resources/assets/js/ajax-form.js'])
     @vite(['resources/assets/js/main.js'])
 </body>
+
 
 </html>

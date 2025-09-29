@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Oxinex - Health Supplement HTML Template</title>
+    <title>Oxinex </title>
     <meta name="description" content="Oxinex - Health Supplement HTML Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -47,7 +47,9 @@
     <!-- Scroll-top-end-->
 
     <!-- header-area -->
+
     <x-app-layout>
+
     <!-- header-area-end -->
 
 
