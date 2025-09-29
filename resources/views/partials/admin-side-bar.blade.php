@@ -80,7 +80,7 @@
                 <li>
                     <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.list') ? 'active' : '' }}">
 
-                        
+
 
                         <i class="fas fa-list"></i> Categories List
                     </a>

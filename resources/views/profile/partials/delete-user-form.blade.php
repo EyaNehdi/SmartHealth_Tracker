@@ -8,12 +8,22 @@
         </p>
     </header>
 
+    {{-- 🔹 Logout Button --}}
+    <form method="POST" action="{{ route('profile.destroy')  }}">
+        @csrf
+        <x-secondary-button class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-xl px-8 py-3 transition duration-200 shadow-md hover:shadow-lg">
+            {{ __('Logout') }}
+        </x-secondary-button>
+    </form>
+
+    {{-- 🔹 Delete Account Button --}}
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
         class="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-8 py-3 transition duration-200 shadow-md hover:shadow-lg"
     >{{ __('Delete Account') }}</x-danger-button>
 
+    {{-- Confirm Deletion Modal --}}
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-lg mx-auto">
         <form method="post" action="{{ route('profile.destroy') }}" class="space-y-8">
             @csrf

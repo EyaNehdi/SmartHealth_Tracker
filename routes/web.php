@@ -26,6 +26,15 @@ use App\Http\Controllers\TypeEventController;
 use App\Http\Controllers\EventController;
 
 Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('events', EventController::class);
+    Route::get('events/create', [EventController::class, 'create'])->name('events.create');
+});
+Route::prefix('admin')->name('admin.')->group(function () {
+    // ...existing admin routes...
+
+    Route::resource('type_events', TypeEventController::class);
+});
 
 use Illuminate\Support\Carbon;
 use App\Models\Event;
@@ -76,7 +85,7 @@ Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])-
 Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->middleware(['auth', 'verified'])->name('activities.edit');
 Route::put('/activities/{activity}', [ActivityController::class, 'update'])->middleware(['auth', 'verified'])->name('activities.update');
 
-//Route de produits front 
+//Route de produits front
 // Route front office pour afficher les produits
 Route::get('/magasin', [ProduitController::class, 'storeFront'])->name('produits.index');
 Route::get('/magasin/{produit}', [ProduitController::class, 'show'])->name('produits.show');
@@ -133,7 +142,7 @@ Route::prefix('admin')
         Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('meals.destroy');
 
 
- 
+
 Route::get('/catActivity/create', function () {
             return view('admin.Categories.ajoute');
         })->name('categories.create');

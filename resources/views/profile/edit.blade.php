@@ -1,4 +1,28 @@
 <x-app-layout>
+    <section class="breadcrumb__area breadcrumb__bg"
+        data-background="{{ Vite::asset('resources/assets/img/bg/sd_bg.html') }}">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-10">
+                    <div class="breadcrumb__content">
+                        <h2 class="title"> Profil</h2>
+                        <nav class="breadcrumb">
+                            <span property="itemListElement" typeof="ListItem">
+                                <a href="/">Home</a>
+                            </span>
+                            <span class="breadcrumb-separator">|</span>
+                            <span property="itemListElement" typeof="ListItem">Profil</span>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section__bg-shape">
+            <span class="bottom-shape"
+                data-background="{{ Vite::asset('resources/assets/img/bg/section_bg_shape02.svg') }}"></span>
+        </div>
+    </section>
     <x-slot name="header">
         <h2 class="font-bold text-3xl text-green-700 dark:text-green-300 leading-tight tracking-tight">
             {{ __('Your Fitness Profile') }}
