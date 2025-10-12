@@ -13,14 +13,14 @@ class ParticipationController extends Controller
     public function index()
     {
         $participations = Participation::with(['challenge', 'user'])->latest()->get();
-        return view('participations.index', compact('participations'));
+        return view('frontoffice.participations.index', compact('participations'));
     }
 
     public function create()
     {
         $challenges = Challenge::all();
         $users = User::all();
-        return view('participations.create', compact('challenges', 'users'));
+        return view('frontoffice.participations.create', compact('challenges', 'users'));
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class ParticipationController extends Controller
     {
         $challenges = Challenge::all();
         $users = User::all();
-        return view('participations.edit', compact('participation', 'challenges', 'users'));
+        return view('frontoffice.participations.edit', compact('participation', 'challenges', 'users'));
     }
 
     public function update(Request $request, Participation $participation)
@@ -116,7 +116,7 @@ public function myParticipations()
 {
     $participations = auth()->user()->participations()->with('challenge', 'challenge.creator')->get();
 
-    return view('participations.create', compact('participations'));
+    return view('frontoffice.participations.create', compact('participations'));
 }
 // ParticipationController.php
 

@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User; // Ensure this class exists in the specified namespace
+use App\Models\User;
+use App\Models\Challenge;
 
 class Participation extends Model
 {

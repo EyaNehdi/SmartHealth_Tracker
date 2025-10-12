@@ -21,7 +21,7 @@ class CategoryActivityController extends Controller
 
            $categories = $query->get();
 
-        return view('admin.Categories.list', compact('categories'));
+        return view('frontoffice.categories.list', compact('categories'));
        }
 
        public function store(Request $request)
@@ -45,7 +45,7 @@ class CategoryActivityController extends Controller
 
        public function edit(CategoryActivity $category)
        {
-           return view('admin.categories.edit', compact('category'));
+           return view('frontoffice.categories.edit', compact('category'));
        }
 
        public function update(Request $request, CategoryActivity $category)

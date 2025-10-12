@@ -18,12 +18,12 @@ class EquipmentController extends Controller
 
         $equipments = $query->get();
 
-        return view('admin.Equipments.list', compact('equipments'));
+        return view('backoffice.equipments.list', compact('equipments'));
     }
 
     public function create()
     {
-        return view('admin.Equipments.ajoute');
+        return view('backoffice.equipments.ajoute');
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class EquipmentController extends Controller
 
     public function edit(Equipment $equipment)
     {
-        return view('admin.Equipments.edit', compact('equipment'));
+        return view('backoffice.equipments.edit', compact('equipment'));
     }
 
     public function update(Request $request, Equipment $equipment)
