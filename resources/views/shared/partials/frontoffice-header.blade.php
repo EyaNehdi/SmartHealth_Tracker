@@ -34,8 +34,9 @@
                             </div>
                             <div class="tgmenu__action">
                                 <ul class="list-wrap">
+                                    @auth
                                     <li class="header-cart">
-                                        <a href="shop.html" class="cart-count headerCart__button">
+                                        <a href="javascript:void(0)" class="cart-count headerCart__button">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M3 14.5V18C3 18.5523 3.44772 19 4 19H5.5V11L4.5 11.5C3.67157 11.5 3 12.1716 3 13V14.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                                 <path d="M5.5 11V7C5.5 6.17157 6.17157 5.5 7 5.5C7.82843 5.5 8.5 6.17157 8.5 7V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -45,9 +46,10 @@
                                                 <path d="M18.5 12V19C18.5 19.5523 18.9477 20 19.5 20H20.5C21.0523 20 21.5 19.5523 21.5 19V14C21.5 12.8954 20.6046 12 19.5 12H18.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                                 <path d="M18.5 12V6.5C18.5 5.67157 17.8284 5 17 5C16.1716 5 15.5 5.67157 15.5 6.5V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
-                                            <span class="mini-cart-count">2</span>
+                                            <span class="mini-cart-count" id="participation-count">{{ auth()->user()->participations()->count() }}</span>
                                         </a>
                                     </li>
+                                    @endauth
                                     <li class="header-search">
                                         <a href="javascript:void(0)" class="search-open-btn">
                                             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -128,4 +130,167 @@
         </div>
         <!-- Mobile Menu end -->
     </div>
+
+    <!-- mini-cart-area -->
+    @auth
+    <div class="mini__cart-wrap">
+        <div class="mini__cart-toggle"><img src="{{ Vite::asset('resources/assets/img/icons/close.png') }}" alt="icon"></div>
+        <div class="mini__cart-top">
+            <h4 class="mini__cart-title">notre participation</h4>
+            <div class="mini__cart-widget">
+                @php
+                    $userParticipations = auth()->user()->participations()->with(['challenge', 'challenge.creator'])->get();
+                @endphp
+                
+                @forelse($userParticipations as $p)
+                <div class="mini__cart-item">
+                    <div class="thumb">
+                        @if ($p->image)
+                            <img src="{{ asset('storage/' . $p->image) }}" alt="img">
+                        @else
+                            <img src="{{ Vite::asset('resources/assets/img/blog/blog_img01.jpg') }}" alt="img">
+                        @endif
+                    </div>
+                    <div class="content">
+                        <h6 class="title">{{ $p->challenge->titre }}</h6>
+                        <!-- Participant comment -->
+                        <p><strong>You:</strong> {{ $p->comment ?? '-' }}</p>
+                        <!-- Owner reply -->
+                        @if ($p->reply)
+                            <p><strong>Owner:</strong> {{ $p->reply }}</p>
+                        @endif
+                        <!-- Display existing participant reply -->
+                        @if ($p->participant_reply)
+                            <small class="text-muted d-block mt-1"><strong>You replied:</strong><br> {{ $p->participant_reply }}</small>
+                        @endif
+                        <!-- Participant reply to owner -->
+                        @if ($p->reply && !$p->participant_reply)
+                            <form action="{{ route('participation.participant_reply', $p->id) }}" method="POST" class="mt-2">
+                                @csrf
+                                @method('PUT')
+                                <input type="text" name="participant_reply" placeholder="Reply to owner..." class="form-control mb-1">
+                                <button type="submit" class="btn btn-sm btn-primary">Send</button>
+                            </form>
+                        @endif
+                    </div>
+                    <div class="mini__cart-delete">
+                        <img src="{{ Vite::asset('resources/assets/img/icons/close.png') }}" alt="icon">
+                    </div>
+                </div>
+                @empty
+                <p>No participations yet.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+    <div class="headerCart__overlay"></div>
+    @endauth
+    <!-- mini-cart-area-end -->
 </header>
+
+@push('frontoffice-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle mini-cart functionality
+    const headerCartButton = document.querySelector('.headerCart__button');
+    const miniCartWrap = document.querySelector('.mini__cart-wrap');
+    const miniCartToggle = document.querySelector('.mini__cart-toggle');
+    const headerCartOverlay = document.querySelector('.headerCart__overlay');
+    const participationCount = document.getElementById('participation-count');
+    
+    // Open mini-cart when clicking the cart button
+    if (headerCartButton && miniCartWrap) {
+        headerCartButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            miniCartWrap.classList.add('active');
+            document.body.classList.add('cart-open');
+        });
+    }
+    
+    // Close mini-cart when clicking the toggle button
+    if (miniCartToggle && miniCartWrap) {
+        miniCartToggle.addEventListener('click', function() {
+            miniCartWrap.classList.remove('active');
+            document.body.classList.remove('cart-open');
+        });
+    }
+    
+    // Close mini-cart when clicking the overlay
+    if (headerCartOverlay && miniCartWrap) {
+        headerCartOverlay.addEventListener('click', function() {
+            miniCartWrap.classList.remove('active');
+            document.body.classList.remove('cart-open');
+        });
+    }
+    
+    // Handle participant reply form submissions
+    const replyForms = miniCartWrap ? miniCartWrap.querySelectorAll('form[action*="participant_reply"]') : [];
+    replyForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            
+            // Disable button and show loading
+            submitButton.disabled = true;
+            submitButton.textContent = 'Sending...';
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show';
+                    successAlert.innerHTML = `
+                        <strong>Success!</strong> Your reply has been sent.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    // Insert before the form
+                    this.parentNode.insertBefore(successAlert, this);
+                    
+                    // Hide the form since reply was sent
+                    this.style.display = 'none';
+                    
+                    // Add the reply to the display
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'mt-1';
+                    replyDiv.innerHTML = `
+                        <small class="text-muted d-block"><strong>You replied:</strong><br> ${formData.get('participant_reply')}</small>
+                    `;
+                    this.parentNode.appendChild(replyDiv);
+                    
+                    // Update participation count
+                    if (participationCount) {
+                        const currentCount = parseInt(participationCount.textContent) || 0;
+                        participationCount.textContent = currentCount;
+                    }
+                } else {
+                    throw new Error(data.message || 'Error sending reply');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending your reply. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            });
+        });
+    });
+});
+</script>
+@endpush

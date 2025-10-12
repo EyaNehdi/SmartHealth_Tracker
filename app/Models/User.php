@@ -61,6 +61,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the user's participations.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function participations()
     {
