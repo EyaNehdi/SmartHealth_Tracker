@@ -60,12 +60,6 @@ Route::get('/upcoming-events', function () {
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('frontoffice.dashboard.index');
-    })->name('dashboard');
-
     // User Activities Management
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
@@ -90,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/participations/{participation}/edit', [ParticipationController::class, 'edit'])->name('participations.edit');
     Route::put('/participations/{participation}', [ParticipationController::class, 'update'])->name('participations.update');
     Route::delete('/participations/{participation}', [ParticipationController::class, 'destroy'])->name('participations.destroy');
-    
+
     // Participation Actions
     Route::put('/participation/{participation}/reply', [ParticipationController::class, 'reply'])->name('participation.reply');
     Route::put('/participation/{participation}/participant-reply', [ParticipationController::class, 'participantReply'])->name('participation.participant_reply');
@@ -125,7 +119,7 @@ Route::prefix('admin')
         Route::get('/food/add', function () {
             return view('backoffice.food.add-food');
         })->name('food.add');
-        
+
         Route::get('/food/list', [FoodItemController::class, 'foodList'])->name('food.list');
         Route::post('/food/store', [FoodItemController::class, 'store'])->name('food.store');
         Route::get('/food/{food}', [FoodItemController::class, 'showView'])->name('food.show');
