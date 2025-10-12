@@ -46,12 +46,12 @@ public function index(Request $request)
 
     // Réponse AJAX : juste le partial
     if ($request->ajax()) {
-        $html = view('admin.produits.partials.list', compact('produits'))->render();
+        $html = view('backoffice.produits.partials.list', compact('produits'))->render();
         return response()->json(['html' => $html]);
     }
 
     $categories = Categorie::all();
-    return view('admin.produits.produits-list', compact('produits', 'categories'));
+    return view('backoffice.produits.produits-list', compact('produits', 'categories'));
 }
 
 // Magasin front office
@@ -89,10 +89,10 @@ public function storeFront(Request $request)
 
     // Si c'est une requête AJAX, retourner uniquement le partial
     if ($request->ajax()) {
-        return view('produits.partials.list', compact('produits'))->render();
+        return view('frontoffice.produits.partials.list', compact('produits'))->render();
     }
 
-    return view('produits.index', compact('produits', 'categories'));
+    return view('frontoffice.produits.index', compact('produits', 'categories'));
 }
 
 
@@ -108,7 +108,7 @@ public function storeFront(Request $request)
     public function create()
     {
         $categories = Categorie::all();
-        return view('admin.produits.add-produit', compact('categories'));
+        return view('backoffice.produits.add-produit', compact('categories'));
     }
 
     /**
@@ -148,13 +148,13 @@ public function show($id)
     $produit = Produit::with('categorie')->findOrFail($id);
     $categories = Categorie::all(); // si tu veux afficher la sidebar identique
 
-    return view('produits.show', compact('produit', 'categories'));
+    return view('frontoffice.produits.show', compact('produit', 'categories'));
 }
 
 //pdf 
 public function downloadPdf(Produit $produit)
 {
-    $pdf = Pdf::loadView('produits.pdf', compact('produit'));
+    $pdf = Pdf::loadView('frontoffice.produits.pdf', compact('produit'));
     return $pdf->download($produit->nom . '.pdf');
 }
     /**
@@ -163,7 +163,7 @@ public function downloadPdf(Produit $produit)
     public function edit(Produit $produit)
     {
         $categories = Categorie::all();
-        return view('admin.produits.edit-produit', compact('produit', 'categories'));
+        return view('backoffice.produits.edit-produit', compact('produit', 'categories'));
     }
 
     /**

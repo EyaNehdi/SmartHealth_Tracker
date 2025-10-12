@@ -13,7 +13,7 @@ class TypeEventController extends Controller
     public function index()
     {
         $types = TypeEvent::orderBy('name')->get();
-        return view('admin.type_events.index', compact('types'));
+        return view('backoffice.type_events.index', compact('types'));
     }
 
     /**
@@ -21,7 +21,7 @@ class TypeEventController extends Controller
      */
     public function create()
     {
-        return view('admin.type_events.create');
+        return view('backoffice.type_events.create');
     }
 
     /**
@@ -42,7 +42,7 @@ class TypeEventController extends Controller
      */
     public function edit(TypeEvent $typeEvent)
     {
-        return view('admin.type_events.edit', compact('typeEvent'));
+        return view('backoffice.type_events.edit', compact('typeEvent'));
     }
 
     /**

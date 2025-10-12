@@ -20,7 +20,7 @@ class FoodItemController extends Controller
     public function foodList()
     {
         $foods = FoodItem::all();
-        return view('admin.food.food-list', compact('foods'));
+        return view('backoffice.food.food-list', compact('foods'));
     }
 
     public function store(StoreFoodRequest $request)
@@ -39,14 +39,14 @@ class FoodItemController extends Controller
     public function showView($id)
     {
         $food = FoodItem::findOrFail($id);
-        return view('admin.food.food-show', compact('food'));
+        return view('backoffice.food.food-show', compact('food'));
     }
 
     // Show edit form of food
     public function edit($id)
     {
         $food = FoodItem::findOrFail($id);
-        return view('admin.food.edit-food', compact('food'));
+        return view('backoffice.food.edit-food', compact('food'));
     }
 
     // Update food from web form, redirect after update

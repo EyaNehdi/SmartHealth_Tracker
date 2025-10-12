@@ -1,61 +1,8 @@
-<!doctype html>
-<html class="no-js" lang="en">
+@extends('shared.layouts.frontoffice')
 
+@section('page-title', 'SmartHealth Tracker - Home')
 
-<!-- Mirrored from themeadapt.com/tf/oxinex/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 26 Sep 2025 21:11:04 GMT -->
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Oxinex </title>
-    <meta name="description" content="Oxinex - Health Supplement HTML Template">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="shortcut icon" type="image/x-icon" href="{{Vite::asset('resources/assets/img/favicon.png')}}">
-    <!-- Place favicon.ico in the root directory -->
-
-    <!-- CSS here -->
-    @vite(['resources/assets/css/bootstrap.min.css'])
-    @vite(['resources/assets/css/magnific-popup.css'])
-    @vite(['resources/assets/css/swiper-bundle.min.css'])
-    @vite(['resources/assets/css/slick.css'])
-    @vite(['resources/assets/css/default-icons.css'])
-    @vite(['resources/assets/css/default.css'])
-    @vite(['resources/assets/css/sal.css'])
-    @vite(['resources/assets/css/tg-cursor.css'])
-    @vite(['resources/assets/css/main.css'])
-</head>
-
-<body>
-
-
-    <!--Preloader-end -->
-    <div id="preloader">
-        <div id="loader" class="loader">
-            <div class="loader-container">
-                <div class="loader-icon"><img src="{{Vite::asset('resources/assets/img/logo/preloader.svg')}}" alt="Preloader"></div>
-            </div>
-        </div>
-    </div>
-    <!-- Scroll-top -->
-    <button class="scroll__top scroll-to-target" data-target="html">
-        <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11 6L1 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M6 11L1 6L6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-    </button>
-    <!-- Scroll-top-end-->
-
-    <!-- header-area -->
-
-    <x-app-layout>
-
-    <!-- header-area-end -->
-
-
-
-    <!-- main-area -->
-    <main class="main-area fix">
+@section('content')
 
         <!-- slider-area -->
         <section class="slider__area">
@@ -604,32 +551,4 @@
         </section>
         <!-- cta-area-end -->
 
-    </main>
-    <!-- main-area-end -->
-
-    <!-- footer-area -->
-</x-app-layout>
-    <!-- footer-area-end -->
-
-
-
-    <!-- JS here -->
-    @vite(['resources/assets/js/vendor/jquery-3.6.0.min.js'])
-    @vite(['resources/assets/js/bootstrap.min.js'])
-    @vite(['resources/assets/js/jquery.magnific-popup.min.js'])
-    @vite(['resources/assets/js/jquery.appear.js'])
-    @vite(['resources/assets/js/swiper-bundle.min.js'])
-    @vite(['resources/assets/js/slick.js'])
-    @vite(['resources/assets/js/jquery.marquee.min.js'])
-    @vite(['resources/assets/js/jquery.counterup.min.js'])
-    @vite(['resources/assets/js/tg-cursor.min.js'])
-    @vite(['resources/assets/js/jquery.easing.js'])
-    @vite(['resources/assets/js/sal.js'])
-    @vite(['resources/assets/js/ajax-form.js'])
-    @vite(['resources/assets/js/main.js'])
-</body>
-
-
-<!-- Mirrored from themeadapt.com/tf/oxinex/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 26 Sep 2025 21:11:04 GMT -->
-
-</html>
+@endsection
