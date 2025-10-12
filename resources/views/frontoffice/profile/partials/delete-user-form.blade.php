@@ -1,6 +1,6 @@
 <div class="d-flex flex-column gap-3">
     <!-- Logout Button -->
-    <form method="POST" action="{{ route('profile.destroy') }}">
+    <form method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit" class="btn btn-outline-secondary">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
