@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
+use App\Http\Controllers\CartController;
 
 
 Route::get('/dashboard', function () {
@@ -194,7 +195,22 @@ Route::put('/participation/{participation}/participant-reply', [ParticipationCon
 
 });
 
+// Cart routes
+Route::post('/cart/add', [CartController::class, 'add'])->name('panier.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('panier.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('panier.remove');
+Route::get('/cart', [CartController::class, 'get'])->name('panier.get');
 
+use Illuminate\Http\Request;
+Route::get('/test-session', function(Request $request){
+    session()->put('test', 'ok');
+    return session()->all();
+});
+
+// Route::get('/clear-cart', function () {
+//     session()->forget('cart');
+//     return 'Panier vidé !';
+// });
 
 
 
