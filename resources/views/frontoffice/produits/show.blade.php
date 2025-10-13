@@ -131,10 +131,15 @@
                                             <div class="product-actions mt-auto">
                                                 <div class="row g-2">
                                                     <div class="col-12 col-sm-6">
-                                                        <button class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center">
-                                                            <i class="fas fa-shopping-cart me-2"></i>
-                                                            Ajouter au panier
-                                                        </button>
+                                                      <button class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center add-to-panier-btn"
+        data-id="{{ $produit->id }}" 
+        data-nom="{{ $produit->nom }}" 
+        data-prix="{{ $produit->prix }}" 
+        data-image="{{ $produit->image ? asset('storage/' . $produit->image) : Vite::asset('resources/assets/img/product_placeholder.png') }}">
+    <i class="fas fa-shopping-cart me-2"></i> Ajouter au panier
+</button>
+
+
                                                     </div>
                                                     <div class="col-12 col-sm-6">
                                                         <a href="{{ route('produits.pdf', $produit->id) }}" 
@@ -235,6 +240,136 @@
             </div>
         </div>
     </div>
+<!-- Inclure SweetAlert2 dans ton layout ou ici -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const miniPanier = document.querySelector('.shop-mini-panier');
+    const miniPanierItems = miniPanier.querySelector('.mini-panier-items');
+    const miniPanierTotal = miniPanier.querySelector('.mini-panier-total');
+
+    // Ajouter au panier
+    document.querySelectorAll('.add-to-panier-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+    const data = {
+        id: this.dataset.id, // garde le même type que côté PHP (string)
+        nom: this.dataset.nom,
+        prix: parseFloat(this.dataset.prix),
+        image: this.dataset.image,
+        _token: '{{ csrf_token() }}'
+    };
+
+    fetch('{{ route("panier.add") }}', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(panier => {
+        renderPanier(panier);
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Produit ajouté au panier !',
+            showConfirmButton: false,
+            timer: 1200,
+            toast: true
+        });
+    });
+});
+
+    });
+
+    function renderPanier(panier) {
+    miniPanierItems.innerHTML = '';
+    let total = 0;
+
+    panier.forEach(item => {
+        const prix = parseFloat(item.prix); // <-- conversion en nombre
+        total += prix * item.qty;
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="${item.image}" width="50" style="border-radius:5px;">
+                <div style="flex:1">
+                    <span>${item.nom}</span><br>
+                    <small>${prix.toFixed(2)} DT</small>  <!-- utilisation de prix converti -->
+                    <div>
+                        <button class="qty-decrease" data-id="${item.id}">-</button>
+                        <span class="qty">${item.qty}</span>
+                        <button class="qty-increase" data-id="${item.id}">+</button>
+                    </div>
+                </div>
+                <button class="remove-item btn btn-sm btn-danger" data-id="${item.id}">&times;</button>
+            </div>
+        `;
+        miniPanierItems.appendChild(li);
+    });
+
+    miniPanierTotal.textContent = total.toFixed(2);
+
+    // Événements
+    miniPanier.querySelectorAll('.qty-increase').forEach(btn => {
+        btn.addEventListener('click', () => updateQty(btn.dataset.id, 1));
+    });
+    miniPanier.querySelectorAll('.qty-decrease').forEach(btn => {
+        btn.addEventListener('click', () => updateQty(btn.dataset.id, -1));
+    });
+    miniPanier.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', () => removeItem(btn.dataset.id));
+    });
+}
+
+
+    function updateQty(id, change) {
+        fetch('{{ route("panier.get") }}')
+        .then(res => res.json())
+        .then(panier => {
+            const item = panier.find(i => i.id == id);
+            if(!item) return;
+            const data = { id: id, qty: Math.max(1, item.qty + change) };
+
+            fetch('{{ route("panier.update") }}', {
+                method:'POST',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Accept':'application/json',
+                    'X-CSRF-TOKEN':'{{ csrf_token() }}'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(renderPanier);
+        });
+    }
+
+    function removeItem(id) {
+    const data = {id: id, _token: '{{ csrf_token() }}'};
+    fetch('{{ route("panier.remove") }}', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(panier => {
+        renderPanier(panier);
+        console.log("Panier après suppression :", panier); // debug
+    });
+}
+
+
+    // Charger le panier au chargement
+    fetch('{{ route("panier.get") }}')
+    .then(res => res.json())
+    .then(renderPanier);
+});
+</script>
+
+
+
+
+
 
     <style>
         /* Product Detail Card */

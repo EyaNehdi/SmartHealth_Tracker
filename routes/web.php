@@ -11,6 +11,10 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
+
+use App\Http\Controllers\CartController;
+
+
 use App\Http\Controllers\TypeEventController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
@@ -203,6 +207,26 @@ Route::prefix('admin')
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
     });
+
+
+
+
+// Cart routes
+Route::post('/cart/add', [CartController::class, 'add'])->name('panier.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('panier.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('panier.remove');
+Route::get('/cart', [CartController::class, 'get'])->name('panier.get');
+
+use Illuminate\Http\Request;
+Route::get('/test-session', function(Request $request){
+    session()->put('test', 'ok');
+    return session()->all();
+});
+
+// Route::get('/clear-cart', function () {
+//     session()->forget('cart');
+//     return 'Panier vidé !';
+// });
 
 
 
