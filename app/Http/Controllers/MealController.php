@@ -29,10 +29,10 @@ class MealController extends Controller
         $meals = $query->get();
 
         if ($request->ajax()) {
-            return view('admin.meals.partials.meals-table-rows', compact('meals'));
+            return view('backoffice.meals.partials.meals-table-rows', compact('meals'));
         }
 
-        return view('admin.meals.list', compact('meals'));
+        return view('backoffice.meals.list', compact('meals'));
     }
 
 
@@ -41,17 +41,17 @@ class MealController extends Controller
         $meal = Meal::with('foodItems')->findOrFail($id);
 
         if (request()->ajax()) {
-            return view('admin.meals.partials.food-items-list', compact('meal'));
+            return view('backoffice.meals.partials.food-items-list', compact('meal'));
         }
 
-        return view('admin.meals.show', compact('meal'));
+        return view('backoffice.meals.show', compact('meal'));
     }
 
     // Show form to create a new meal
     public function create()
     {
         $foodItems = FoodItem::all();
-        return view('admin.meals.create', compact('foodItems'));
+        return view('backoffice.meals.create', compact('foodItems'));
     }
 
 
@@ -61,7 +61,7 @@ class MealController extends Controller
     {
         $meal = Meal::with('foodItems')->findOrFail($id);
         $foodItems = FoodItem::all();
-        return view('admin.meals.edit', compact('meal', 'foodItems'));
+        return view('backoffice.meals.edit', compact('meal', 'foodItems'));
     }
 
     public function store(StoreMealRequest $request)

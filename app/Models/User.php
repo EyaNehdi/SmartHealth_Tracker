@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Challenge;
+use App\Models\Participation;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -57,9 +59,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Challenge::class, 'participations', 'user_id', 'challenge_id');
     }
 
+    /**
+     * Get the user's participations.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function participations()
-{
-    return $this->hasMany(Participation::class);
-}
+    {
+        return $this->hasMany(Participation::class);
+    }
 
 }

@@ -1,4 +1,4 @@
-<x-guest-layout>
+@extends('shared.layouts.auth')
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 

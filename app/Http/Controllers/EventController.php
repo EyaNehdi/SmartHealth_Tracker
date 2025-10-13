@@ -11,13 +11,13 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::with('typeEvent')->orderBy('date','desc')->get();
-        return view('admin.events.index', compact('events'));
+        return view('backoffice.events.index', compact('events'));
     }
 
     public function create()
     {
         $types = TypeEvent::orderBy('name')->get();
-        return view('admin.events.create', compact('types'));
+        return view('backoffice.events.create', compact('types'));
     }
 
     public function store(Request $request)
@@ -37,7 +37,7 @@ class EventController extends Controller
     public function edit(Event $event)
     {
         $types = TypeEvent::orderBy('name')->get();
-        return view('admin.events.edit', compact('event','types'));
+        return view('backoffice.events.edit', compact('event','types'));
     }
 
     public function update(Request $request, Event $event)
@@ -68,7 +68,7 @@ class EventController extends Controller
                     ->orderBy('date', 'desc')
                     ->paginate(6); // pagination pour front
 
-    return view('front.index', compact('events'));
+    return view('frontoffice.events.index', compact('events'));
 
 }
 

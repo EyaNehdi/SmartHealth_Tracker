@@ -13,7 +13,7 @@ class ActivityController extends Controller
     {
         $categories = CategoryActivity::all();
         $equipments = Equipment::all(); // Ajouter les équipements
-        return view('activities.Ajout', compact('categories', 'equipments')); // Passer equipments à la vue
+        return view('frontoffice.activities.Ajout', compact('categories', 'equipments')); // Passer equipments à la vue
     }
 
     public function index(Request $request)
@@ -38,7 +38,7 @@ class ActivityController extends Controller
         $activities = $query->get();
         $categories = CategoryActivity::all();
 
-        return view('activities.list', compact('activities', 'categories'));
+        return view('frontoffice.activities.list', compact('activities', 'categories'));
     }
 
     public function store(Request $request)
@@ -87,7 +87,7 @@ class ActivityController extends Controller
 
         $categories = CategoryActivity::all();
         $equipments = Equipment::all(); // Ajouter les équipements pour l'édition
-        return view('activities.edit', compact('activity', 'categories', 'equipments')); // Passer equipments
+        return view('frontoffice.activities.edit', compact('activity', 'categories', 'equipments')); // Passer equipments
     }
 
     public function update(Request $request, Activity $activity)

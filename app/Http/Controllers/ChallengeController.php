@@ -37,7 +37,7 @@ class ChallengeController extends Controller
 
     $users = User::all();
 
-    return view('challenges.index', compact('challenges', 'users', 'allChallenges', 'mostParticipated', 'search'));
+    return view('frontoffice.challenges.index', compact('challenges', 'users', 'allChallenges', 'mostParticipated', 'search'));
 }
 
 
@@ -53,7 +53,7 @@ class ChallengeController extends Controller
 
 
     $users = User::all(); // Add this line to fetch all users
-        return view('challenges.create', compact('users', 'challenges', 'participations'));
+        return view('frontoffice.challenges.create', compact('users', 'challenges', 'participations'));
     }
 
 public function store(Request $request)
@@ -106,7 +106,7 @@ public function edit(Challenge $challenge)
         abort(403, 'Unauthorized action.');
     }
 
-    return view('challenges.edit', compact('challenge'));
+    return view('frontoffice.challenges.edit', compact('challenge'));
 }
 
 public function update(Request $request, Challenge $challenge)
