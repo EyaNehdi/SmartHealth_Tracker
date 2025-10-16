@@ -117,7 +117,7 @@
 @vite(['resources/assets/js/sal.js'])
 @vite(['resources/assets/js/ajax-form.js'])
 @vite(['resources/assets/js/main.js'])
-
+@vite(['resources/js/group_chat.js'])
 @stack('frontoffice-scripts')
 </body>
 </html>

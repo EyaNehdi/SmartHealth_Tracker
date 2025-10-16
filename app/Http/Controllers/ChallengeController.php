@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Challenge;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class ChallengeController extends Controller
@@ -139,6 +141,19 @@ public function update(Request $request, Challenge $challenge)
 
     return redirect()->route('challenges.index')->with('success', 'Challenge modifié avec succès.');
 }
+ public function groups()
+    {
+        Log::info('Accessing user groups', ['user_id' => Auth::id()]);
+
+        $challenges = Challenge::where('created_by', Auth::id())
+            ->orWhereHas('participations', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->withCount('participations')
+            ->get();
+
+        return view('frontoffice.groups.index', compact('challenges'));
+    }
 
 
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use App\Models\Participation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Broadcast;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -42,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
     });
 
         Paginator::useBootstrap();
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
+        require base_path('routes/channels.php');
     }
 }
