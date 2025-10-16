@@ -35,6 +35,311 @@
                             <div class="tgmenu__action">
                                 <ul class="list-wrap">
                                     @auth
+                                     <li class="header-shop-panier position-relative">
+    <a href="javascript:void(0)" class="shop-panier-toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 6H21L19 14H7L6 6Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="20" r="1" fill="#fff"/>
+            <circle cx="18" cy="20" r="1" fill="#fff"/>
+        </svg>
+        {{-- <span class="shop-panier-count">0</span> --}}
+    </a>
+
+    <!-- Mini-panier global -->
+    <div class="shop-mini-panier">
+        <div class="mini-panier-header">
+            <h4>Votre panier</h4>
+            <button class="mini-panier-close">&times;</button>
+        </div>
+        <div class="mini-panier-body">
+            <ul class="mini-panier-items">
+                <!-- Items injectés via JS -->
+            </ul>
+        </div>
+        <div class="mini-panier-footer">
+            <p>Total: <span class="mini-panier-total">0 DT</span></p>
+        </div>
+    </div>
+</li>
+
+<div class="shop-mini-panier-overlay"></div>
+<script>
+window.routes = {
+    panierGet: "{{ route('panier.get') }}",
+    panierAdd: "{{ route('panier.add') }}",
+    panierUpdate: "{{ route('panier.update') }}",
+    panierRemove: "{{ route('panier.remove') }}"
+};
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    const panierToggle = document.querySelector('.shop-panier-toggle');
+    const miniPanier = document.querySelector('.shop-mini-panier');
+    const closeBtn = document.querySelector('.mini-panier-close');
+    const overlay = document.querySelector('.shop-mini-panier-overlay');
+    const listEl = miniPanier.querySelector('.mini-panier-items');
+    const totalEl = miniPanier.querySelector('.mini-panier-total');
+    const countEl = document.querySelector('.shop-panier-count');
+
+    // Affichage du mini-panier
+    function togglePanier() {
+        miniPanier.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+    function closePanier() {
+        miniPanier.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+    panierToggle.addEventListener('click', togglePanier);
+    closeBtn.addEventListener('click', closePanier);
+    overlay.addEventListener('click', closePanier);
+
+    // Conversion en tableau si backend renvoie un objet
+    function normalizePanier(p) {
+        if (!p) return [];
+        return Array.isArray(p) ? p : Object.values(p);
+    }
+
+    // Échappement HTML pour éviter injection
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Rendu du panier
+    function renderPanier(panier) {
+       panier = normalizePanier(panier).filter(item => item.id !== undefined && item.id !== null && item.id !== '');
+        listEl.innerHTML = '';
+        let total = 0;
+
+        panier.forEach(item => {
+            const prix = parseFloat(item.prix) || 0;
+            const qty = parseInt(item.qty) || 1;
+            total += prix * qty;
+
+            const li = document.createElement('li');
+            li.dataset.itemId = item.id;
+
+            li.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${item.image ?? ''}" width="50" style="border-radius:5px; object-fit:cover;">
+                    <div style="flex:1">
+                        <span class="item-nom">${escapeHtml(item.nom ?? '')}</span><br>
+                        <small>${prix.toFixed(2)} DT</small>
+                        <div style="margin-top:6px;">
+                            <button class="qty-decrease btn-qty" data-id="${item.id}">-</button>
+                            <span class="qty">${qty}</span>
+                            <button class="qty-increase btn-qty" data-id="${item.id}">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-item btn btn-sm btn-danger" data-id="${item.id}">&times;</button>
+                </div>
+            `;
+            listEl.appendChild(li);
+        });
+
+        totalEl.textContent = total.toFixed(2) + ' DT';
+        if (countEl) countEl.textContent = panier.length;
+    }
+
+    // Chargement du panier depuis backend
+    async function updatePanier() {
+        try {
+            const res = await fetch(window.routes.panierGet, { credentials: 'same-origin' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const panier = await res.json();
+            renderPanier(panier);
+        } catch (err) {
+            console.error('Erreur récupération panier :', err);
+        }
+    }
+
+    // Modifier la quantité
+    async function changeQty(id, delta) {
+        try {
+            const resGet = await fetch(window.routes.panierGet, { credentials: 'same-origin' });
+            const panier = await resGet.json();
+            const normalized = normalizePanier(panier);
+            const item = normalized.find(i => String(i.id) === String(id));
+            if (!item) return;
+
+            const newQty = Math.max(1, (parseInt(item.qty) || 1) + delta);
+            const payload = { id: id, qty: newQty };
+
+            const res = await fetch(window.routes.panierUpdate, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const updated = await res.json();
+            renderPanier(updated);
+        } catch (err) {
+            console.error('Erreur update qty :', err);
+        }
+    }
+
+    // Supprimer un item
+    async function removeItem(id) {
+        try {
+            const payload = { id: id };
+            const res = await fetch(window.routes.panierRemove, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const updated = await res.json();
+            renderPanier(updated);
+        } catch (err) {
+            console.error('Erreur suppression item :', err);
+        }
+    }
+
+    // **Event delegation** pour tous les boutons
+    listEl.addEventListener('click', (e) => {
+        const target = e.target;
+        const id = target.dataset.id;
+        if (!id) return;
+
+        if (target.classList.contains('qty-increase')) {
+            changeQty(id, +1);
+        } else if (target.classList.contains('qty-decrease')) {
+            changeQty(id, -1);
+        } else if (target.classList.contains('remove-item')) {
+            removeItem(id);
+        }
+    });
+
+    // Initial load
+    updatePanier();
+
+    // Optionnel : écouter les changements cross-tab
+    window.addEventListener('storage', updatePanier);
+});
+</script>
+
+
+
+
+
+<style>
+.header-shop-panier {
+    position: relative; /* Nécessaire pour le dropdown */
+}
+
+.shop-panier-toggle svg path,
+.shop-panier-toggle svg circle {
+    stroke: #fff;
+    fill: #fff;
+}
+
+/* Mini-panier dropdown */
+.shop-mini-panier, .shop-mini-panier-principal {
+    position: absolute;
+    top: 120%;   /* juste en dessous de l’icône */
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Actif */
+.shop-mini-panier.active, .shop-mini-panier-principal.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Header */
+.mini-panier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.mini-panier-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Close button */
+.mini-panier-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Body with scroll */
+.mini-panier-body {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.mini-panier-items {
+    list-style: none;
+    padding: 10px 15px;
+    margin: 0;
+}
+
+.mini-panier-items li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+/* Footer */
+.mini-panier-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #eee;
+}
+
+.mini-panier-footer p {
+    margin: 0 0 5px;
+    font-weight: bold;
+}
+
+.mini-panier-footer .btn {
+    display: block;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 5px;
+    font-size: 14px;
+}
+</style>
+{{-- end js et css --}}
                                     <li class="header-cart">
                                         <a href="javascript:void(0)" class="cart-count headerCart__button">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
