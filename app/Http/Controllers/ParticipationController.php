@@ -39,9 +39,9 @@ class ParticipationController extends Controller
             $data['image'] = $request->file('image')->store('participations', 'public');
         }
 
-        Participation::create($data);
+       Participation::create($data);
 
-        return redirect()->route('challenges.index')->with('success', 'Participation added successfully!');
+    return redirect()->route('challenges.chat', $request->challenge_id)->with('success', 'Joined challenge and group chat!');
     }
 
     public function edit(Participation $participation)
@@ -124,7 +124,7 @@ public function myParticipations()
     if (!$user) {
         abort(401);
     }
-    
+
     $participations = $user->participations()->with('challenge', 'challenge.creator')->get();
 
     return view('frontoffice.participations.create', compact('participations'));

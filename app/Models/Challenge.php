@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Participation;
 
 class Challenge extends Model
 {
@@ -20,8 +18,14 @@ class Challenge extends Model
         return $this->hasMany(Participation::class);
     }
 
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
     public function isParticipatedBy($userId)
     {
-        return $this->participations()->where('user_id', $userId)->exists();
+        return $this->participations()->where('user_id', $userId)->exists() ||
+               $this->created_by === $userId;
     }
 }

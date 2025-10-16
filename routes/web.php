@@ -20,6 +20,7 @@ use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use App\Models\Event;
+use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,8 @@ Route::get('/upcoming-events', function () {
 |--------------------------------------------------------------------------
 */
 
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Management
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
@@ -97,6 +100,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'send'])->name('messages.send');
+    // ... Existing routes ...
+
+// Group chat for challenges
+Route::get('/challenges/{challenge}/chat', [MessageController::class, 'groupIndex'])->name('challenges.chat');
+Route::post('/challenges/{challenge}/messages', [MessageController::class, 'sendGroup'])->name('challenges.messages.send');
+Route::get('/groups', [ChallengeController::class, 'groups'])->name('groups.index');
+ Route::get('/challenges/{id}/messages', [MessageController::class, 'getMessages'])->name('challenges.messages')->middleware('auth');
 });
 
 /*
