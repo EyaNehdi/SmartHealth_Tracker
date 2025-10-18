@@ -58,6 +58,7 @@
         </div>
         <div class="mini-panier-footer">
             <p>Total: <span class="mini-panier-total">0 DT</span></p>
+            <a href="{{ route('panier.page') }}" class="btn btn-primary mt-2">Voir Panier</a>
         </div>
     </div>
 </li>

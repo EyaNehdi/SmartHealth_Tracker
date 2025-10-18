@@ -131,15 +131,13 @@
                                             <div class="product-actions mt-auto">
                                                 <div class="row g-2">
                                                     <div class="col-12 col-sm-6">
-                                                      <button class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center add-to-panier-btn"
-        data-id="{{ $produit->id }}" 
-        data-nom="{{ $produit->nom }}" 
-        data-prix="{{ $produit->prix }}" 
-        data-image="{{ $produit->image ? asset('storage/' . $produit->image) : Vite::asset('resources/assets/img/product_placeholder.png') }}">
-    <i class="fas fa-shopping-cart me-2"></i> Ajouter au panier
-</button>
-
-
+                                                        <button class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center add-to-panier-btn"
+                                                            data-id="{{ $produit->id }}" 
+                                                            data-nom="{{ $produit->nom }}" 
+                                                            data-prix="{{ $produit->prix }}" 
+                                                            data-image="{{ $produit->image ? asset('storage/' . $produit->image) : Vite::asset('resources/assets/img/product_placeholder.png') }}">
+                                                            <i class="fas fa-shopping-cart me-2"></i> Ajouter au panier
+                                                        </button>
                                                     </div>
                                                     <div class="col-12 col-sm-6">
                                                         <a href="{{ route('produits.pdf', $produit->id) }}" 
@@ -240,136 +238,119 @@
             </div>
         </div>
     </div>
-<!-- Inclure SweetAlert2 dans ton layout ou ici -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+    <!-- Inclure SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const miniPanier = document.querySelector('.shop-mini-panier');
-    const miniPanierItems = miniPanier.querySelector('.mini-panier-items');
-    const miniPanierTotal = miniPanier.querySelector('.mini-panier-total');
+    const addBtns = document.querySelectorAll('.add-to-panier-btn');
 
-    // Ajouter au panier
-    document.querySelectorAll('.add-to-panier-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-    const data = {
-        id: this.dataset.id, // garde le même type que côté PHP (string)
-        nom: this.dataset.nom,
-        prix: parseFloat(this.dataset.prix),
-        image: this.dataset.image,
-        _token: '{{ csrf_token() }}'
-    };
+    addBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const data = {
+                id: this.dataset.id,
+                nom: this.dataset.nom,
+                prix: parseFloat(this.dataset.prix),
+                image: this.dataset.image,
+                _token: '{{ csrf_token() }}'
+            };
 
-    fetch('{{ route("panier.add") }}', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(panier => {
-        renderPanier(panier);
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Produit ajouté au panier !',
-            showConfirmButton: false,
-            timer: 1200,
-            toast: true
+            try {
+                const res = await fetch('{{ route("panier.add") }}', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const panier = await res.json();
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Produit ajouté au panier !',
+                    showConfirmButton: false,
+                    timer: 1200,
+                    toast: true
+                });
+
+                // Mettre à jour mini-panier si présent
+                updateMiniPanier(panier);
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire({icon:'error', title:'Erreur', text:'Impossible d\'ajouter le produit.'});
+            }
         });
     });
-});
 
-    });
+    // --- Fonction pour mini-panier ---
+    function updateMiniPanier(panier) {
+        const miniPanier = document.querySelector('.shop-mini-panier');
+        if (!miniPanier) return;
+        const list = miniPanier.querySelector('.mini-panier-items');
+        const total = miniPanier.querySelector('.mini-panier-total');
+        if (!list || !total) return;
 
-    function renderPanier(panier) {
-    miniPanierItems.innerHTML = '';
-    let total = 0;
+        list.innerHTML = '';
+        let sum = 0;
 
-    panier.forEach(item => {
-        const prix = parseFloat(item.prix); // <-- conversion en nombre
-        total += prix * item.qty;
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px;">
-                <img src="${item.image}" width="50" style="border-radius:5px;">
-                <div style="flex:1">
-                    <span>${item.nom}</span><br>
-                    <small>${prix.toFixed(2)} DT</small>  <!-- utilisation de prix converti -->
+        panier.forEach(item => {
+            sum += item.prix * item.qty;
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="d-flex align-items-center gap-2">
+                    <img src="${item.image}" width="50" style="border-radius:5px;">
                     <div>
-                        <button class="qty-decrease" data-id="${item.id}">-</button>
-                        <span class="qty">${item.qty}</span>
-                        <button class="qty-increase" data-id="${item.id}">+</button>
+                        <strong>${item.nom}</strong><br>
+                        <small>${item.qty} x ${item.prix.toFixed(2)} DT</small>
+                    </div>
+                    <div class="ms-auto d-flex gap-1">
+                        <button class="btn btn-sm btn-light mini-qty-decrease" data-id="${item.id}">-</button>
+                        <button class="btn btn-sm btn-light mini-qty-increase" data-id="${item.id}">+</button>
+                        <button class="btn btn-sm btn-danger remove-mini-item" data-id="${item.id}">&times;</button>
                     </div>
                 </div>
-                <button class="remove-item btn btn-sm btn-danger" data-id="${item.id}">&times;</button>
-            </div>
-        `;
-        miniPanierItems.appendChild(li);
-    });
-
-    miniPanierTotal.textContent = total.toFixed(2);
-
-    // Événements
-    miniPanier.querySelectorAll('.qty-increase').forEach(btn => {
-        btn.addEventListener('click', () => updateQty(btn.dataset.id, 1));
-    });
-    miniPanier.querySelectorAll('.qty-decrease').forEach(btn => {
-        btn.addEventListener('click', () => updateQty(btn.dataset.id, -1));
-    });
-    miniPanier.querySelectorAll('.remove-item').forEach(btn => {
-        btn.addEventListener('click', () => removeItem(btn.dataset.id));
-    });
-}
-
-
-    function updateQty(id, change) {
-        fetch('{{ route("panier.get") }}')
-        .then(res => res.json())
-        .then(panier => {
-            const item = panier.find(i => i.id == id);
-            if(!item) return;
-            const data = { id: id, qty: Math.max(1, item.qty + change) };
-
-            fetch('{{ route("panier.update") }}', {
-                method:'POST',
-                headers: {
-                    'Content-Type':'application/json',
-                    'Accept':'application/json',
-                    'X-CSRF-TOKEN':'{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(renderPanier);
+            `;
+            list.appendChild(li);
         });
+
+        total.textContent = sum.toFixed(2);
+
+        // Actions mini-panier
+        miniPanier.querySelectorAll('.mini-qty-increase').forEach(btn => btn.addEventListener('click', () => updateQty(btn.dataset.id, 1)));
+        miniPanier.querySelectorAll('.mini-qty-decrease').forEach(btn => btn.addEventListener('click', () => updateQty(btn.dataset.id, -1)));
+        miniPanier.querySelectorAll('.remove-mini-item').forEach(btn => btn.addEventListener('click', () => removeItem(btn.dataset.id)));
     }
 
-    function removeItem(id) {
-    const data = {id: id, _token: '{{ csrf_token() }}'};
-    fetch('{{ route("panier.remove") }}', {
-        method:'POST',
-        headers:{'Content-Type':'application/json', 'Accept': 'application/json'},
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(panier => {
-        renderPanier(panier);
-        console.log("Panier après suppression :", panier); // debug
-    });
-}
+    async function updateQty(id, change) {
+        const resGet = await fetch('{{ route("panier.get") }}');
+        const panier = await resGet.json();
+        const item = panier.find(i => i.id == id);
+        if (!item) return;
+        const newQty = Math.max(1, item.qty + change);
 
+        const resUpdate = await fetch('{{ route("panier.update") }}', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            body: JSON.stringify({id: id, qty: newQty})
+        });
+        const updatedPanier = await resUpdate.json();
+        updateMiniPanier(updatedPanier);
+    }
 
-    // Charger le panier au chargement
-    fetch('{{ route("panier.get") }}')
-    .then(res => res.json())
-    .then(renderPanier);
+    async function removeItem(id) {
+        const res = await fetch('{{ route("panier.remove") }}', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            body: JSON.stringify({id: id})
+        });
+        const updatedPanier = await res.json();
+        updateMiniPanier(updatedPanier);
+        Swal.fire({icon:'success', title:'Produit supprimé', toast:true, position:'top-end', showConfirmButton:false, timer:1000});
+    }
 });
 </script>
-
-
-
-
-
 
     <style>
         /* Product Detail Card */

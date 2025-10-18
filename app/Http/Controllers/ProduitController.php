@@ -42,9 +42,8 @@ public function index(Request $request)
         default: $query->orderBy('created_at', 'desc'); break;
     }
 
-    $produits = $query->paginate($perPage);
+    $produits = $query->paginate($perPage)->withQueryString();
 
-    // Réponse AJAX : juste le partial
     if ($request->ajax()) {
         $html = view('backoffice.produits.partials.list', compact('produits'))->render();
         return response()->json(['html' => $html]);
@@ -53,6 +52,7 @@ public function index(Request $request)
     $categories = Categorie::all();
     return view('backoffice.produits.produits-list', compact('produits', 'categories'));
 }
+
 
 // Magasin front office
 public function storeFront(Request $request)

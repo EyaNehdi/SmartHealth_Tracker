@@ -11,22 +11,28 @@ class CartController extends Controller
     // Ajouter un produit au panier
     public function add(Request $request)
     {
+        // Récupérer les données JSON correctement
+        $data = $request->json()->all();
+
         $cart = Session::get('cart', []);
-        $id = (string) $request->id;
+        $id = (string) $data['id'];
 
         if(isset($cart[$id])){
             $cart[$id]['qty']++;
         } else {
             $cart[$id] = [
                 'id' => $id,
-                'nom' => $request->nom,
-                'prix' => floatval($request->prix),
-                'image' => $request->image,
+                'nom' => $data['nom'] ?? 'Produit',
+                'prix' => isset($data['prix']) ? floatval($data['prix']) : 0,
+                'image' => $data['image'] ?? '',
                 'qty' => 1
             ];
         }
 
         Session::put('cart', $cart);
+
+        Log::info('Cart after add', $cart);
+
         return response()->json(array_values($cart));
     }
 
@@ -40,47 +46,41 @@ class CartController extends Controller
     // Mettre à jour la quantité d’un produit
     public function update(Request $request)
     {
+        $data = $request->json()->all();
         $cart = Session::get('cart', []);
-        $id = (string) $request->id;
+        $id = (string) $data['id'];
 
         if(isset($cart[$id])){
-            $cart[$id]['qty'] = max(0, intval($request->qty));
-            if($cart[$id]['qty'] === 0){
+            $qty = max(0, intval($data['qty'] ?? 1));
+            if($qty === 0){
                 unset($cart[$id]);
+            } else {
+                $cart[$id]['qty'] = $qty;
             }
         }
 
         Session::put('cart', $cart);
+
+        Log::info('Cart after update', $cart);
+
         return response()->json(array_values($cart));
     }
 
     // Supprimer un produit du panier
     public function remove(Request $request)
     {
-        $id = (string) $request->id;
+        $data = $request->json()->all();
+        $id = (string) ($data['id'] ?? '');
+
         $cart = Session::get('cart', []);
 
-        Log::info('Cart before remove', $cart);
-
-        // Vérifier si l'item existe et supprimer
-        if(array_key_exists($id, $cart)){
+        if(isset($cart[$id])){
             unset($cart[$id]);
             Log::info("Removed item $id");
-        } else {
-            // Si pas trouvé par clé, chercher par id dans la liste (au cas où)
-            foreach($cart as $key => $item){
-                if($item['id'] === $id){
-                    unset($cart[$key]);
-                    Log::info("Removed item $id by value search");
-                    break;
-                }
-            }
-            if(!isset($cart[$id])){
-                Log::warning("Item $id not found in cart");
-            }
         }
 
         Session::put('cart', $cart);
+
         Log::info('Cart after remove', $cart);
 
         return response()->json(array_values($cart));
