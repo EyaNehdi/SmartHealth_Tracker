@@ -11,7 +11,8 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
-
+use App\Http\Controllers\PanierController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\CartController;
 
 
@@ -228,6 +229,16 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('panier.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('panier.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('panier.remove');
 Route::get('/cart', [CartController::class, 'get'])->name('panier.get');
+// panier paiement
+Route::get('/panier', [PanierController::class, 'show'])->name('panier.page');
+//Stripe route pour magasin
+Route::post('/checkout/create-session', [StripeController::class, 'createCheckoutSession'])->name('checkout.create');
+Route::get('/checkout/success', [StripeController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('checkout.cancel');
+
+Route::get('/panier/test', function() {
+    return session('panier', []);
+});
 
 use Illuminate\Http\Request;
 Route::get('/test-session', function(Request $request){
