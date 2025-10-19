@@ -96,7 +96,7 @@
         /* Main layout grid */
         .body-content {
             display: grid !important;
-            grid-template-areas: 
+            grid-template-areas:
                 "sidebar header"
                 "sidebar content" !important;
             grid-template-columns: var(--sidebar-width) 1fr !important;
@@ -129,7 +129,7 @@
         /* Force grid layout to override any external CSS */
         .ms-aside-left-open .body-content {
             display: grid !important;
-            grid-template-areas: 
+            grid-template-areas:
                 "sidebar header"
                 "sidebar content" !important;
             grid-template-columns: var(--sidebar-width) 1fr !important;
@@ -149,6 +149,7 @@
         .ms-content-wrapper .container,
         .ms-content-wrapper .container-fluid,
         .ms-content-wrapper .row {
+
             padding-left: 15px !important;
             padding-right: 15px !important;
         }
@@ -187,11 +188,12 @@
 
         /* Content area */
         .ms-content-wrapper {
+            margin-left: 250px;
             grid-area: content !important;
             padding: 1.5rem;
             overflow-y: auto;
             background-color: var(--light-color);
-            transition: var(--transition);
+            transition: margin-left 0.3s ease;
             margin: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
@@ -829,9 +831,9 @@
             :root {
                 --sidebar-width: 100%;
             }
-            
+
             .body-content {
-                grid-template-areas: 
+                grid-template-areas:
                     "header"
                     "content";
                 grid-template-columns: 1fr;
@@ -856,7 +858,7 @@
             .ms-content-wrapper {
                 padding: 1rem;
             }
-            
+
             .ms-header {
                 padding: 0 1rem;
             }
@@ -866,7 +868,7 @@
             .ms-content-wrapper {
                 padding: 0.75rem;
             }
-            
+
             .ms-header {
                 padding: 0 0.75rem;
             }
@@ -877,12 +879,12 @@
                 flex-direction: column;
                 gap: 0.75rem;
             }
-            
+
             .ms-header-menu-left {
                 order: 2;
                 width: 100%;
             }
-            
+
             .ms-header-menu-right {
                 order: 1;
                 width: 100%;
@@ -1388,10 +1390,10 @@
     <main class="body-content">
         <!-- Sidebar -->
         @include('shared.partials.backoffice-sidebar')
-        
+
         <!-- Header -->
         @include('shared.partials.backoffice-header')
-        
+
         <!-- Body Content Wrapper -->
         <div class="ms-content-wrapper">
             @yield('content')
@@ -1403,16 +1405,16 @@
 
     <!-- jQuery -->
     <script src="{{ asset('assets2/js/jquery-3.3.1.min.js') }}"></script>
-    
+
     <!-- Bootstrap core JavaScript -->
     <script src="{{ asset('assets2/js/bootstrap.min.js') }}"></script>
-    
+
     <!-- jQuery UI -->
     <script src="{{ asset('assets2/js/jquery-ui.min.js') }}"></script>
-    
+
     <!-- Framework JavaScript -->
     <script src="{{ asset('assets2/js/framework.js') }}"></script>
-    
+
     @stack('backoffice-scripts')
 </body>
 </html>
