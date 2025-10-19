@@ -24,12 +24,15 @@
                                         <ul class="sub-menu">
                                             <li><a href="{{ route('challenges.index') }}">Tous les objectifs</a></li>
                                             <li><a href="{{ route('challenges.create') }}">notre objectif/ajouter</a></li>
+                                            <li><a href="{{ route('groups.index') }}">notre groupes</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="#ingredient" class="section-link">Magasin</a></li>
-                                    <li><a href="{{ route('activities.index') }}" class="section-link">Activities</a></li>
                                     <li><a href="{{ route('produits.index') }}" class="section-link">Magasin</a></li>
+
+                                    <li><a href="{{ route('activities.index') }}" class="section-link">Activities</a></li>
+
                                     <li><a href="{{ route('events.front') }}" class="section-link">Event</a></li>
+                                    <li><a href="{{ route('contact') }}" class="section-link">CONTACT</a></li>
                                 </ul>
                             </div>
                             <div class="tgmenu__action">
@@ -447,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 @php
                     $userParticipations = auth()->user()->participations()->with(['challenge', 'challenge.creator'])->get();
                 @endphp
-                
+
                 @forelse($userParticipations as $p)
                 <div class="mini__cart-item">
                     <div class="thumb">
@@ -503,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const miniCartToggle = document.querySelector('.mini__cart-toggle');
     const headerCartOverlay = document.querySelector('.headerCart__overlay');
     const participationCount = document.getElementById('participation-count');
-    
+
     // Open mini-cart when clicking the cart button
     if (headerCartButton && miniCartWrap) {
         headerCartButton.addEventListener('click', function(e) {
@@ -512,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.add('cart-open');
         });
     }
-    
+
     // Close mini-cart when clicking the toggle button
     if (miniCartToggle && miniCartWrap) {
         miniCartToggle.addEventListener('click', function() {
@@ -520,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('cart-open');
         });
     }
-    
+
     // Close mini-cart when clicking the overlay
     if (headerCartOverlay && miniCartWrap) {
         headerCartOverlay.addEventListener('click', function() {
@@ -528,21 +531,21 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('cart-open');
         });
     }
-    
+
     // Handle participant reply form submissions
     const replyForms = miniCartWrap ? miniCartWrap.querySelectorAll('form[action*="participant_reply"]') : [];
     replyForms.forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
-            
+
             // Disable button and show loading
             submitButton.disabled = true;
             submitButton.textContent = 'Sending...';
-            
+
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
@@ -562,13 +565,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Success!</strong> Your reply has been sent.
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     `;
-                    
+
                     // Insert before the form
                     this.parentNode.insertBefore(successAlert, this);
-                    
+
                     // Hide the form since reply was sent
                     this.style.display = 'none';
-                    
+
                     // Add the reply to the display
                     const replyDiv = document.createElement('div');
                     replyDiv.className = 'mt-1';
@@ -576,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <small class="text-muted d-block"><strong>You replied:</strong><br> ${formData.get('participant_reply')}</small>
                     `;
                     this.parentNode.appendChild(replyDiv);
-                    
+
                     // Update participation count
                     if (participationCount) {
                         const currentCount = parseInt(participationCount.textContent) || 0;

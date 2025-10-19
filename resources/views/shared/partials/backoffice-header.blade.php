@@ -1,5 +1,9 @@
 <!-- Enhanced Header with Functional Search -->
 <header class="ms-header ms-header-primary">
+
+
+
+
     <div class="ms-header-container">
         <div class="ms-header-left">
             <div class="ms-logo">
@@ -13,16 +17,16 @@
                 <span class="ms-toggler-bar bg-primary"></span>
             </div>
         </div>
-        
+
         <div class="ms-header-right">
             <div class="ms-header-menu">
                 <div class="ms-header-menu-left">
                     <div class="ms-header-search">
                         <form class="ms-header-search-form" id="search-form">
-                            <input class="ms-header-search-input" 
-                                   type="text" 
-                                   placeholder="Search..." 
-                                   name="q" 
+                            <input class="ms-header-search-input"
+                                   type="text"
+                                   placeholder="Search..."
+                                   name="q"
                                    id="search-input"
                                    autocomplete="off">
                             <button class="ms-header-search-btn" type="submit">
@@ -34,7 +38,7 @@
                         </form>
                     </div>
                 </div>
-                
+
                 <div class="ms-header-menu-right">
                     <div class="ms-header-user">
                         <div class="dropdown">
@@ -100,7 +104,7 @@
                         </label>
                     </div>
                 </div>
-                
+
                 <div class="settings-section">
                     <h5 class="settings-section-title">Layout Settings</h5>
                     <div class="settings-item">
@@ -114,7 +118,7 @@
                         </label>
                     </div>
                 </div>
-                
+
                 <div class="settings-section">
                     <h5 class="settings-section-title">Keyboard Shortcuts</h5>
                     <div class="shortcuts-list">
@@ -176,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Search input handler
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
-        
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             if (query.length > 1) {
@@ -208,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('keydown', function(e) {
         const results = searchDropdown.querySelectorAll('.search-result');
         const activeResult = searchDropdown.querySelector('.search-result.active');
-        
+
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             if (activeResult) {
@@ -250,11 +254,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function performSearch(query) {
         const results = [];
-        
+
         // Search through all data
         Object.keys(searchData).forEach(category => {
             searchData[category].forEach(item => {
-                if (item.title.toLowerCase().includes(query) || 
+                if (item.title.toLowerCase().includes(query) ||
                     item.description.toLowerCase().includes(query)) {
                     results.push({ ...item, category });
                 }
@@ -274,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="search-result-description">${result.description} • ${result.category}</div>
                 </div>
             `).join('');
-            
+
             // Add click handlers
             searchDropdown.querySelectorAll('.search-result').forEach(result => {
                 result.addEventListener('click', function() {
@@ -285,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
-        
+
         searchDropdown.classList.add('show');
     }
 
@@ -357,14 +361,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             searchInput.focus();
         }
-        
+
         // Ctrl + D to toggle dark mode
         if (e.ctrlKey && e.key === 'd') {
             e.preventDefault();
             darkModeToggle.checked = !darkModeToggle.checked;
             darkModeToggle.dispatchEvent(new Event('change'));
         }
-        
+
         // Escape to close panels
         if (e.key === 'Escape') {
             settingsPanel.classList.remove('show');

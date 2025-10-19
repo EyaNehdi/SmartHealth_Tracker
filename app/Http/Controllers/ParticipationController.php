@@ -41,7 +41,7 @@ class ParticipationController extends Controller
 
        Participation::create($data);
 
-    return redirect()->route('challenges.chat', $request->challenge_id)->with('success', 'Joined challenge and group chat!');
+    return redirect()->route('groups.index', $request->challenge_id)->with('success', 'Joined challenge and group chat!');
     }
 
     public function edit(Participation $participation)
