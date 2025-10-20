@@ -500,7 +500,7 @@
                                 <path d="M12.75 11.25H11.865L11.565 10.965C12.645 9.705 13.29 8.115 13.29 6.375C13.29 2.865 10.41 0 6.885 0C3.36 0 0.48 2.865 0.48 6.375C0.48 9.885 3.36 12.75 6.885 12.75C8.625 12.75 10.215 12.105 11.475 11.025L11.775 11.325V12.21L16.47 16.89L17.88 15.48L13.2 10.785L12.75 11.25ZM6.885 11.25C4.215 11.25 2.04 9.075 2.04 6.375C2.04 3.675 4.215 1.5 6.885 1.5C9.555 1.5 11.73 3.675 11.73 6.375C11.73 9.075 9.555 11.25 6.885 11.25Z" fill="#22c55e"/>
                             </svg>
                             <!-- Icône de réinitialisation -->
-                            <a href="{{ route('activities.index') }}" title="Réinitialiser les filtres" style="margin-right: 5px;">
+                            <a href="{{ route('activities.front') }}" title="Réinitialiser les filtres" style="margin-right: 5px;">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9 3V1.5L6.75 3.75L9 6V4.5C11.4825 4.5 13.5 6.5175 13.5 9C13.5 9.795 13.2975 10.545 12.945 11.1975L14.115 12.3675C14.73 11.43 15.09 10.2975 15.09 9C15.09 5.6925 12.3075 3 9 3ZM9 13.5C6.5175 13.5 4.5 11.4825 4.5 9C4.5 8.205 4.7025 7.455 5.055 6.8025L3.885 5.6325C3.27 6.57 2.91 7.7025 2.91 9C2.91 12.3075 5.6925 15 9 15V16.5L11.25 14.25L9 12V13.5Z" fill="#22c55e"/>
                                 </svg>
@@ -508,7 +508,7 @@
                             Rechercher et Filtrer
                         </h4>
                         <!-- Formulaire de recherche par mot-clé -->
-                        <form action="{{ route('activities.index') }}" method="GET" class="mb-4">
+                        <form action="{{ route('activities.front') }}" method="GET" class="mb-4">
                             <div class="form-grp">
                                 <label for="search">Rechercher</label>
                                 <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Mot-clé (nom ou description)">
@@ -516,7 +516,7 @@
                             <button type="submit" class="tg-btn tg-btn-three black-btn mt-2">Rechercher</button>
                         </form>
                         <!-- Formulaire de filtrage par date -->
-                        <form action="{{ route('activities.index') }}" method="GET">
+                        <form action="{{ route('activities.front') }}" method="GET">
                             <div class="form-grp">
                                 <label for="date">Date</label>
                                 <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">

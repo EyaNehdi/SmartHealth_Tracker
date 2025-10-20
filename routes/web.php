@@ -111,12 +111,6 @@ Route::get('/upcoming-events', function () {
 
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('frontoffice.dashboard.index');
-    })->name('dashboard');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -242,12 +236,7 @@ Route::prefix('admin')
         Route::delete('/categories/{categorie}', [CategorieController::class, 'destroy'])->name('categories.destroy');
 
         // Alternative Category Routes (Legacy) - Admin specific
-       Route::get('/categories/create', [CategoryActivityController::class, 'create'])->name('categories.create');
-    Route::post('/categories', [CategoryActivityController::class, 'store'])->name('categories.store');
-    Route::get('/categories/list', [CategoryActivityController::class, 'index'])->name('categories.list');
-    Route::get('/categories/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
-    Route::put('/categories/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
+       
 
         /*
         |--------------------------------------------------------------------------
