@@ -79,10 +79,9 @@
   <aside id="ms-side-nav" class="side-nav fixed ms-aside-scrollable ms-aside-left">
     <!-- Logo -->
     <div class="logo-sn ms-d-block-lg">
-      <a class="pl-0 ml-0 text-center" href="index-2.html"> <img src="{{Vite::asset('resources/assets2/img/medjestic-logo-216x62.png')}}" alt="logo"> </a>
-      <a href="#" class="text-center ms-logo-img-link"> <img src="{{Vite::asset('resources/assets2/img/dashboard/doctor-3.jpg')}}" alt="logo"></a>
-      <h5 class="text-center text-white mt-2">Dr.Samuel</h5>
-      <h6 class="text-center text-white mb-3">Admin</h6>
+      
+      <h5 class="text-center text-white mt-2">Admin</h5>
+
     </div>
     <!-- Navigation -->
     <ul class="accordion ms-main-aside fs-14" id="side-nav-accordion">

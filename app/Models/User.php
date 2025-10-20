@@ -48,7 +48,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
-
+    public function isAdmin()
+{
+    return $this->role === 'admin'; // Adjust based on your role logic
+}
     public function challengesCreated()
     {
         return $this->hasMany(Challenge::class, 'created_by');
@@ -61,7 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the user's participations.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function participations()
