@@ -1,7 +1,6 @@
 @extends('shared.layouts.backoffice')
 
 @section('content')
-
 <div class="ms-content-wrapper">
     <div class="row">
         <div class="col-md-12">
@@ -27,10 +26,17 @@
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
                                 <label for="name">Nom du type</label>
-                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nom du type" value="{{ old('name', $typeEvent->name) }}" required>
+                                <input type="text" name="name" id="name" 
+                                       class="form-control @error('name') is-invalid @enderror" 
+                                       placeholder="Nom du type" 
+                                       value="{{ old('name', $typeEvent->name) }}" 
+                                       required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div id="name-error" class="invalid-feedback">
+                                    Le nom est obligatoire et doit contenir uniquement des lettres.
+                                </div>
                             </div>
                         </div>
 
@@ -43,4 +49,37 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('name');
+    const form = nameInput.closest('form');
+    const nameError = document.getElementById('name-error');
+
+    // Regex pour lettres et espaces seulement
+    const regex = /^[A-Za-zÀ-ÿ\s]+$/;
+
+    // Détection en temps réel
+    nameInput.addEventListener('input', function () {
+        const value = nameInput.value.trim();
+        if (value === '' || !regex.test(value)) {
+            nameInput.classList.add('is-invalid');
+            nameError.style.display = 'block';
+        } else {
+            nameInput.classList.remove('is-invalid');
+            nameError.style.display = 'none';
+        }
+    });
+
+    // Validation au submit
+    form.addEventListener('submit', function (event) {
+        const value = nameInput.value.trim();
+        if (value === '' || !regex.test(value)) {
+            nameInput.classList.add('is-invalid');
+            nameError.style.display = 'block';
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+});
+</script>
 @endsection

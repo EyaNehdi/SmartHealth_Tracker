@@ -35,6 +35,9 @@ Route::get('/', function () {
 
 // Public Events
 Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
+Route::post('/evenements/{event}/participate', [EventController::class, 'participate'])
+     ->name('events.participate');
+
 
 // Public Products Store
 Route::get('/magasin', [ProduitController::class, 'storeFront'])->name('produits.index');
@@ -198,7 +201,7 @@ Route::prefix('admin')
         */
         Route::resource('events', EventController::class);
         Route::get('events/create', [EventController::class, 'create'])->name('events.create');
-
+       
         /*
         |--------------------------------------------------------------------------
         | EVENT TYPES MANAGEMENT

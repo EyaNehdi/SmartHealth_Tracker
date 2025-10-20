@@ -17,10 +17,12 @@ class Event extends Model
         'date',
         'description',
         'type_event_id',
+        'participants', // JSON pour stocker les IDs utilisateurs
     ];
 
     protected $casts = [
         'date' => 'date',
+        'participants' => 'array', // Laravel convertit JSON <-> array
     ];
 
     public function typeEvent()
@@ -28,29 +30,57 @@ class Event extends Model
         return $this->belongsTo(TypeEvent::class);
     }
 
-    // Champs calculés pour l'analyse temporelle
-
-    // Nombre de jours avant l'événement
+    // Champs calculés pour analyse temporelle
     public function getDaysUntilEventAttribute()
     {
         return Carbon::parse($this->date)->diffInDays(now());
     }
 
-    // Mois de l'événement
     public function getMonthAttribute()
     {
-        return Carbon::parse($this->date)->format('F'); // "January", "February", ...
+        return Carbon::parse($this->date)->format('F');
     }
 
-    // Trimestre de l'événement
     public function getQuarterAttribute()
     {
         return ceil(Carbon::parse($this->date)->month / 3);
     }
 
-    // Jour de la semaine
     public function getWeekDayAttribute()
     {
-        return Carbon::parse($this->date)->format('l'); // "Monday", "Tuesday", ...
+        return Carbon::parse($this->date)->format('l');
+    }
+
+    // Nombre de participants
+    public function getParticipantsCountAttribute()
+    {
+        return count($this->participants ?? []);
+    }
+
+    // Pourcentage de participation pour barre de progression
+    public function getParticipationPercentAttribute()
+    {
+        $maxParticipants = 50; // ajuster selon tes besoins
+        $count = $this->participants_count;
+        return min(100, round(($count / $maxParticipants) * 100));
+    }
+
+    // Ajouter un participant
+    public function addParticipant(int $userId)
+    {
+        $participants = $this->participants ?? [];
+
+        if (!in_array($userId, $participants)) {
+            $participants[] = $userId;
+            $this->participants = $participants;
+            $this->save();
+        }
+    }
+
+    // Vérifier si utilisateur participe
+    public function isParticipating(int $userId)
+    {
+        $participants = $this->participants ?? [];
+        return in_array($userId, $participants);
     }
 }
