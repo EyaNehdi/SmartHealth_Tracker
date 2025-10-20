@@ -1,4 +1,3 @@
-
 @extends('shared.layouts.backoffice')
 
 @section('content')
@@ -138,4 +137,3 @@
 </div>
 
 @endsection
-

@@ -28,12 +28,10 @@
                                         </ul>
                                     </li>
 
-                                    <li><a href="#ingredient" class="section-link">Magasin</a></li>
                                     <li><a href="activities/front" class="section-link">Activities</a></li>
 
                                     <li><a href="{{ route('produits.index') }}" class="section-link">Magasin</a></li>
 
-                                    <li><a href="{{ route('activities.index') }}" class="section-link">Activities</a></li>
 
                                     <li><a href="{{ route('events.front') }}" class="section-link">Event</a></li>
                                     <li><a href="{{ route('contact') }}" class="section-link">CONTACT</a></li>
