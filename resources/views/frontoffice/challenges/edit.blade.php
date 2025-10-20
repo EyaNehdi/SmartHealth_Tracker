@@ -1,4 +1,3 @@
-
 @extends('shared.layouts.frontoffice')
 
 @section('page-title', 'Edit Challenge - SmartHealth Tracker')
@@ -124,13 +123,15 @@
                     <div class="col-lg-6">
                         <div class="contact__form-wrap">
                             <h2 class="title">Leave Us A Message</h2>
-                              <form method="POST" action="{{ route('challenges.update', $challenge->id) }}" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
+                            <form method="POST" action="{{ route('challenges.update', $challenge->id) }}"
+                                enctype="multipart/form-data">
+                                @csrf
+                                @method('PUT')
 
                                 <div class="form-grp">
                                     <label for="Titre">Titre *</label>
-                                    <input type="text" name="titre" value="{{ old('titre', $challenge->titre) }}" required>
+                                    <input type="text" name="titre" value="{{ old('titre', $challenge->titre) }}"
+                                        required>
                                 </div>
                                 <div class="form-group">
                                     <label for="image">Challenge Image</label>
@@ -155,11 +156,13 @@
                                 </div>
                                 <div class="form-grp">
                                     <label for="DateDEbut">Date de début *</label>
-                                    <input id="dateDebut" name="dateDebut" type="date" value="{{ old('dateDebut', $challenge->dateDebut) }}" required>
+                                    <input id="dateDebut" name="dateDebut" type="date"
+                                        value="{{ old('dateDebut', $challenge->dateDebut) }}" required>
                                 </div>
                                 <div class="form-grp">
                                     <label for="DateFin">Date de fin *</label>
-                                    <input id="dateFin" name="dateFin" type="date" value="{{ old('dateFin', $challenge->dateFin) }}" required>
+                                    <input id="dateFin" name="dateFin" type="date"
+                                        value="{{ old('dateFin', $challenge->dateFin) }}" required>
                                 </div>
 
                                 <button type="submit" class="tg-btn tg-btn-three black-btn">Submit Message</button>
@@ -177,28 +180,28 @@
 @endsection
 
 @push('frontoffice-scripts')
-<script>
-    function previewImage(event) {
-        const input = event.target;
-        const preview = document.getElementById('imagePreview');
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('imagePreview');
 
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
 
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+
+                // Update file name
+                input.nextElementSibling.innerText = input.files[0].name;
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+                input.nextElementSibling.innerText = "Choose an image...";
             }
-
-            reader.readAsDataURL(input.files[0]);
-
-            // Update file name
-            input.nextElementSibling.innerText = input.files[0].name;
-        } else {
-            preview.src = '#';
-            preview.style.display = 'none';
-            input.nextElementSibling.innerText = "Choose an image...";
         }
-    }
-</script>
+    </script>
 @endpush

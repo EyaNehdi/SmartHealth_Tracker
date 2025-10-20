@@ -8,7 +8,7 @@
         <a href="#" class="text-center ms-logo-img-link">
             <img src="{{ asset('assets2/img/dashboard/doctor-3.jpg') }}" alt="profile">
         </a>
-        <h5 class="text-center text-white mt-2">Dr.Samuel</h5>
+        
         <h6 class="text-center text-white mb-3">Admin</h6>
     </div>
 

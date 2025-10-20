@@ -11,12 +11,22 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
+use App\Http\Controllers\PanierController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\CartController;
+
+
 use App\Http\Controllers\TypeEventController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use App\Models\Event;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES (No Authentication Required)
@@ -25,20 +35,50 @@ use App\Http\Controllers\ChatController;
 
 // Homepage
 Route::get('/', function () {
+    // Check if user is logged in
+    if (Auth::check()) {
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('admin.adminPanel');
+        }
+    }
+
+    // If not logged in
     return view('home');
 
-    
 })->name('home');
 
+// Route::get('/home', function () {
+//     return view('home');
+// })->name('home');
 
-Route::get('/detaill', function () {
-    return view('frontoffice.activities.detaill');});
+Route::get('/switch-interface', function () {
+    // Ensure user is authenticated
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
 
-    Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+    // Store the current interface in session and toggle it
+    $current = Session::get('interface', 'frontoffice');
+    $new = $current === 'frontoffice' ? 'backoffice' : 'frontoffice';
+    Session::put('interface', $new);
 
+    // Redirect accordingly
+    if ($new === 'backoffice') {
+        return redirect()->route('admin.adminPanel');
+    } else {
+        return redirect()->route('home');
+    }
+})->name('switch.interface');
 
+// In routes/web.php
+Route::middleware('auth')->group(function () {
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+});
 // Public Events
 Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
+Route::post('/evenements/{event}/participate', [EventController::class, 'participate'])
+     ->name('events.participate');
+
 
 // Public Products Store
 Route::get('/magasin', [ProduitController::class, 'storeFront'])->name('produits.index');
@@ -78,6 +118,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('frontoffice.dashboard.index');
     })->name('dashboard');
 
+
+Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Management
    
 
@@ -116,6 +158,20 @@ Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.se
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'send'])->name('messages.send');
+    // ... Existing routes ...
+
+// Group chat for challenges
+Route::get('/challenges/{challenge}/chat', [MessageController::class, 'groupIndex'])->name('challenges.chat');
+Route::post('/challenges/{challenge}/messages', [MessageController::class, 'sendGroup'])->name('challenges.messages.send');
+Route::get('/groups', [ChallengeController::class, 'groups'])->name('groups.index');
+ Route::get('/challenges/{id}/messages', [MessageController::class, 'getMessages'])->name('challenges.messages')->middleware('auth');
+Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
+
+// Contact route
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 });
 
 /*
@@ -139,10 +195,11 @@ Route::prefix('admin')
         | FOOD MANAGEMENT
         |--------------------------------------------------------------------------
         */
+
         Route::get('/food/add', function () {
             return view('backoffice.food.add-food');
         })->name('food.add');
-        
+
         Route::get('/food/list', [FoodItemController::class, 'foodList'])->name('food.list');
         Route::post('/food/store', [FoodItemController::class, 'store'])->name('food.store');
         Route::get('/food/{food}', [FoodItemController::class, 'showView'])->name('food.show');
@@ -211,7 +268,7 @@ Route::prefix('admin')
         */
         Route::resource('events', EventController::class);
         Route::get('events/create', [EventController::class, 'create'])->name('events.create');
-
+       
         /*
         |--------------------------------------------------------------------------
         | EVENT TYPES MANAGEMENT
@@ -231,7 +288,44 @@ Route::prefix('admin')
         Route::get('/produits/{produit}/edit', [ProduitController::class, 'edit'])->name('produits.edit');
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
+
+Route::get('/challenges', [ChallengeController::class, 'indexAdmin'])->name('challenges.index');
+          Route::get('challenges/add', [ChallengeController::class, 'createAdmin'])->name('backoffice.challenges.add');
+         Route::post('/challenges', [ChallengeController::class, 'storeadmin'])->name('challenges.store');
+
+    Route::delete('/challenges/{challenge}', [ChallengeController::class, 'adminDestroy'])->name('challenges.destroy');
+    Route::patch('/challenges/{challenge}/toggle-famous', [ChallengeController::class, 'toggleFamous'])->name('challenges.toggleFamous');
     });
+
+
+
+
+// Cart routes
+Route::post('/cart/add', [CartController::class, 'add'])->name('panier.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('panier.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('panier.remove');
+Route::get('/cart', [CartController::class, 'get'])->name('panier.get');
+// panier paiement
+Route::get('/panier', [PanierController::class, 'show'])->name('panier.page');
+//Stripe route pour magasin
+Route::post('/checkout/create-session', [StripeController::class, 'createCheckoutSession'])->name('checkout.create');
+Route::get('/checkout/success', [StripeController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('checkout.cancel');
+
+Route::get('/panier/test', function() {
+    return session('panier', []);
+});
+
+use Illuminate\Http\Request;
+Route::get('/test-session', function(Request $request){
+    session()->put('test', 'ok');
+    return session()->all();
+});
+
+// Route::get('/clear-cart', function () {
+//     session()->forget('cart');
+//     return 'Panier vidé !';
+// });
 
 
 

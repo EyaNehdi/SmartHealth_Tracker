@@ -3,14 +3,12 @@
     <!-- Logo Section -->
     <div class="logo-sn ms-d-block-lg">
         <a class="pl-0 ml-0 text-center" href="{{ route('admin.adminPanel') }}">
-            <img src="{{ asset('assets2/img/medjestic-logo-216x62.png') }}" alt="logo" class="sidebar-logo">
+            <img src="{{ Vite::asset('resources/assets/img/logo/logo02.svg') }}" alt="logo" class="sidebar-logo">
         </a>
         <div class="user-profile-section">
-            <a href="#" class="text-center ms-logo-img-link">
-                <img src="{{ asset('assets2/img/dashboard/doctor-3.jpg') }}" alt="profile" class="user-avatar">
-            </a>
-            <h5 class="text-center text-white mt-2 user-name">Dr.Samuel</h5>
-            <h6 class="text-center text-white mb-3 user-role">Admin</h6>
+
+
+            <h2 class="text-center text-white mb-3 user-role">Admin</h2>
         </div>
     </div>
 
@@ -37,11 +35,10 @@
             </a>
         </li>
 
-        {{-- Food Management --}}
+        <!-- Food Management -->
         @php
         $isFoodActive = request()->routeIs('admin.food.add') || request()->routeIs('admin.food.list') || request()->routeIs('admin.food.edit') || request()->routeIs('admin.food.show');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isFoodActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#food"
@@ -75,11 +72,10 @@
             </ul>
         </li>
 
-        {{-- Meals Management --}}
+        <!-- Meals Management -->
         @php
         $isMealActive = request()->routeIs('admin.meals.list') || request()->routeIs('admin.meals.create') || request()->routeIs('admin.meals.edit') || request()->routeIs('admin.meals.show');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isMealActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#meals"
@@ -113,11 +109,47 @@
             </ul>
         </li>
 
-        {{-- Categories Management --}}
+        <!-- Challenges Management -->
+        @php
+        $isChallengeActive = request()->routeIs('admin.challenges.index') || request()->routeIs('admin.challenges.create');
+        @endphp
+        <li class="menu-item has-submenu">
+            <a href="#" class="menu-link {{ $isChallengeActive ? 'active' : '' }} has-chevron"
+                data-toggle="collapse" data-target="#challenges"
+                aria-expanded="{{ $isChallengeActive ? 'true' : 'false' }}"
+                aria-controls="challenges">
+                <span class="menu-icon">
+                    <i class="fas fa-trophy"></i>
+                </span>
+                <span class="menu-text">Challenges Management</span>
+                <span class="menu-chevron">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </a>
+            <ul id="challenges" class="submenu collapse {{ $isChallengeActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+                <li class="submenu-item">
+                    <a href="{{ route('admin.challenges.index') }}" class="submenu-link {{ request()->routeIs('admin.challenges.index') ? 'active' : '' }}">
+                        <span class="submenu-icon">
+                            <i class="fas fa-list"></i>
+                        </span>
+                        <span class="submenu-text">Challenges List</span>
+                    </a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{{ route('admin.backoffice.challenges.add') }}" class="submenu-link {{ request()->routeIs('admin.challenges.create') ? 'active' : '' }}">
+                        <span class="submenu-icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="submenu-text">Create Challenge</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Categories Management -->
         @php
         $isCategoryActive = request()->routeIs('admin.categories.*');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isCategoryActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#categories"
@@ -151,11 +183,10 @@
             </ul>
         </li>
 
-        {{-- Equipment Management --}}
+        <!-- Equipment Management -->
         @php
         $isEquipmentActive = request()->routeIs('admin.equipments.*');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isEquipmentActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#equipments"
@@ -234,7 +265,6 @@ $isActivityActive = request()->routeIs('admin.activities.*');
         $isEventActive = request()->routeIs('admin.events.*');
         $isTypeEventActive = request()->routeIs('admin.type_events.*');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isEventActive || $isTypeEventActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#events"
@@ -276,11 +306,10 @@ $isActivityActive = request()->routeIs('admin.activities.*');
             </ul>
         </li>
 
-        {{-- Products Management --}}
+        <!-- Products Management -->
         @php
         $isProductActive = request()->routeIs('admin.produits.*');
         @endphp
-
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link {{ $isProductActive ? 'active' : '' }} has-chevron"
                 data-toggle="collapse" data-target="#products"

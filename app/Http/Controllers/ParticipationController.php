@@ -7,6 +7,7 @@ use App\Models\Participation;
 use App\Models\Challenge;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ParticipationController extends Controller
 {
@@ -38,9 +39,9 @@ class ParticipationController extends Controller
             $data['image'] = $request->file('image')->store('participations', 'public');
         }
 
-        Participation::create($data);
+       Participation::create($data);
 
-        return redirect()->route('challenges.index')->with('success', 'Participation added successfully!');
+    return redirect()->route('groups.index', $request->challenge_id)->with('success', 'Joined challenge and group chat!');
     }
 
     public function edit(Participation $participation)
@@ -88,7 +89,7 @@ public function reply(Request $request, $id)
     $participation = Participation::findOrFail($id);
 
     // Check if current user is the challenge owner
-    if ($participation->challenge->created_by !== auth()->id()) {
+    if (!$participation->challenge || $participation->challenge->created_by !== Auth::id()) {
         abort(403);
     }
 
@@ -108,13 +109,23 @@ public function participantReply(Request $request, Participation $participation)
         'participant_reply' => $request->participant_reply,
     ]);
 
+    if ($request->ajax()) {
+        return response()->json(['success' => true, 'message' => 'Reply sent!']);
+    }
+
     return back()->with('success', 'Reply sent!');
 }
 
 
 public function myParticipations()
 {
-    $participations = auth()->user()->participations()->with('challenge', 'challenge.creator')->get();
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+    if (!$user) {
+        abort(401);
+    }
+
+    $participations = $user->participations()->with('challenge', 'challenge.creator')->get();
 
     return view('frontoffice.participations.create', compact('participations'));
 }

@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Participation;
 
 class Challenge extends Model
 {
     protected $fillable = ['titre', 'description', 'dateDebut', 'dateFin', 'created_by', 'image'];
+
+   protected $casts = [
+    'dateDebut' => 'datetime',
+    'dateFin' => 'datetime',
+    'is_famous' => 'boolean',
+];
 
     public function creator()
     {
@@ -20,8 +24,19 @@ class Challenge extends Model
         return $this->hasMany(Participation::class);
     }
 
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'challenge_user', 'challenge_id', 'user_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
     public function isParticipatedBy($userId)
     {
-        return $this->participations()->where('user_id', $userId)->exists();
+        return $this->participations()->where('user_id', $userId)->exists() ||
+               $this->created_by === $userId;
     }
 }

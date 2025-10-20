@@ -276,6 +276,7 @@
 @vite(['resources/assets/js/ajax-form.js'])
 @vite(['resources/assets/js/main.js'])
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chatIcon = document.getElementById('chatIcon');
@@ -361,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 @stack('frontoffice-scripts')
 </body>
 </html>

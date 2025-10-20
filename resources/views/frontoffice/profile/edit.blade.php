@@ -133,7 +133,7 @@
                                 <div class="sidebar__contact">
                                     <h4 class="title">Besoin d'aide ?</h4>
                                     <p>Contactez notre équipe de support pour toute question concernant votre profil.</p>
-                                    <a href="#" class="tg-btn tg-btn-three">Nous Contacter</a>
+                                    <a href="{{ route('contact') }}" class="btn btn-primary">Nous contacter</a>
                                 </div>
                             </div>
                         </aside>

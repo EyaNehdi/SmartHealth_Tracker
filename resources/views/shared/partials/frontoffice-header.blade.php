@@ -24,18 +24,332 @@
                                         <ul class="sub-menu">
                                             <li><a href="{{ route('challenges.index') }}">Tous les objectifs</a></li>
                                             <li><a href="{{ route('challenges.create') }}">notre objectif/ajouter</a></li>
+                                            <li><a href="{{ route('groups.index') }}">notre groupes</a></li>
                                         </ul>
                                     </li>
+
                                     <li><a href="#ingredient" class="section-link">Magasin</a></li>
                                     <li><a href="activities/front" class="section-link">Activities</a></li>
+
                                     <li><a href="{{ route('produits.index') }}" class="section-link">Magasin</a></li>
+
+                                    <li><a href="{{ route('activities.index') }}" class="section-link">Activities</a></li>
+
                                     <li><a href="{{ route('events.front') }}" class="section-link">Event</a></li>
+                                    <li><a href="{{ route('contact') }}" class="section-link">CONTACT</a></li>
                                 </ul>
                             </div>
                             <div class="tgmenu__action">
                                 <ul class="list-wrap">
+                                    @auth
+                                     <li class="header-shop-panier position-relative">
+    <a href="javascript:void(0)" class="shop-panier-toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 6H21L19 14H7L6 6Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="20" r="1" fill="#fff"/>
+            <circle cx="18" cy="20" r="1" fill="#fff"/>
+        </svg>
+        {{-- <span class="shop-panier-count">0</span> --}}
+    </a>
+
+    <!-- Mini-panier global -->
+    <div class="shop-mini-panier">
+        <div class="mini-panier-header">
+            <h4>Votre panier</h4>
+            <button class="mini-panier-close">&times;</button>
+        </div>
+        <div class="mini-panier-body">
+            <ul class="mini-panier-items">
+                <!-- Items injectés via JS -->
+            </ul>
+        </div>
+        <div class="mini-panier-footer">
+            <p>Total: <span class="mini-panier-total">0 DT</span></p>
+            <a href="{{ route('panier.page') }}" class="btn btn-primary mt-2">Voir Panier</a>
+        </div>
+    </div>
+</li>
+
+<div class="shop-mini-panier-overlay"></div>
+<script>
+window.routes = {
+    panierGet: "{{ route('panier.get') }}",
+    panierAdd: "{{ route('panier.add') }}",
+    panierUpdate: "{{ route('panier.update') }}",
+    panierRemove: "{{ route('panier.remove') }}"
+};
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    const panierToggle = document.querySelector('.shop-panier-toggle');
+    const miniPanier = document.querySelector('.shop-mini-panier');
+    const closeBtn = document.querySelector('.mini-panier-close');
+    const overlay = document.querySelector('.shop-mini-panier-overlay');
+    const listEl = miniPanier.querySelector('.mini-panier-items');
+    const totalEl = miniPanier.querySelector('.mini-panier-total');
+    const countEl = document.querySelector('.shop-panier-count');
+
+    // Affichage du mini-panier
+    function togglePanier() {
+        miniPanier.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+    function closePanier() {
+        miniPanier.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+    panierToggle.addEventListener('click', togglePanier);
+    closeBtn.addEventListener('click', closePanier);
+    overlay.addEventListener('click', closePanier);
+
+    // Conversion en tableau si backend renvoie un objet
+    function normalizePanier(p) {
+        if (!p) return [];
+        return Array.isArray(p) ? p : Object.values(p);
+    }
+
+    // Échappement HTML pour éviter injection
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Rendu du panier
+    function renderPanier(panier) {
+       panier = normalizePanier(panier).filter(item => item.id !== undefined && item.id !== null && item.id !== '');
+        listEl.innerHTML = '';
+        let total = 0;
+
+        panier.forEach(item => {
+            const prix = parseFloat(item.prix) || 0;
+            const qty = parseInt(item.qty) || 1;
+            total += prix * qty;
+
+            const li = document.createElement('li');
+            li.dataset.itemId = item.id;
+
+            li.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${item.image ?? ''}" width="50" style="border-radius:5px; object-fit:cover;">
+                    <div style="flex:1">
+                        <span class="item-nom">${escapeHtml(item.nom ?? '')}</span><br>
+                        <small>${prix.toFixed(2)} DT</small>
+                        <div style="margin-top:6px;">
+                            <button class="qty-decrease btn-qty" data-id="${item.id}">-</button>
+                            <span class="qty">${qty}</span>
+                            <button class="qty-increase btn-qty" data-id="${item.id}">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-item btn btn-sm btn-danger" data-id="${item.id}">&times;</button>
+                </div>
+            `;
+            listEl.appendChild(li);
+        });
+
+        totalEl.textContent = total.toFixed(2) + ' DT';
+        if (countEl) countEl.textContent = panier.length;
+    }
+
+    // Chargement du panier depuis backend
+    async function updatePanier() {
+        try {
+            const res = await fetch(window.routes.panierGet, { credentials: 'same-origin' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const panier = await res.json();
+            renderPanier(panier);
+        } catch (err) {
+            console.error('Erreur récupération panier :', err);
+        }
+    }
+
+    // Modifier la quantité
+    async function changeQty(id, delta) {
+        try {
+            const resGet = await fetch(window.routes.panierGet, { credentials: 'same-origin' });
+            const panier = await resGet.json();
+            const normalized = normalizePanier(panier);
+            const item = normalized.find(i => String(i.id) === String(id));
+            if (!item) return;
+
+            const newQty = Math.max(1, (parseInt(item.qty) || 1) + delta);
+            const payload = { id: id, qty: newQty };
+
+            const res = await fetch(window.routes.panierUpdate, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const updated = await res.json();
+            renderPanier(updated);
+        } catch (err) {
+            console.error('Erreur update qty :', err);
+        }
+    }
+
+    // Supprimer un item
+    async function removeItem(id) {
+        try {
+            const payload = { id: id };
+            const res = await fetch(window.routes.panierRemove, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const updated = await res.json();
+            renderPanier(updated);
+        } catch (err) {
+            console.error('Erreur suppression item :', err);
+        }
+    }
+
+    // **Event delegation** pour tous les boutons
+    listEl.addEventListener('click', (e) => {
+        const target = e.target;
+        const id = target.dataset.id;
+        if (!id) return;
+
+        if (target.classList.contains('qty-increase')) {
+            changeQty(id, +1);
+        } else if (target.classList.contains('qty-decrease')) {
+            changeQty(id, -1);
+        } else if (target.classList.contains('remove-item')) {
+            removeItem(id);
+        }
+    });
+
+    // Initial load
+    updatePanier();
+
+    // Optionnel : écouter les changements cross-tab
+    window.addEventListener('storage', updatePanier);
+});
+</script>
+
+
+
+
+
+<style>
+.header-shop-panier {
+    position: relative; /* Nécessaire pour le dropdown */
+}
+
+.shop-panier-toggle svg path,
+.shop-panier-toggle svg circle {
+    stroke: #fff;
+    fill: #fff;
+}
+
+/* Mini-panier dropdown */
+.shop-mini-panier, .shop-mini-panier-principal {
+    position: absolute;
+    top: 120%;   /* juste en dessous de l’icône */
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Actif */
+.shop-mini-panier.active, .shop-mini-panier-principal.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Header */
+.mini-panier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.mini-panier-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Close button */
+.mini-panier-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Body with scroll */
+.mini-panier-body {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.mini-panier-items {
+    list-style: none;
+    padding: 10px 15px;
+    margin: 0;
+}
+
+.mini-panier-items li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+/* Footer */
+.mini-panier-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #eee;
+}
+
+.mini-panier-footer p {
+    margin: 0 0 5px;
+    font-weight: bold;
+}
+
+.mini-panier-footer .btn {
+    display: block;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 5px;
+    font-size: 14px;
+}
+</style>
+{{-- end js et css --}}
                                     <li class="header-cart">
-                                        <a href="shop.html" class="cart-count headerCart__button">
+                                        <a href="javascript:void(0)" class="cart-count headerCart__button">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M3 14.5V18C3 18.5523 3.44772 19 4 19H5.5V11L4.5 11.5C3.67157 11.5 3 12.1716 3 13V14.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                                 <path d="M5.5 11V7C5.5 6.17157 6.17157 5.5 7 5.5C7.82843 5.5 8.5 6.17157 8.5 7V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -45,9 +359,10 @@
                                                 <path d="M18.5 12V19C18.5 19.5523 18.9477 20 19.5 20H20.5C21.0523 20 21.5 19.5523 21.5 19V14C21.5 12.8954 20.6046 12 19.5 12H18.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                                 <path d="M18.5 12V6.5C18.5 5.67157 17.8284 5 17 5C16.1716 5 15.5 5.67157 15.5 6.5V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
-                                            <span class="mini-cart-count">2</span>
+                                            <span class="mini-cart-count" id="participation-count">{{ auth()->user()->participations()->count() }}</span>
                                         </a>
                                     </li>
+                                    @endauth
                                     <li class="header-search">
                                         <a href="javascript:void(0)" class="search-open-btn">
                                             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -128,4 +443,167 @@
         </div>
         <!-- Mobile Menu end -->
     </div>
+
+    <!-- mini-cart-area -->
+    @auth
+    <div class="mini__cart-wrap">
+        <div class="mini__cart-toggle"><img src="{{ Vite::asset('resources/assets/img/icons/close.png') }}" alt="icon"></div>
+        <div class="mini__cart-top">
+            <h4 class="mini__cart-title">notre participation</h4>
+            <div class="mini__cart-widget">
+                @php
+                    $userParticipations = auth()->user()->participations()->with(['challenge', 'challenge.creator'])->get();
+                @endphp
+
+                @forelse($userParticipations as $p)
+                <div class="mini__cart-item">
+                    <div class="thumb">
+                        @if ($p->image)
+                            <img src="{{ asset('storage/' . $p->image) }}" alt="img">
+                        @else
+                            <img src="{{ Vite::asset('resources/assets/img/blog/blog_img01.jpg') }}" alt="img">
+                        @endif
+                    </div>
+                    <div class="content">
+                        <h6 class="title">{{ $p->challenge->titre }}</h6>
+                        <!-- Participant comment -->
+                        <p><strong>You:</strong> {{ $p->comment ?? '-' }}</p>
+                        <!-- Owner reply -->
+                        @if ($p->reply)
+                            <p><strong>Owner:</strong> {{ $p->reply }}</p>
+                        @endif
+                        <!-- Display existing participant reply -->
+                        @if ($p->participant_reply)
+                            <small class="text-muted d-block mt-1"><strong>You replied:</strong><br> {{ $p->participant_reply }}</small>
+                        @endif
+                        <!-- Participant reply to owner -->
+                        @if ($p->reply && !$p->participant_reply)
+                            <form action="{{ route('participation.participant_reply', $p->id) }}" method="POST" class="mt-2">
+                                @csrf
+                                @method('PUT')
+                                <input type="text" name="participant_reply" placeholder="Reply to owner..." class="form-control mb-1">
+                                <button type="submit" class="btn btn-sm btn-primary">Send</button>
+                            </form>
+                        @endif
+                    </div>
+                    <div class="mini__cart-delete">
+                        <img src="{{ Vite::asset('resources/assets/img/icons/close.png') }}" alt="icon">
+                    </div>
+                </div>
+                @empty
+                <p>No participations yet.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+    <div class="headerCart__overlay"></div>
+    @endauth
+    <!-- mini-cart-area-end -->
 </header>
+
+@push('frontoffice-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle mini-cart functionality
+    const headerCartButton = document.querySelector('.headerCart__button');
+    const miniCartWrap = document.querySelector('.mini__cart-wrap');
+    const miniCartToggle = document.querySelector('.mini__cart-toggle');
+    const headerCartOverlay = document.querySelector('.headerCart__overlay');
+    const participationCount = document.getElementById('participation-count');
+
+    // Open mini-cart when clicking the cart button
+    if (headerCartButton && miniCartWrap) {
+        headerCartButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            miniCartWrap.classList.add('active');
+            document.body.classList.add('cart-open');
+        });
+    }
+
+    // Close mini-cart when clicking the toggle button
+    if (miniCartToggle && miniCartWrap) {
+        miniCartToggle.addEventListener('click', function() {
+            miniCartWrap.classList.remove('active');
+            document.body.classList.remove('cart-open');
+        });
+    }
+
+    // Close mini-cart when clicking the overlay
+    if (headerCartOverlay && miniCartWrap) {
+        headerCartOverlay.addEventListener('click', function() {
+            miniCartWrap.classList.remove('active');
+            document.body.classList.remove('cart-open');
+        });
+    }
+
+    // Handle participant reply form submissions
+    const replyForms = miniCartWrap ? miniCartWrap.querySelectorAll('form[action*="participant_reply"]') : [];
+    replyForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+
+            // Disable button and show loading
+            submitButton.disabled = true;
+            submitButton.textContent = 'Sending...';
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show';
+                    successAlert.innerHTML = `
+                        <strong>Success!</strong> Your reply has been sent.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+
+                    // Insert before the form
+                    this.parentNode.insertBefore(successAlert, this);
+
+                    // Hide the form since reply was sent
+                    this.style.display = 'none';
+
+                    // Add the reply to the display
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'mt-1';
+                    replyDiv.innerHTML = `
+                        <small class="text-muted d-block"><strong>You replied:</strong><br> ${formData.get('participant_reply')}</small>
+                    `;
+                    this.parentNode.appendChild(replyDiv);
+
+                    // Update participation count
+                    if (participationCount) {
+                        const currentCount = parseInt(participationCount.textContent) || 0;
+                        participationCount.textContent = currentCount;
+                    }
+                } else {
+                    throw new Error(data.message || 'Error sending reply');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending your reply. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            });
+        });
+    });
+});
+</script>
+@endpush

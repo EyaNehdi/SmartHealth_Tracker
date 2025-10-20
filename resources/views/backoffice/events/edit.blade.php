@@ -13,47 +13,69 @@
                 </ol>
             </nav>
         </div>
+
         <div class="col-xl-12 col-md-12">
             <div class="ms-panel">
                 <div class="ms-panel-header ms-panel-custome">
-                    <h6>Edit Event</h6>
+                    <h6>Modifier Event</h6>
                     <a href="{{ route('admin.events.index') }}" class="ms-text-primary">Events List</a>
                 </div>
+
                 <div class="ms-panel-body">
-                    <form class="needs-validation" method="POST" action="{{ route('admin.events.update', $event) }}" novalidate>
+                    <form id="eventForm" method="POST" action="{{ route('admin.events.update', $event) }}" novalidate>
                         @csrf
                         @method('PUT')
 
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
-                                <label for="title">Title</label>
-                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" id="title" placeholder="Event Title" value="{{ old('title', $event->title) }}" required>
-                                @error('title')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label for="title">Titre</label>
+                                <input type="text" 
+                                       name="title" 
+                                       id="title" 
+                                       class="form-control @error('title') is-invalid @enderror" 
+                                       placeholder="Event Title" 
+                                       value="{{ old('title', $event->title) }}" 
+                                       required>
+                                <div class="invalid-feedback" id="title-error">
+                                    @error('title') {{ $message }} @enderror
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="location">Location</label>
-                                <input type="text" name="location" class="form-control @error('location') is-invalid @enderror" id="location" placeholder="Event Location" value="{{ old('location', $event->location) }}" required>
-                                @error('location')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label for="location">Localisation</label>
+                                <input type="text" 
+                                       name="location" 
+                                       id="location" 
+                                       class="form-control @error('location') is-invalid @enderror" 
+                                       placeholder="Event Location" 
+                                       value="{{ old('location', $event->location) }}" 
+                                       required>
+                                <div class="invalid-feedback" id="location-error">
+                                    @error('location') {{ $message }} @enderror
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
                                 <label for="date">Date</label>
-                                <input type="date" name="date" class="form-control @error('date') is-invalid @enderror" id="date" value="{{ old('date', $event->date) }}" required>
-                                @error('date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="date" 
+                                       name="date" 
+                                       id="date" 
+                                       class="form-control @error('date') is-invalid @enderror" 
+                                       value="{{ old('date', $event->date) }}" 
+                                       required>
+                                <div class="invalid-feedback" id="date-error">
+                                    @error('date') {{ $message }} @enderror
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="type_event_id">Type</label>
-                                <select name="type_event_id" class="form-control @error('type_event_id') is-invalid @enderror" id="type_event_id" required>
+                                <select name="type_event_id" 
+                                        id="type_event_id" 
+                                        class="form-control @error('type_event_id') is-invalid @enderror" 
+                                        required>
                                     <option value="">Select Type</option>
                                     @foreach($types as $type)
                                         <option value="{{ $type->id }}" {{ $event->type_event_id == $type->id ? 'selected' : '' }}>
@@ -61,21 +83,59 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('type_event_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <div class="invalid-feedback" id="type-error">
+                                    @error('type_event_id') {{ $message }} @enderror
+                                </div>
                             </div>
                         </div>
 
-                       
-
-                        <button class="btn btn-warning mt-4 d-inline w-20" type="reset">Reset</button>
-                        <button class="btn btn-primary mt-4 d-inline w-20" type="submit">Save</button>
+                        <button class="btn btn-warning mt-4 d-inline w-20" type="reset">Réinitialiser</button>
+                        <button class="btn btn-primary mt-4 d-inline w-20" type="submit">Enregistrer</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ✅ Script de validation côté client -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('eventForm');
+    const title = document.getElementById('title');
+    const location = document.getElementById('location');
+    const titleError = document.getElementById('title-error');
+    const locationError = document.getElementById('location-error');
+    const onlyLetters = /^[A-Za-zÀ-ÿ\s]+$/;
+
+    title.addEventListener('input', () => validateTextField(title, titleError, "Le titre"));
+    location.addEventListener('input', () => validateTextField(location, locationError, "Le lieu"));
+
+    function validateTextField(input, errorContainer, fieldName) {
+        const value = input.value.trim();
+
+        if (value === '') {
+            errorContainer.textContent = `${fieldName} est obligatoire.`;
+            input.classList.add('is-invalid');
+        } else if (!onlyLetters.test(value)) {
+            errorContainer.textContent = `${fieldName} doit contenir uniquement des lettres.`;
+            input.classList.add('is-invalid');
+        } else {
+            errorContainer.textContent = '';
+            input.classList.remove('is-invalid');
+        }
+    }
+
+    form.addEventListener('submit', (e) => {
+        validateTextField(title, titleError, "Le titre");
+        validateTextField(location, locationError, "Le lieu");
+
+        const invalidInputs = form.querySelectorAll('.is-invalid');
+        if (invalidInputs.length > 0) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
 
 @endsection

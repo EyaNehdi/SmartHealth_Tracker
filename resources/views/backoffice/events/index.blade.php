@@ -16,9 +16,8 @@
         <div class="col-xl-12 col-md-12">
             <div class="ms-panel">
                 <div class="ms-panel-header ms-panel-custome d-flex justify-content-between align-items-center">
-                    <h6>Events List</h6>
-                    <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm">➕ Add Event</a>
-                    
+                    <h6>Liste des Events</h6>
+                    <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm">➕ Ajouter Event</a>
                 </div>
 
                 <div class="ms-panel-body">
@@ -26,14 +25,16 @@
                         <table class="table table-striped table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Title</th>
-                                    <th>Location</th>
+                                    <th>Titre</th>
+                                    <th>Localisation</th>
                                     <th>Date</th>
                                     <th>Type</th>
-                                    <th>Days Until</th>
-                                    <th>Month</th>
-                                    <th>Quarter</th>
-                                    <th>Week Day</th>
+                                    <th>Jours restants</th>
+                                    <th>Mois</th>
+                                    <th>Trimestre</th>
+                                    <th>Jour de la semaine</th>
+                                    <th>Participants</th> <!-- Nouvelle colonne -->
+                                    <th>Progression</th> <!-- Nouvelle colonne -->
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -48,14 +49,25 @@
                                         <td>{{ $event->month }}</td>
                                         <td>{{ $event->quarter }}</td>
                                         <td>{{ $event->week_day }}</td>
+                                        <td>{{ count($event->participants ?? []) }}</td>
+                                        <td style="min-width: 120px;">
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {{ $event->participation_percent ?? 0 }}%;" 
+                                                     aria-valuenow="{{ $event->participation_percent ?? 0 }}" 
+                                                     aria-valuemin="0" aria-valuemax="100">
+                                                    {{ $event->participation_percent ?? 0 }}%
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="d-flex gap-2">
                                             <a href="{{ route('admin.events.edit', $event) }}" 
-                                               class="btn btn-warning btn-sm">✏ Edit</a>
+                                               class="btn btn-warning btn-sm">✏ Modifier</a>
 
                                             <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Delete this event?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">🗑 Supprimer</button>
                                             </form>
                                         </td>
                                     </tr>

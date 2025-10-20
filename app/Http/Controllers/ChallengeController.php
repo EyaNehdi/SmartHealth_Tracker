@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Challenge;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class ChallengeController extends Controller
@@ -13,35 +15,53 @@ class ChallengeController extends Controller
 
 
 
-    public function index(Request $request)
+ public function index(Request $request)
 {
-    // Get search query from input
-    $search = $request->input('query');
+    $query = $request->input('query');
+    $category = $request->input('category');
 
-    // Fetch all challenges (with participations count + creator) and filter if search exists
     $allChallenges = Challenge::with('creator')
         ->withCount('participations')
-        ->when($search, function ($query) use ($search) {
-            $query->where('titre', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+        ->when($query, function ($q) use ($query) {
+            return $q->where('titre', 'like', "%{$query}%")
+                     ->orWhere('description', 'like', "%{$query}%");
         })
-        ->get();
+        ->when($category, function ($q) use ($category) {
+            // Adjust based on how categories are stored (e.g., a 'category' column)
+            return $q->where('category', $category);
+        })
+        ->paginate(2);
 
-    // Challenges created by current user
-    $challenges = Challenge::where('created_by', auth()->id())
-        ->withCount('participations')
-        ->get();
+    $mostParticipated = Challenge::withCount('participations')
+        ->orderBy('participations_count', 'desc')
+        ->first();
 
-    // Challenge with the most participants
-    $mostParticipated = $allChallenges->sortByDesc('participations_count')->first();
+    $search = $query;
 
-    $users = User::all();
-
-    return view('frontoffice.challenges.index', compact('challenges', 'users', 'allChallenges', 'mostParticipated', 'search'));
+    return view('frontoffice.challenges.index', compact('allChallenges', 'mostParticipated', 'search'));
 }
 
 
+public function indexAdmin(Request $request)
+    {
+        $search = $request->input('query');
+        $allChallenges = Challenge::with('creator')
+            ->withCount('participations')
+            ->when($search, function ($query) use ($search) {
+                $query->where('titre', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->get();
 
+        $challenges = Challenge::where('created_by', auth()->id())
+            ->withCount('participations')
+            ->get();
+
+        $mostParticipated = $allChallenges->sortByDesc('participations_count')->first();
+        $users = User::all();
+
+        return view('backoffice.challenges.index', compact('challenges', 'users', 'allChallenges', 'mostParticipated', 'search'));
+    }
 
 
     public function create()
@@ -55,13 +75,55 @@ class ChallengeController extends Controller
     $users = User::all(); // Add this line to fetch all users
         return view('frontoffice.challenges.create', compact('users', 'challenges', 'participations'));
     }
+    public function createAdmin()
+    {
+        $participations = auth()->user()->participations()->with('challenge', 'challenge.creator')->get();
+   $challenges = Challenge::where('created_by', auth()->id())
+    ->withCount('participations')
+    ->get();
+
+
+    $users = User::all(); // Add this line to fetch all users
+        return view('backoffice.challenges.add', compact('users', 'challenges', 'participations'));
+    }
+  public function storeadmin(Request $request)
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'dateDebut' => 'required|date|after_or_equal:today',
+            'dateFin' => 'required|date|after:dateDebut',
+            'participants' => 'nullable|array',
+            'participants.*' => 'exists:users,id',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $challenge = Challenge::create([
+            'titre' => $validated['titre'],
+            'description' => $validated['description'],
+            'dateDebut' => $validated['dateDebut'],
+            'dateFin' => $validated['dateFin'],
+            'created_by' => auth()->id(),
+        ]);
+
+        if (!empty($validated['participants'])) {
+            $challenge->participants()->attach($validated['participants']);
+        }
+
+        if ($request->hasFile('image')) {
+            $challenge->image = $request->file('image')->store('challenges', 'public');
+            $challenge->save();
+        }
+
+        return redirect()->route('admin.challenges.index')->with('success', 'Challenge créé avec succès !');
+    }
 
 public function store(Request $request)
 {
     $request->validate([
         'titre' => 'required|string|max:255',
         'description' => 'required|string',
-        'dateDebut' => 'required|date',
+        'dateDebut' => 'required|date|after_or_equal:today',
         'dateFin' => 'required|date|after_or_equal:dateDebut',
         'image' => 'nullable|image|max:2048',
     ]);
@@ -85,60 +147,136 @@ public function store(Request $request)
 
 public function destroy(Challenge $challenge)
 {
-    // Vérifier que l’utilisateur est bien le créateur
-    if ($challenge->created_by !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
+   // Authorize the action
+    if (auth()->id() !== $challenge->created_by) {
+        abort(403, 'Unauthorized');
     }
 
-    // Supprimer l’image du stockage si elle existe
-    if ($challenge->image && Storage::disk('public')->exists($challenge->image)) {
+    // Prevent deletion if famous
+    if ($challenge->is_famous) {
+        return redirect()->route('challenges.create')->with('error', 'Ce challenge est célèbre et ne peut pas être supprimé.');
+    }
+
+    // Delete associated image if exists
+    if ($challenge->image) {
         Storage::disk('public')->delete($challenge->image);
     }
 
-    // Supprimer le challenge
+    // Delete participations
+    $challenge->participations()->delete();
+
+    // Delete the challenge
     $challenge->delete();
 
-    return redirect()->route('challenges.index')->with('success', 'Challenge supprimé avec succès.');
+    return redirect()->route('challenges.create')->with('success', 'Challenge supprimé avec succès !');
+}
+public function adminDestroy(Challenge $challenge)
+{
+    // Authorize the action
+    if (!auth()->user()->isAdmin()) {
+        abort(403, 'Unauthorized');
+    }
+
+    // Delete associated image if exists
+    if ($challenge->image) {
+        \Storage::disk('public')->delete($challenge->image);
+    }
+
+    // Delete participations
+    $challenge->participations()->delete();
+
+    // Delete the challenge
+    $challenge->delete();
+
+    return redirect()->route('admin.challenges.index')->with('success', 'Challenge supprimé avec succès !');
 }
 public function edit(Challenge $challenge)
 {
-    if ($challenge->created_by !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
+    // Authorize the user (only creator can edit)
+    if (auth()->id() !== $challenge->created_by) {
+        abort(403, 'Unauthorized');
     }
 
-    return view('frontoffice.challenges.edit', compact('challenge'));
+    $participations = auth()->user()->participations()->with('challenge', 'challenge.creator')->get();
+    $challenges = Challenge::where('created_by', auth()->id())
+        ->withCount('participations')
+        ->with('creator')
+        ->get();
+    $users = User::all();
+
+    return view('frontoffice.challenges.create', compact('users', 'challenges', 'participations'));
 }
 
 public function update(Request $request, Challenge $challenge)
 {
-    if ($challenge->created_by !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
+    // Authorize the user
+    if (auth()->id() !== $challenge->created_by) {
+        abort(403, 'Unauthorized');
     }
 
-    $request->validate([
+    $validated = $request->validate([
         'titre' => 'required|string|max:255',
         'description' => 'required|string',
-        'dateDebut' => 'required|date',
-        'dateFin' => 'required|date|after_or_equal:dateDebut',
+        'dateDebut' => 'nullable|date',
+        'dateFin' => 'required|date|after:dateDebut',
         'image' => 'nullable|image|max:2048',
     ]);
 
-    $data = $request->only(['titre', 'description', 'dateDebut', 'dateFin']);
+    $challenge->update([
+        'titre' => $validated['titre'],
+        'description' => $validated['description'],
+        'dateDebut' => $validated['dateDebut'],
+        'dateFin' => $validated['dateFin'],
+    ]);
 
-    // Gérer la nouvelle image
     if ($request->hasFile('image')) {
-        // Supprimer l’ancienne si elle existe
-        if ($challenge->image && Storage::disk('public')->exists($challenge->image)) {
+        // Delete old image if exists
+        if ($challenge->image) {
             Storage::disk('public')->delete($challenge->image);
         }
-
-        $data['image'] = $request->file('image')->store('challenges', 'public');
+        $challenge->image = $request->file('image')->store('challenges', 'public');
+        $challenge->save();
     }
 
-    $challenge->update($data);
-
-    return redirect()->route('challenges.index')->with('success', 'Challenge modifié avec succès.');
+    return redirect()->route('challenges.create')->with('success', 'Objectif mis à jour avec succès !');
 }
+ public function groups()
+    {
+        Log::info('Accessing user groups', ['user_id' => Auth::id()]);
 
+        $challenges = Challenge::where('created_by', Auth::id())
+            ->orWhereHas('participations', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->withCount('participations')
+            ->get();
+
+        return view('frontoffice.groups.index', compact('challenges'));
+    }
+
+// In ChallengeController.php
+
+public function toggleFamous(Request $request, Challenge $challenge)
+{
+    if (!auth()->user()->isAdmin()) {
+        abort(403, 'Unauthorized');
+    }
+
+    $challenge->is_famous = !$challenge->is_famous;
+    $challenge->save();
+    try {
+        $users = $challenge->participations()->with('user')->get()->pluck('user');
+        foreach ($users as $user) {
+            $user->notify(new \App\Notifications\FamousChallengeNotification($challenge));
+        }
+        Log::info('Notifications sent for famous challenge ID: ' . $challenge->id);
+    } catch (\Exception $e) {
+        Log::error('Failed to send notifications for challenge ID: ' . $challenge->id . '. Error: ' . $e->getMessage());
+    }
+
+    $message = $challenge->is_famous ? 'Challenge marqué comme Célèbre !' : 'Statut Célèbre retiré du challenge !';
+
+    return redirect()->route('admin.challenges.index')->with('success', $message);
+}
 
 }
