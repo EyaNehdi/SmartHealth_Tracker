@@ -189,6 +189,46 @@
             </ul>
         </li>
 
+
+
+          {{-- Activities Management --}}
+@php
+$isActivityActive = request()->routeIs('admin.activities.*');
+@endphp
+
+<li class="menu-item has-submenu">
+    <a href="#" class="menu-link {{ $isActivityActive ? 'active' : '' }} has-chevron"
+        data-toggle="collapse" data-target="#activities"
+        aria-expanded="{{ $isActivityActive ? 'true' : 'false' }}"
+        aria-controls="activities">
+        <span class="menu-icon">
+            <i class="fas fa-running"></i>
+        </span>
+        <span class="menu-text">Activities</span>
+        <span class="menu-chevron">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </a>
+    <ul id="activities" class="submenu collapse {{ $isActivityActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
+        <li class="submenu-item">
+            <a href="{{ route('admin.activities.index') }}" class="submenu-link {{ request()->routeIs('admin.activities.index') ? 'active' : '' }}">
+                <span class="submenu-icon">
+                    <i class="fas fa-list"></i>
+                </span>
+                <span class="submenu-text">Activities List</span>
+            </a>
+        </li>
+        <li class="submenu-item">
+            <a href="{{ route('admin.activities.create') }}" class="submenu-link {{ request()->routeIs('admin.activities.create') ? 'active' : '' }}">
+                <span class="submenu-icon">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="submenu-text">Add Activity</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
         {{-- Events Management --}}
         @php
         $isEventActive = request()->routeIs('admin.events.*');

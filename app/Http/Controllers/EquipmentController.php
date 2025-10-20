@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Equipment;
-
-
 use Illuminate\Http\Request;
 
 class EquipmentController extends Controller
@@ -27,23 +26,46 @@ class EquipmentController extends Controller
     }
 
     public function store(Request $request)
-{
-    try {
+    {
         $validated = $request->validate([
-            'nom' => 'required|string|max:255',
+            'nom' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\sàáâãäåçèéêëìíîïðòóôõöùúûüýÿÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÒÓÔÕÖÙÚÛÜÝŸ\-]+$/u',
+            ],
             'type' => 'required|string|in:cardio,musculation,rééducation,autre',
+            'marque' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\sàáâãäåçèéêëìíîïðòóôõöùúûüýÿÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÒÓÔÕÖÙÚÛÜÝŸ\-]+$/u',
+            ],
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'etat' => 'required|string|in:neuf,bon,usagé,à réparer',
             'description' => 'nullable|string',
-            'statut' => 'required|string|in:disponible,indisponible,en_maintenance',
+        ], [
+            'nom.required' => 'Le nom de l\'équipement est requis.',
+            'nom.regex' => 'Le nom doit contenir uniquement des lettres, espaces ou tirets (pas de chiffres ou caractères spéciaux).',
+            'type.required' => 'Le type est requis.',
+            'marque.required' => 'La marque est requise.',
+            'marque.regex' => 'La marque doit contenir uniquement des lettres, espaces ou tirets (pas de chiffres ou caractères spéciaux).',
+            'image.mimes' => 'L\'image doit être au format JPEG, PNG, JPG ou GIF.',
+            'image.max' => 'L\'image ne doit pas dépasser 2MB.',
+            'etat.required' => 'L\'état est requis.',
         ]);
 
-        Equipment::create($validated);
+        $data = $validated;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('equipments', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        Equipment::create($data);
 
         return redirect()->route('admin.equipments.list')->with('message', 'Équipement ajouté avec succès.');
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return redirect()->back()->withErrors($e->validator)->withInput()->with('error', 'Erreur lors de l\'ajout de l\'équipement. Veuillez vérifier les champs.');
     }
-}
-
 
     public function edit(Equipment $equipment)
     {
@@ -52,26 +74,55 @@ class EquipmentController extends Controller
 
     public function update(Request $request, Equipment $equipment)
     {
-        try {
-            $request->validate([
-                'nom' => 'required|string|max:255',
-                'type' => 'required|string|in:cardio,musculation,rééducation,autre',
-                'description' => 'nullable|string',
-                'statut' => 'required|string|in:disponible,indisponible',
-            ]);
+        $validated = $request->validate([
+            'nom' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\sàáâãäåçèéêëìíîïðòóôõöùúûüýÿÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÒÓÔÕÖÙÚÛÜÝŸ\-]+$/u',
+            ],
+            'type' => 'required|string|in:cardio,musculation,rééducation,autre',
+            'marque' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\sàáâãäåçèéêëìíîïðòóôõöùúûüýÿÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÒÓÔÕÖÙÚÛÜÝŸ\-]+$/u',
+            ],
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'etat' => 'required|string|in:neuf,bon,usagé,à réparer',
+            'description' => 'nullable|string',
+        ], [
+            'nom.required' => 'Le nom de l\'équipement est requis.',
+            'nom.regex' => 'Le nom doit contenir uniquement des lettres, espaces ou tirets (pas de chiffres ou caractères spéciaux).',
+            'type.required' => 'Le type est requis.',
+            'marque.required' => 'La marque est requise.',
+            'marque.regex' => 'La marque doit contenir uniquement des lettres, espaces ou tirets (pas de chiffres ou caractères spéciaux).',
+            'image.mimes' => 'L\'image doit être au format JPEG, PNG, JPG ou GIF.',
+            'image.max' => 'L\'image ne doit pas dépasser 2MB.',
+            'etat.required' => 'L\'état est requis.',
+        ]);
 
-            $equipment->update($request->all());
+        $data = $validated;
 
-            return redirect()->route('admin.equipments.list')->with('updated', 'Équipement modifié avec succès.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()->withErrors($e->validator)->withInput()->with('error', 'Erreur lors de la modification de l\'équipement. Veuillez vérifier les champs.');
+        if ($request->hasFile('image')) {
+            if ($equipment->image) {
+                \Storage::disk('public')->delete($equipment->image);
+            }
+            $imagePath = $request->file('image')->store('equipments', 'public');
+            $data['image'] = $imagePath;
         }
+
+        $equipment->update($data);
+
+        return redirect()->route('admin.equipments.list')->with('updated', 'Équipement modifié avec succès.');
     }
 
     public function destroy(Equipment $equipment)
     {
+        if ($equipment->image) {
+            \Storage::disk('public')->delete($equipment->image);
+        }
         $equipment->delete();
         return redirect()->route('admin.equipments.list')->with('success', 'Équipement supprimé avec succès.');
     }
-
 }

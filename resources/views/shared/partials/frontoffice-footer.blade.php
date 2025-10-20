@@ -41,7 +41,7 @@
                     <h2 class="footer__widget-title">About Us</h2>
                     <ul class="list-wrap footer__widget-link">
                         <li><a href="{{ route('home') }}">About Company</a></li>
-                        <li><a href="{{ route('activities.index') }}">Activities</a></li>
+                        <li><a href="">Activities</a></li>
                         <li><a href="{{ route('challenges.index') }}">Challenges</a></li>
                         <li><a href="{{ route('events.front') }}">Events</a></li>
                         <li><a href="{{ route('produits.index') }}">Our Shop</a></li>

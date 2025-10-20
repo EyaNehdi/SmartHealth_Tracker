@@ -16,7 +16,7 @@ use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use App\Models\Event;
-
+use App\Http\Controllers\ChatController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES (No Authentication Required)
@@ -26,7 +26,16 @@ use App\Models\Event;
 // Homepage
 Route::get('/', function () {
     return view('home');
+
+    
 })->name('home');
+
+
+Route::get('/detaill', function () {
+    return view('frontoffice.activities.detaill');});
+
+    Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+
 
 // Public Events
 Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
@@ -59,6 +68,9 @@ Route::get('/upcoming-events', function () {
 |--------------------------------------------------------------------------
 */
 
+
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard
@@ -67,12 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // User Activities Management
-    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
-    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
-    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
-    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
-    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
-    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+   
 
     // User Challenges Management
     Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
@@ -82,7 +89,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
     Route::delete('/challenges/{challenge}', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
 
-    // User Participations Management
+
+Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
+Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
+Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
+Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
+Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+// User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::get('/participations/create', [ParticipationController::class, 'create'])->name('participations.create');
     Route::post('/participations', [ParticipationController::class, 'store'])->name('participations.store');
@@ -90,7 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/participations/{participation}/edit', [ParticipationController::class, 'edit'])->name('participations.edit');
     Route::put('/participations/{participation}', [ParticipationController::class, 'update'])->name('participations.update');
     Route::delete('/participations/{participation}', [ParticipationController::class, 'destroy'])->name('participations.destroy');
-    
+
     // Participation Actions
     Route::put('/participation/{participation}/reply', [ParticipationController::class, 'reply'])->name('participation.reply');
     Route::put('/participation/{participation}/participant-reply', [ParticipationController::class, 'participantReply'])->name('participation.participant_reply');
@@ -146,6 +163,14 @@ Route::prefix('admin')
         Route::put('/meals/{meal}', [MealController::class, 'update'])->name('meals.update');
         Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('meals.destroy');
 
+
+         Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
+    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+
         /*
         |--------------------------------------------------------------------------
         | CATEGORIES MANAGEMENT
@@ -160,14 +185,12 @@ Route::prefix('admin')
         Route::delete('/categories/{categorie}', [CategorieController::class, 'destroy'])->name('categories.destroy');
 
         // Alternative Category Routes (Legacy) - Admin specific
-        Route::get('/catActivity/create', function () {
-            return view('backoffice.categories.ajoute');
-        })->name('categories.create');
-        Route::post('/catActivity', [CategoryActivityController::class, 'store'])->name('categories.store');
-        Route::get('/catActivity/list', [CategoryActivityController::class, 'index'])->name('categories.list');
-        Route::get('/catActivity/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
-        Route::put('/catActivity/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
-        Route::delete('/catActivity/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
+       Route::get('/categories/create', [CategoryActivityController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryActivityController::class, 'store'])->name('categories.store');
+    Route::get('/categories/list', [CategoryActivityController::class, 'index'])->name('categories.list');
+    Route::get('/categories/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
 
         /*
         |--------------------------------------------------------------------------

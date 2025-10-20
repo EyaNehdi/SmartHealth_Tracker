@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Equipment extends Model
 {
-    protected $table = 'equipments'; // Spécifier la table correcte
+    protected $table = 'equipments';
 
-    protected $fillable = ['nom', 'type', 'description', 'statut'];
+    protected $fillable = ['nom', 'type', 'marque', 'image', 'etat', 'description'];
 
     public function activities()
     {
