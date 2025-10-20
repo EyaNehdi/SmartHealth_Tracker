@@ -21,6 +21,7 @@ use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use App\Models\Event;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -109,14 +110,18 @@ Route::get('/upcoming-events', function () {
 
 
 
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', function () {
+        return view('frontoffice.dashboard.index');
+    })->name('dashboard');
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Management
-    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
-    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
-    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
-    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
-    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
-    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+   
 
     // User Challenges Management
     Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
@@ -126,7 +131,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
     Route::delete('/challenges/{challenge}', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
 
-    // User Participations Management
+
+Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
+Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
+Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
+Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
+Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+// User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::get('/participations/create', [ParticipationController::class, 'create'])->name('participations.create');
     Route::post('/participations', [ParticipationController::class, 'store'])->name('participations.store');
@@ -205,6 +220,14 @@ Route::prefix('admin')
         Route::put('/meals/{meal}', [MealController::class, 'update'])->name('meals.update');
         Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('meals.destroy');
 
+
+         Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
+    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+
         /*
         |--------------------------------------------------------------------------
         | CATEGORIES MANAGEMENT
@@ -219,14 +242,12 @@ Route::prefix('admin')
         Route::delete('/categories/{categorie}', [CategorieController::class, 'destroy'])->name('categories.destroy');
 
         // Alternative Category Routes (Legacy) - Admin specific
-        Route::get('/catActivity/create', function () {
-            return view('backoffice.categories.ajoute');
-        })->name('categories.create');
-        Route::post('/catActivity', [CategoryActivityController::class, 'store'])->name('categories.store');
-        Route::get('/catActivity/list', [CategoryActivityController::class, 'index'])->name('categories.list');
-        Route::get('/catActivity/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
-        Route::put('/catActivity/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
-        Route::delete('/catActivity/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
+       Route::get('/categories/create', [CategoryActivityController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryActivityController::class, 'store'])->name('categories.store');
+    Route::get('/categories/list', [CategoryActivityController::class, 'index'])->name('categories.list');
+    Route::get('/categories/{category}/edit', [CategoryActivityController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryActivityController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryActivityController::class, 'destroy'])->name('categories.destroy');
 
         /*
         |--------------------------------------------------------------------------

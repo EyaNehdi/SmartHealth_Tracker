@@ -11,6 +11,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Styles -->
     @vite(['resources/assets/css/bootstrap.min.css'])
@@ -68,6 +71,140 @@
         .footer__copyright a:hover {
             color: #ffffff !important;
         }
+
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chat-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-box {
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h6 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 25px;
+            padding: 10px 15px;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #5a6fd8;
+        }
+
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 
@@ -85,12 +222,7 @@
 <!-- Preloader-end -->
 
 <!-- Scroll-top -->
-<button class="scroll__top scroll-to-target" data-target="html">
-    <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11 6L1 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M6 11L1 6L6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-</button>
+
 <!-- Scroll-top-end -->
 
 <!-- Header -->
@@ -103,6 +235,32 @@
 
 <!-- Footer -->
 @include('shared.partials.frontoffice-footer')
+
+<!-- Chat Widget -->
+<div class="chat-widget">
+    <div class="chat-icon" id="chatIcon">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chat-box" id="chatBox" style="display: none;">
+        <div class="chat-header">
+            <h6>Assistant  Energix</h6>
+            <button class="btn-close" id="closeChat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <p>Bonjour ! Je suis votre assistant Energix. Comment puis-je vous aider aujourd'hui ?</p>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Tapez votre message..." maxlength="1000">
+            <button id="sendMessage">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
 @vite(['resources/assets/js/vendor/jquery-3.6.0.min.js'])
 @vite(['resources/assets/js/bootstrap.min.js'])
@@ -117,7 +275,93 @@
 @vite(['resources/assets/js/sal.js'])
 @vite(['resources/assets/js/ajax-form.js'])
 @vite(['resources/assets/js/main.js'])
-@vite(['resources/js/group_chat.js'])
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatIcon = document.getElementById('chatIcon');
+    const chatBox = document.getElementById('chatBox');
+    const closeChat = document.getElementById('closeChat');
+    const messageInput = document.getElementById('messageInput');
+    const sendMessage = document.getElementById('sendMessage');
+    const chatMessages = document.getElementById('chatMessages');
+
+    // Ouvrir/fermer le chat
+    chatIcon.addEventListener('click', function() {
+        chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    closeChat.addEventListener('click', function() {
+        chatBox.style.display = 'none';
+    });
+
+    // Envoyer un message avec Enter
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage.click();
+        }
+    });
+
+    // Envoyer un message avec le bouton
+    sendMessage.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+        if (message === '') return;
+
+        // Ajouter le message de l'utilisateur
+        addMessage(message, 'user');
+        messageInput.value = '';
+
+        // Désactiver le bouton pendant l'envoi
+        sendMessage.disabled = true;
+        sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        // Envoyer au backend
+        fetch('{{ route("chat.send") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', 'bot');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            addMessage('Désolé, une erreur de connexion est survenue.', 'bot');
+        })
+        .finally(() => {
+            sendMessage.disabled = false;
+            sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        });
+    });
+
+    function addMessage(content, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const messageP = document.createElement('p');
+        messageP.textContent = content;
+        messageP.style.margin = '0';
+        messageP.style.fontSize = '14px';
+        messageP.style.lineHeight = '1.4';
+        
+        messageDiv.appendChild(messageP);
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+});
+</script>
 @stack('frontoffice-scripts')
 </body>
 </html>

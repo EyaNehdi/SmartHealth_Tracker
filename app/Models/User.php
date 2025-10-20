@@ -9,17 +9,20 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Challenge;
 use App\Models\Participation;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens,Billable;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
+
+   
     protected $fillable = [
         'name',
         'email',

@@ -1,4 +1,3 @@
-<!-- resources/views/admin/Equipments/list.blade.php -->
 @extends('shared.layouts.backoffice')
 
 @section('content')
@@ -21,7 +20,7 @@
                 </div>
                 <div class="ms-panel-body">
                     @if (session('success'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -47,8 +46,10 @@
                                     <tr>
                                         <th scope="col">Nom</th>
                                         <th scope="col">Type</th>
+                                        <th scope="col">Marque</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">État</th>
                                         <th scope="col">Description</th>
-                                        <th scope="col">Statut</th>
                                         <th scope="col">Actions</th>
                                     </tr>
                                 </thead>
@@ -57,8 +58,16 @@
                                         <tr>
                                             <td>{{ $equipment->nom }}</td>
                                             <td>{{ ucfirst($equipment->type) }}</td>
+                                            <td>{{ $equipment->marque ?? 'N/A' }}</td>
+                                            <td>
+                                                @if ($equipment->image)
+                                                    <img src="{{ asset('storage/' . $equipment->image) }}" alt="{{ $equipment->nom }}" style="max-width: 100px; max-height: 100px;">
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+                                            <td>{{ ucfirst($equipment->etat) }}</td>
                                             <td>{{ Str::limit($equipment->description ?? 'N/A', 50) }}</td>
-                                            <td>{{ ucfirst($equipment->statut) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.equipments.edit', $equipment->id) }}" class="btn btn-sm btn-primary" title="Modifier">
                                                     <i class="fas fa-edit"></i>
@@ -82,4 +91,71 @@
         </div>
     </div>
 </div>
+
+<style>
+    .ms-content-wrapper {
+        padding: 30px;
+        background-color: #f8f9fa;
+    }
+    .ms-panel {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .ms-panel-header {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .ms-panel-body {
+        padding: 20px;
+    }
+    .table-responsive {
+        margin-top: 20px;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+        padding: 12px;
+    }
+    .table th {
+        background-color: #f1f1f1;
+        font-weight: 600;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 5px 10px;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        padding: 5px 10px;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+    }
+    .alert-dismissible {
+        margin-bottom: 1.5rem;
+    }
+    .alert .btn-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 1rem;
+    }
+    .ms-text-primary {
+        color: #007bff;
+        font-weight: 500;
+    }
+    img {
+        object-fit: cover;
+        border-radius: 4px;
+    }
+</style>
 @endsection
