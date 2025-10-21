@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FoodItemController;
 use App\Http\Controllers\MealController;
+use App\Http\Controllers\MealPlanController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -29,6 +30,24 @@ Route::post('/login-api', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('meals', MealController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | FOOD ITEMS API ROUTES
+    |--------------------------------------------------------------------------
+    */
     Route::apiResource('food-items', FoodItemController::class);
+    
+    /*
+    |--------------------------------------------------------------------------
+    | MEALS API ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('meals', MealController::class);
+    
+    /*
+    |--------------------------------------------------------------------------
+    | MEAL PLANS API ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('meal-plans', MealPlanController::class);
 });

@@ -18,6 +18,8 @@ use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\TypeEventController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\MealPlanController;
+use App\Http\Controllers\FoodMealsDashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use App\Models\Event;
@@ -44,7 +46,6 @@ Route::get('/', function () {
 
     // If not logged in
     return view('home');
-
 })->name('home');
 
 // Route::get('/home', function () {
@@ -77,7 +78,7 @@ Route::middleware('auth')->group(function () {
 // Public Events
 Route::get('/evenements', [EventController::class, 'frontIndex'])->name('events.front');
 Route::post('/evenements/{event}/participate', [EventController::class, 'participate'])
-     ->name('events.participate');
+    ->name('events.participate');
 
 
 // Public Products Store
@@ -115,7 +116,7 @@ Route::get('/upcoming-events', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Management
-   
+
 
     // User Challenges Management
     Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
@@ -126,16 +127,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/challenges/{challenge}', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
 
 
-Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
-Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
-Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
-Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
-Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
-Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
-Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
-Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
-Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-// User Participations Management
+    Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
+    Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
+    Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+    Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
+    Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
+    Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
+    Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
+    Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store');
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    // User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::get('/participations/create', [ParticipationController::class, 'create'])->name('participations.create');
     Route::post('/participations', [ParticipationController::class, 'store'])->name('participations.store');
@@ -156,16 +157,16 @@ Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.se
     Route::post('/messages', [MessageController::class, 'send'])->name('messages.send');
     // ... Existing routes ...
 
-// Group chat for challenges
-Route::get('/challenges/{challenge}/chat', [MessageController::class, 'groupIndex'])->name('challenges.chat');
-Route::post('/challenges/{challenge}/messages', [MessageController::class, 'sendGroup'])->name('challenges.messages.send');
-Route::get('/groups', [ChallengeController::class, 'groups'])->name('groups.index');
- Route::get('/challenges/{id}/messages', [MessageController::class, 'getMessages'])->name('challenges.messages')->middleware('auth');
-Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
+    // Group chat for challenges
+    Route::get('/challenges/{challenge}/chat', [MessageController::class, 'groupIndex'])->name('challenges.chat');
+    Route::post('/challenges/{challenge}/messages', [MessageController::class, 'sendGroup'])->name('challenges.messages.send');
+    Route::get('/groups', [ChallengeController::class, 'groups'])->name('groups.index');
+    Route::get('/challenges/{id}/messages', [MessageController::class, 'getMessages'])->name('challenges.messages')->middleware('auth');
+    Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
 
-// Contact route
-Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    // Contact route
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 });
 
 /*
@@ -213,14 +214,18 @@ Route::prefix('admin')
         Route::get('/meals/{meal}/edit', [MealController::class, 'edit'])->name('meals.edit');
         Route::put('/meals/{meal}', [MealController::class, 'update'])->name('meals.update');
         Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('meals.destroy');
+        // Ingredient Management Routes
+        Route::post('/meals/{meal}/add-ingredient', [MealController::class, 'addIngredient'])->name('meals.add-ingredient');
+        Route::delete('/meals/{meal}/remove-ingredient/{foodItem}', [MealController::class, 'removeIngredient'])->name('meals.remove-ingredient');
+        Route::get('/meals/{meal}/ingredients-list', [MealController::class, 'ingredientsList'])->name('meals.ingredients-list');
 
 
-         Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
-    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
-    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
-    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
-    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
-    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+        Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+        Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+        Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
+        Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+        Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+        Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
 
         /*
         |--------------------------------------------------------------------------
@@ -236,7 +241,7 @@ Route::prefix('admin')
         Route::delete('/categories/{categorie}', [CategorieController::class, 'destroy'])->name('categories.destroy');
 
         // Alternative Category Routes (Legacy) - Admin specific
-       
+
 
         /*
         |--------------------------------------------------------------------------
@@ -257,13 +262,33 @@ Route::prefix('admin')
         */
         Route::resource('events', EventController::class);
         Route::get('events/create', [EventController::class, 'create'])->name('events.create');
-       
+
         /*
         |--------------------------------------------------------------------------
         | EVENT TYPES MANAGEMENT
         |--------------------------------------------------------------------------
         */
         Route::resource('type_events', TypeEventController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | MEAL PLANS MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
+        // Custom routes (must be defined before resource routes to avoid conflicts)
+        Route::patch('/meal-plans/{mealPlan}/toggle-active', [MealPlanController::class, 'toggleActive'])->name('meal-plans.toggle-active');
+        Route::delete('/meal-plans/{mealPlan}/assignments/{assignment}', [MealPlanController::class, 'removeMealAssignment'])->name('meal-plans.remove-assignment');
+
+        // Standard resource routes
+        Route::resource('meal-plans', MealPlanController::class)->names([
+            'index' => 'meal-plans.list',
+            'create' => 'meal-plans.create',
+            'store' => 'meal-plans.store',
+            'show' => 'meal-plans.show',
+            'edit' => 'meal-plans.edit',
+            'update' => 'meal-plans.update',
+            'destroy' => 'meal-plans.destroy',
+        ]);
 
         /*
         |--------------------------------------------------------------------------
@@ -278,12 +303,12 @@ Route::prefix('admin')
         Route::put('/produits/{produit}', [ProduitController::class, 'update'])->name('produits.update');
         Route::delete('/produits/{produit}', [ProduitController::class, 'destroy'])->name('produits.destroy');
 
-Route::get('/challenges', [ChallengeController::class, 'indexAdmin'])->name('challenges.index');
-          Route::get('challenges/add', [ChallengeController::class, 'createAdmin'])->name('backoffice.challenges.add');
-         Route::post('/challenges', [ChallengeController::class, 'storeadmin'])->name('challenges.store');
+        Route::get('/challenges', [ChallengeController::class, 'indexAdmin'])->name('challenges.index');
+        Route::get('challenges/add', [ChallengeController::class, 'createAdmin'])->name('backoffice.challenges.add');
+        Route::post('/challenges', [ChallengeController::class, 'storeadmin'])->name('challenges.store');
 
-    Route::delete('/challenges/{challenge}', [ChallengeController::class, 'adminDestroy'])->name('challenges.destroy');
-    Route::patch('/challenges/{challenge}/toggle-famous', [ChallengeController::class, 'toggleFamous'])->name('challenges.toggleFamous');
+        Route::delete('/challenges/{challenge}', [ChallengeController::class, 'adminDestroy'])->name('challenges.destroy');
+        Route::patch('/challenges/{challenge}/toggle-famous', [ChallengeController::class, 'toggleFamous'])->name('challenges.toggleFamous');
     });
 
 
@@ -301,12 +326,13 @@ Route::post('/checkout/create-session', [StripeController::class, 'createCheckou
 Route::get('/checkout/success', [StripeController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('checkout.cancel');
 
-Route::get('/panier/test', function() {
+Route::get('/panier/test', function () {
     return session('panier', []);
 });
 
 use Illuminate\Http\Request;
-Route::get('/test-session', function(Request $request){
+
+Route::get('/test-session', function (Request $request) {
     session()->put('test', 'ok');
     return session()->all();
 });

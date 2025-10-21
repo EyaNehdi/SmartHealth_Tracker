@@ -392,5 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebarOverlay.classList.remove('show');
         });
     }
+
+    // collapse button handler lives in sidebar partial
 });
 </script>

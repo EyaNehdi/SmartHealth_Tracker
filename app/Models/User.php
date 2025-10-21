@@ -75,4 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Participation::class);
     }
 
+    // Meal-related relationships
+    public function meals()
+    {
+        return $this->hasMany(Meal::class, 'created_by');
+    }
+
+    public function mealPlans()
+    {
+        return $this->hasMany(MealPlan::class, 'created_by');
+    }
 }
