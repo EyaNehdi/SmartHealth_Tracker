@@ -86,6 +86,37 @@ Route::get('/magasin', [ProduitController::class, 'storeFront'])->name('produits
 Route::get('/magasin/{produit}', [ProduitController::class, 'show'])->name('produits.show');
 Route::get('/produits/{produit}/pdf', [ProduitController::class, 'downloadPdf'])->name('produits.pdf');
 
+// Public Meals and Meal Plans
+Route::get('/repas', [MealController::class, 'frontIndex'])->name('meals.front.index');
+Route::get('/repas/{id}', [MealController::class, 'frontShow'])->name('meals.front.show');
+Route::get('/plans-de-repas', [MealPlanController::class, 'frontIndex'])->name('meal-plans.front.index');
+Route::get('/plans-de-repas/{id}', [MealPlanController::class, 'frontShow'])->name('meal-plans.front.show');
+
+// Authenticated Meals Routes
+Route::middleware('auth')->group(function () {
+    // Meal Management
+    Route::get('/mes-repas/creer', [MealController::class, 'frontCreate'])->name('meals.front.create');
+    Route::post('/mes-repas', [MealController::class, 'frontStore'])->name('meals.front.store');
+    Route::get('/mes-repas/{id}/modifier', [MealController::class, 'frontEdit'])->name('meals.front.edit');
+    Route::put('/mes-repas/{id}', [MealController::class, 'frontUpdate'])->name('meals.front.update');
+    Route::delete('/mes-repas/{id}', [MealController::class, 'frontDestroy'])->name('meals.front.destroy');
+    
+    // Save/Unsave Meals
+    Route::post('/repas/{id}/sauvegarder', [MealController::class, 'saveMeal'])->name('meals.save');
+    Route::delete('/repas/{id}/retirer', [MealController::class, 'unsaveMeal'])->name('meals.unsave');
+    
+    // Meal Plan Management
+    Route::get('/mes-plans-de-repas/creer', [MealPlanController::class, 'frontCreate'])->name('meal-plans.front.create');
+    Route::post('/mes-plans-de-repas', [MealPlanController::class, 'frontStore'])->name('meal-plans.front.store');
+    Route::get('/mes-plans-de-repas/{id}/modifier', [MealPlanController::class, 'frontEdit'])->name('meal-plans.front.edit');
+    Route::put('/mes-plans-de-repas/{id}', [MealPlanController::class, 'frontUpdate'])->name('meal-plans.front.update');
+    Route::delete('/mes-plans-de-repas/{id}', [MealPlanController::class, 'frontDestroy'])->name('meal-plans.front.destroy');
+    
+    // Save/Unsave Meal Plans
+    Route::post('/plans-de-repas/{id}/sauvegarder', [MealPlanController::class, 'saveMealPlan'])->name('meal-plans.save');
+    Route::delete('/plans-de-repas/{id}/retirer', [MealPlanController::class, 'unsaveMealPlan'])->name('meal-plans.unsave');
+});
+
 // Public Categories
 Route::get('/list', [CategoryActivityController::class, 'index'])->name('categories.list');
 Route::get('/catActivity/create', function () {

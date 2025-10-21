@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/css/sh-sidebar.css',
                 'resources/css/meals-filters.css',
                 'resources/css/meal-plan-forms.css',
+                'resources/css/frontoffice-save-buttons.css',
                 'resources/js/app.js',
                 'resources/js/sh-sidebar.js',
                 'resources/js/meal-ingredients.js',

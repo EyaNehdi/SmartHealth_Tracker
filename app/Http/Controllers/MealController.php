@@ -229,4 +229,160 @@ class MealController extends Controller
         
         return view('backoffice.meals.partials.ingredients-list', compact('meal'));
     }
+
+    // Frontoffice methods
+    public function frontIndex(Request $request)
+    {
+        $query = Meal::with('foodItems')
+            ->search($request->get('search'))
+            ->byMealTimes($request->get('meal_times', []))
+            ->byCaloriesRange($request->get('calories_min'), $request->get('calories_max'))
+            ->byPreparationTimeRange($request->get('prep_time_min'), $request->get('prep_time_max'));
+
+        // Apply ownership/saved filter
+        if (Auth::check() && $request->get('filter')) {
+            $query->byFilter($request->get('filter'), Auth::id());
+        }
+
+        $meals = $query->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->appends($request->query());
+
+        // Handle AJAX requests
+        if ($request->ajax()) {
+            return view('frontoffice.meals._grid', compact('meals'));
+        }
+
+        return view('frontoffice.meals.index', compact('meals'));
+    }
+
+    public function frontShow($id)
+    {
+        $meal = Meal::with('foodItems')->findOrFail($id);
+        
+        return view('frontoffice.meals.show', compact('meal'));
+    }
+
+    public function frontCreate()
+    {
+        $foodItems = FoodItem::orderBy('name')->get();
+        return view('frontoffice.meals.create', compact('foodItems'));
+    }
+
+    public function frontStore(StoreMealRequest $request)
+    {
+        $data = $request->validated();
+        $data['created_by'] = Auth::id();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('meal_images', 'public');
+        }
+
+        if ($request->hasFile('recipe_attachment')) {
+            $data['recipe_attachment'] = $request->file('recipe_attachment')->store('recipe_attachments', 'public');
+        } elseif ($request->filled('recipe_url')) {
+            $data['recipe_attachment'] = $request->recipe_url;
+        }
+
+        $meal = Meal::create($data);
+
+        if (!empty($data['food_items'])) {
+            foreach ($data['food_items'] as $item) {
+                $meal->foodItems()->attach($item['food_id'], [
+                    'quantity' => $item['quantity'],
+                    'unit' => $item['unit'] ?? null,
+                ]);
+            }
+        }
+
+        $meal->updateNutritionalTotals();
+
+        return redirect()->route('meals.front.show', $meal->id)->with('success', 'Meal created successfully!');
+    }
+
+    public function frontEdit($id)
+    {
+        $meal = Meal::where('created_by', Auth::id())->with('foodItems')->findOrFail($id);
+        $foodItems = FoodItem::orderBy('name')->get();
+        return view('frontoffice.meals.edit', compact('meal', 'foodItems'));
+    }
+
+    public function frontUpdate(UpdateMealRequest $request, $id)
+    {
+        $meal = Meal::where('created_by', Auth::id())->findOrFail($id);
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('meal_images', 'public');
+        }
+
+        if ($request->hasFile('recipe_attachment')) {
+            $data['recipe_attachment'] = $request->file('recipe_attachment')->store('recipe_attachments', 'public');
+        } elseif ($request->filled('recipe_url')) {
+            $data['recipe_attachment'] = $request->recipe_url;
+        }
+
+        $meal->update($data);
+        $meal->foodItems()->detach();
+
+        if (isset($data['food_items'])) {
+            foreach ($data['food_items'] as $item) {
+                $meal->foodItems()->attach($item['food_id'], [
+                    'quantity' => $item['quantity'],
+                    'unit' => $item['unit'] ?? null,
+                ]);
+            }
+        }
+
+        $meal->updateNutritionalTotals();
+
+        return redirect()->route('meals.front.show', $meal->id)->with('success', 'Meal updated successfully!');
+    }
+
+    public function frontDestroy($id)
+    {
+        $meal = Meal::where('created_by', Auth::id())->findOrFail($id);
+        $meal->foodItems()->detach();
+        $meal->delete();
+        
+        return redirect()->route('meals.front.index')->with('success', 'Meal deleted successfully!');
+    }
+
+    // Save/Unsave functionality
+    public function saveMeal(Request $request, $id)
+    {
+        $meal = Meal::findOrFail($id);
+        
+        $saved = \App\Models\SavedMeal::firstOrCreate([
+            'user_id' => Auth::id(),
+            'meal_id' => $id,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Meal saved successfully!',
+                'saved' => true
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Meal saved successfully!');
+    }
+
+    public function unsaveMeal(Request $request, $id)
+    {
+        \App\Models\SavedMeal::where('user_id', Auth::id())
+            ->where('meal_id', $id)
+            ->delete();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Meal unsaved successfully!',
+                'saved' => false
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Meal unsaved successfully!');
+    }
 }

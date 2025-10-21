@@ -44,6 +44,20 @@ class MealPlan extends Model
             ->withPivot('day_number', 'meal_time');
     }
 
+    public function savedBy()
+    {
+        return $this->belongsToMany(User::class, 'saved_meal_plans', 'meal_plan_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if the meal plan is saved by a specific user
+     */
+    public function isSavedBy($userId)
+    {
+        return $this->savedBy()->where('user_id', $userId)->exists();
+    }
+
     // Method to get meals for a specific day
     public function getMealsForDay($dayNumber)
     {
@@ -187,5 +201,33 @@ class MealPlan extends Model
         }
 
         return $query;
+    }
+
+    public function scopeOwnedBy($query, $userId)
+    {
+        return $query->where('created_by', $userId);
+    }
+
+    public function scopeSavedBy($query, $userId)
+    {
+        return $query->whereHas('savedBy', function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
+    }
+
+    public function scopeByFilter($query, $filter, $userId = null)
+    {
+        if (!$userId || !$filter) {
+            return $query;
+        }
+
+        switch ($filter) {
+            case 'owned':
+                return $query->ownedBy($userId);
+            case 'saved':
+                return $query->savedBy($userId);
+            default:
+                return $query;
+        }
     }
 }

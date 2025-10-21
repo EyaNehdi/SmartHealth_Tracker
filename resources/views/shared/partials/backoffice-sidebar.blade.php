@@ -75,36 +75,25 @@
 
         <!-- Challenges Management -->
         @php
-        $isChallengeActive = request()->routeIs('admin.challenges.index') || request()->routeIs('admin.challenges.create');
+        $isChallengeActive = request()->routeIs('admin.challenges.*') || request()->routeIs('admin.backoffice.challenges.*');
         @endphp
-        <li class="menu-item has-submenu">
-            <a href="#" class="menu-link {{ $isChallengeActive ? 'active' : '' }} has-chevron"
-                data-toggle="collapse" data-target="#challenges"
-                aria-expanded="{{ $isChallengeActive ? 'true' : 'false' }}"
-                aria-controls="challenges">
-                <span class="menu-icon">
-                    <i class="fas fa-trophy"></i>
-                </span>
-                <span class="menu-text">Challenges Management</span>
-                <span class="menu-chevron">
-                    <i class="fas fa-chevron-down"></i>
-                </span>
+        <li class="sh-menu__item">
+            <a href="#" class="sh-link {{ $isChallengeActive ? 'is-active' : '' }}" data-target="#challenges" aria-expanded="{{ $isChallengeActive ? 'true' : 'false' }}">
+                <span class="sh-link__icon"><i class="fas fa-trophy"></i></span>
+                <span class="sh-link__text">Challenges</span>
+                <span class="sh-link__chev"><i class="fas fa-chevron-down"></i></span>
             </a>
-            <ul id="challenges" class="submenu collapse {{ $isChallengeActive ? 'show' : '' }}" data-parent="#side-nav-accordion">
-                <li class="submenu-item">
-                    <a href="{{ route('admin.challenges.index') }}" class="submenu-link {{ request()->routeIs('admin.challenges.index') ? 'active' : '' }}">
-                        <span class="submenu-icon">
-                            <i class="fas fa-list"></i>
-                        </span>
-                        <span class="submenu-text">Challenges List</span>
+            <ul id="challenges" class="sh-submenu {{ $isChallengeActive ? 'is-open' : '' }}">
+                <li>
+                    <a href="{{ route('admin.challenges.index') }}" data-page="admin.challenges.index" class="sh-submenu__link {{ request()->routeIs('admin.challenges.index') ? 'is-active' : '' }}">
+                        <span class="sh-link__icon"><i class="fas fa-list"></i></span>
+                        <span class="sh-link__text">Challenges List</span>
                     </a>
                 </li>
-                <li class="submenu-item">
-                    <a href="{{ route('admin.backoffice.challenges.add') }}" class="submenu-link {{ request()->routeIs('admin.challenges.create') ? 'active' : '' }}">
-                        <span class="submenu-icon">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        <span class="submenu-text">Create Challenge</span>
+                <li>
+                    <a href="{{ route('admin.backoffice.challenges.add') }}" data-page="admin.backoffice.challenges.add" class="sh-submenu__link {{ request()->routeIs('admin.backoffice.challenges.add') ? 'is-active' : '' }}">
+                        <span class="sh-link__icon"><i class="fas fa-plus"></i></span>
+                        <span class="sh-link__text">Create Challenge</span>
                     </a>
                 </li>
             </ul>

@@ -306,4 +306,174 @@ class MealPlanController extends Controller
         }
     }
 
+    // Frontoffice methods
+    public function frontIndex(Request $request)
+    {
+        $query = MealPlan::with([
+            'assignments.meal',
+            'user'
+        ])
+            ->where('is_active', true)
+            ->search($request->get('search'))
+            ->byDaysRange($request->get('min_days'), $request->get('max_days'));
+
+        // Apply ownership/saved filter
+        if (Auth::check() && $request->get('filter')) {
+            $query->byFilter($request->get('filter'), Auth::id());
+        }
+
+        $mealPlans = $query->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->appends($request->query());
+
+        // Handle AJAX requests
+        if ($request->ajax()) {
+            return view('frontoffice.meal-plans._grid', compact('mealPlans'));
+        }
+
+        return view('frontoffice.meal-plans.index', compact('mealPlans'));
+    }
+
+    public function frontShow($id)
+    {
+        $mealPlan = MealPlan::with([
+            'assignments.meal.foodItems',
+            'user'
+        ])->where('is_active', true)->findOrFail($id);
+
+        return view('frontoffice.meal-plans.show', compact('mealPlan'));
+    }
+
+    public function frontCreate()
+    {
+        $meals = Meal::select('id', 'name', 'description', 'meal_time', 'total_calories', 'total_protein')
+            ->orderBy('name')
+            ->get();
+
+        return view('frontoffice.meal-plans.create', compact('meals'));
+    }
+
+    public function frontStore(StoreMealPlanRequest $request)
+    {
+        $data = $request->validated();
+        $data['created_by'] = Auth::id();
+        $data['is_active'] = true;
+
+        DB::beginTransaction();
+        try {
+            $mealPlan = MealPlan::create($data);
+
+            if (isset($data['assignments']) && !empty($data['assignments'])) {
+                foreach ($data['assignments'] as $assignment) {
+                    MealPlanAssignment::create([
+                        'meal_plan_id' => $mealPlan->id,
+                        'meal_id' => $assignment['meal_id'],
+                        'day_number' => $assignment['day_number'],
+                        'meal_time' => $assignment['meal_time'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('meal-plans.front.show', $mealPlan->id)->with('success', 'Meal plan created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to create meal plan.')->withInput();
+        }
+    }
+
+    public function frontEdit($id)
+    {
+        $mealPlan = MealPlan::where('created_by', Auth::id())->with(['assignments.meal'])->findOrFail($id);
+        $meals = Meal::select('id', 'name', 'description', 'meal_time', 'total_calories', 'total_protein')
+            ->orderBy('name')
+            ->get();
+        
+        return view('frontoffice.meal-plans.edit', compact('mealPlan', 'meals'));
+    }
+
+    public function frontUpdate(UpdateMealPlanRequest $request, $id)
+    {
+        $mealPlan = MealPlan::where('created_by', Auth::id())->findOrFail($id);
+        $data = $request->validated();
+
+        DB::beginTransaction();
+        try {
+            $mealPlan->update($data);
+            $mealPlan->assignments()->delete();
+
+            if (isset($data['assignments']) && !empty($data['assignments'])) {
+                foreach ($data['assignments'] as $assignment) {
+                    MealPlanAssignment::create([
+                        'meal_plan_id' => $mealPlan->id,
+                        'meal_id' => $assignment['meal_id'],
+                        'day_number' => $assignment['day_number'],
+                        'meal_time' => $assignment['meal_time'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('meal-plans.front.show', $mealPlan->id)->with('success', 'Meal plan updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update meal plan.')->withInput();
+        }
+    }
+
+    public function frontDestroy($id)
+    {
+        $mealPlan = MealPlan::where('created_by', Auth::id())->findOrFail($id);
+        
+        DB::beginTransaction();
+        try {
+            $mealPlan->assignments()->delete();
+            $mealPlan->delete();
+            DB::commit();
+            
+            return redirect()->route('meal-plans.front.index')->with('success', 'Meal plan deleted successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to delete meal plan.');
+        }
+    }
+
+    // Save/Unsave functionality
+    public function saveMealPlan(Request $request, $id)
+    {
+        $mealPlan = MealPlan::findOrFail($id);
+        
+        $saved = \App\Models\SavedMealPlan::firstOrCreate([
+            'user_id' => Auth::id(),
+            'meal_plan_id' => $id,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Meal plan saved successfully!',
+                'saved' => true
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Meal plan saved successfully!');
+    }
+
+    public function unsaveMealPlan(Request $request, $id)
+    {
+        \App\Models\SavedMealPlan::where('user_id', Auth::id())
+            ->where('meal_plan_id', $id)
+            ->delete();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Meal plan unsaved successfully!',
+                'saved' => false
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Meal plan unsaved successfully!');
+    }
+
 }
