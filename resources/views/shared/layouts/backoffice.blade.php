@@ -30,6 +30,17 @@
 
     <!-- Medjestic styles -->
     <link href="{{ asset('assets2/css/style.css') }}" rel="stylesheet">
+    
+    <!-- App/Module styles (Vite) -->
+    @vite([
+        'resources/css/app.css',
+        'resources/css/sh-sidebar.css',
+        'resources/css/meals-filters.css',
+        'resources/css/meal-plan-forms.css',
+        'resources/js/app.js',
+        'resources/js/sh-sidebar.js',
+        'resources/js/meal-ingredients.js'
+    ])
 
     <!-- Page Specific CSS (Morris Charts.css) -->
     <link href="{{ asset('assets2/css/morris.css') }}" rel="stylesheet">
@@ -41,7 +52,7 @@
     <style>
         /* CSS Variables for consistent theming */
         :root {
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
             --header-height: 65px;
             --primary-color: #667eea;
             --secondary-color: #764ba2;
@@ -108,6 +119,17 @@
             margin: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
+        }
+
+        /* When compact, shrink CSS var so content expands */
+        body.sh-compact {
+            --sidebar-width: 80px;
+        }
+
+        /* Wire new sidebar to grid */
+        .sh-sidebar {
+            grid-area: sidebar !important;
+            height: 100%;
         }
 
         /* Override any external CSS that adds padding */
@@ -1143,73 +1165,100 @@
             vertical-align: middle;
         }
 
-        /* Action Buttons */
+        /* Action Buttons - Subtle Design */
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             align-items: center;
         }
 
         .btn-action {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: var(--border-radius);
+            padding: 0.6rem 1.2rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            background: #fff;
+            color: #495057;
+        }
+
+        .btn-action:hover {
+            border-color: #007bff;
+            color: #007bff;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
         }
 
         .btn-action.primary {
-            background: var(--primary-color);
+            background: #007bff;
             color: #fff;
+            border-color: #007bff;
         }
 
         .btn-action.primary:hover {
-            background: #5568d3;
+            background: #0056b3;
+            border-color: #0056b3;
             color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-action.secondary {
+            background: #6c757d;
+            color: #fff;
+            border-color: #6c757d;
+        }
+
+        .btn-action.secondary:hover {
+            background: #545b62;
+            border-color: #545b62;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
         }
 
         .btn-action.success {
-            background: var(--success-color);
+            background: #28a745;
             color: #fff;
+            border-color: #28a745;
         }
 
         .btn-action.success:hover {
-            background: #38a169;
+            background: #1e7e34;
+            border-color: #1e7e34;
             color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
 
         .btn-action.warning {
-            background: var(--warning-color);
-            color: #fff;
+            background: #ffc107;
+            color: #212529;
+            border-color: #ffc107;
         }
 
         .btn-action.warning:hover {
-            background: #dd6b20;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(237, 137, 54, 0.3);
+            background: #e0a800;
+            border-color: #e0a800;
+            color: #212529;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
         }
 
         .btn-action.danger {
-            background: var(--danger-color);
+            background: #dc3545;
             color: #fff;
+            border-color: #dc3545;
         }
 
         .btn-action.danger:hover {
-            background: #e53e3e;
+            background: #c82333;
+            border-color: #c82333;
             color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(245, 101, 101, 0.3);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
         }
 
         /* Form Enhancements */

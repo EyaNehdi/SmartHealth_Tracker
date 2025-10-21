@@ -28,7 +28,9 @@ class UpdateFoodRequest extends FormRequest
             'protein' => ['required', 'numeric', 'min:0'],
             'fat' => ['required', 'numeric', 'min:0'],
             'carbs' => ['required', 'numeric', 'min:0'],
-            'serving_size' => ['nullable', 'string', 'max:255'],
+            'serving_size' => ['required', 'integer', 'min:1'],
+            'serving_type' => ['required', 'string', 'max:50'],
+            'custom_serving_type' => ['nullable', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:50'],
             'image' => ['nullable', 'image', 'max:2048'], // max 2MB
         ];
     }
