@@ -20,26 +20,21 @@
                     <div class="media fs-14">
                         <div class="media-body">
                             <h6>{{ $categorie->nom }}</h6>
-                            <div class="dropdown float-right">
-                                <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="material-icons">more_vert</i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-right">
-                                    <li class="ms-dropdown-list">
-                                        <a class="media p-2" href="{{ route('admin.categories.edit', $categorie->id) }}">
-                                            <div class="media-body"><span>Edit</span></div>
-                                        </a>
-                                        <form action="{{ route('admin.categories.destroy', $categorie->id) }}" method="POST" class="media p-2" onsubmit="return confirm('Are you sure?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-link p-0 m-0">
-                                                <div class="media-body"><span>Delete</span></div>
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
                             <p class="fs-12 my-1 text-disabled">{{ Str::limit($categorie->description, 80) }}</p>
+
+                            <div class="mt-2 d-flex gap-2">
+                                <a href="{{ route('admin.categories.edit', $categorie->id) }}" class="btn btn-sm btn-primary">
+                                    <i class="material-icons fs-16">edit</i> Modifier
+                                </a>
+                                
+                                <form action="{{ route('admin.categories.destroy', $categorie->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="material-icons fs-16">delete</i> Supprimer
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
