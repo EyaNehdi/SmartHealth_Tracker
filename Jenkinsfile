@@ -27,12 +27,17 @@ pipeline {
         }
 
         stage('Run Unit Tests') {
-            steps {
-                // Run PHPUnit inside the container
-                sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
-                junit 'test-reports/phpunit.xml'
-            }
+    steps {
+        script {
+            // Wait until container is running
+            sh "until docker compose exec -T laravel-app php artisan --version; do sleep 5; done"
+            // Run PHPUnit
+            sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
         }
+        junit 'test-reports/phpunit.xml'
+    }
+}
+
 
         stage('SonarQube Analysis') {
             environment {
