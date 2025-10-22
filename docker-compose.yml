@@ -11,8 +11,6 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: energix
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
     depends_on:
       - db
     volumes:
@@ -25,8 +23,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: energix
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
