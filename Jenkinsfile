@@ -67,10 +67,5 @@ pipeline {
         // }
     }
 
-    post {
-        always {
-            echo 'Cleaning up containers...'
-            sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
-        }
-    }
+
 }
