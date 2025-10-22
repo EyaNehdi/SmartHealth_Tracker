@@ -5,11 +5,15 @@ services:
     build: .
     container_name: laravel-app
     ports:
-      - "8081:8080"   # Map container's 8080 to host 8081
+      - "8081:8080"   # host:container
     depends_on:
       - mysql-db
-    env_file:
-      - .env
+    environment:
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_DATABASE: energix
+      DB_USERNAME: root
+      DB_PASSWORD: ""
 
   mysql-db:
     image: mysql:8.1
