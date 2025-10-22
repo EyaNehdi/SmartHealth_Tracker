@@ -1,24 +1,31 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
 WORKDIR /var/www/html
 
+# Install system dependencies & PHP extensions
+RUN apt-get update && apt-get install -y \
+    libpng-dev libjpeg62-turbo-dev libwebp-dev libfreetype6-dev \
+    zip unzip git curl npm \
+ && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+ && docker-php-ext-install pdo pdo_mysql mbstring exif xml zip gd bcmath
+
+# Copy composer files and install dependencies
+COPY composer.json composer.lock ./
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+ && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+ && composer install --no-dev --optimize-autoloader
+
+# Copy rest of the app
 COPY . .
 
-# PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif xml zip gd bcmath
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
 
-# Node.js + npm
-RUN apt-get update && apt-get install -y nodejs npm
-
-# Build assets
+# Install node dependencies and build assets
 RUN npm install && npm run build
 
-# Apache
-RUN a2enmod rewrite
+# Expose port (optional, depends on your reverse proxy)
+EXPOSE 9000
 
-# Set DocumentRoot
-RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
-
-# Permissions
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+CMD ["php-fpm"]
