@@ -14,7 +14,7 @@ services:
       DB_PORT: 3306
       DB_DATABASE: energix
       DB_USERNAME: root
-      DB_PASSWORD: rootpassword  # Standardized
+      DB_PASSWORD: rootpassword  # Matches .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
@@ -23,7 +23,7 @@ services:
       start_period: 40s
 
   mysql-db:
-    image: mysql:8.0  # Stable version
+    image: mysql:8.0  # Stable
     container_name: mysql-db
     restart: unless-stopped
     environment:
