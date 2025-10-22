@@ -4,8 +4,7 @@ pipeline {
     environment {
         APP_IMAGE = "my-laravel-app:latest"
         DOCKER_COMPOSE_FILE = "docker-compose.yml"
-        PROJECT_NAME = "energix_devops"  // Matches output network/volume prefix
-        SONARQUBE = "sonar"
+        SONARQUBE = "sonar" // Name of SonarQube server in Jenkins
     }
 
     stages {
@@ -23,63 +22,24 @@ pipeline {
 
         stage('Start Containers') {
             steps {
-                sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE down -v"
-                sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE up -d --build"
-
-                // DEBUG: Show logs
-                sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE logs mysql-db"
-
-                // ROBUST WAIT FOR MYSQL
-                sh '''
-                echo "=== Waiting for MySQL (60s timeout) ==="
-                for i in {1..30}; do
-                    if docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE ps mysql-db | grep "healthy"; then
-                        echo "✓ MySQL is HEALTHY!"
-                        break
-                    elif ! docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE ps mysql-db | grep "Up"; then
-                        echo "✗ MySQL container is DOWN!"
-                        docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE logs mysql-db
-                        exit 1
-                    else
-                        echo "⏳ MySQL starting... ($i/30)"
-                        sleep 2
-                    fi
-                done
-
-                # Final ping test
-                if ! docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T mysql-db mysqladmin ping -hlocalhost -uroot -prootpassword --silent; then
-                    echo "✗ MySQL ping failed!"
-                    docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE logs mysql-db
-                    exit 1
-                fi
-                echo "✓ MySQL READY!"
-                '''
+                sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
+                sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
             }
         }
 
-        stage('Generate App Key') {
-            steps {
-                sh '''
-                docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app php artisan key:generate --no-interaction --force
-                docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app chmod 644 .env
-                '''
-            }
-        }
+        
 
         stage('Run Migrations') {
             steps {
-                sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app php artisan migrate --force"
+                sh "docker compose exec -T laravel-app php artisan migrate --force"
             }
         }
 
         stage('Run Unit Tests') {
             steps {
                 script {
-                    sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app mkdir -p /var/www/html/test-reports"
-                    sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
-                    // Copy report to workspace for junit
-                    sh "mkdir -p test-reports"
-                    sh "docker cp laravel-app:/var/www/html/test-reports/phpunit.xml test-reports/"
+                    sh "docker compose exec -T laravel-app mkdir -p /var/www/html/test-reports"
+                    sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
                 }
                 junit 'test-reports/phpunit.xml'
             }
@@ -95,7 +55,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                    docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
+                    docker compose exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
                     sonar-scanner \
                         -Dsonar.projectKey=laravel-app \
                         -Dsonar.sources=app \
@@ -109,8 +69,8 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up...'
-            sh "docker compose -p $PROJECT_NAME -f $DOCKER_COMPOSE_FILE down -v"
+            echo 'Cleaning up containers...'
+            sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
         }
     }
 }
