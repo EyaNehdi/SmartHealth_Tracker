@@ -11,6 +11,9 @@ services:
       DB_DATABASE: energix
       DB_USERNAME: root
       DB_PASSWORD: rootpassword
+      APP_ENV: local
+      APP_DEBUG: true
+      DB_CONNECTION: mysql
     depends_on:
       - db
     volumes:
