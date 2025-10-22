@@ -14,11 +14,8 @@ RUN apt-get update && apt-get install -y \
 COPY composer.json composer.lock ./
 
 # Install composer
-# After copying composer.json & composer.lock
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
- && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
- && composer install --no-dev --optimize-autoloader
-
+ && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 # Install dependencies WITHOUT scripts (artisan does not exist yet)
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-scripts
