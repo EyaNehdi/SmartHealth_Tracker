@@ -6,7 +6,7 @@ services:
     container_name: laravel-app
     restart: unless-stopped
     ports:
-      - "9001:9000"
+      - "8080:80"  
     environment:
       DB_HOST: db
       DB_PORT: 3306
