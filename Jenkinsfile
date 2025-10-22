@@ -27,28 +27,6 @@ pipeline {
             }
         }
 
-        stage('Wait for Services') {
-            steps {
-                script {
-                    echo "Waiting for MySQL and Laravel to be ready..."
-                    // Wait for MySQL
-                    sh """
-                    until docker compose exec -T mysql-db mysqladmin ping -uroot --silent; do
-                        echo 'Waiting 5s for MySQL...'
-                        sleep 5
-                    done
-                    """
-                    // Wait for Laravel
-                    sh """
-                    until docker compose exec -T laravel-app php artisan --version; do
-                        echo 'Waiting 5s for Laravel...'
-                        sleep 5
-                    done
-                    """
-                }
-            }
-        }
-
         stage('Run Migrations') {
             steps {
                 sh "docker compose exec -T laravel-app php artisan migrate --force"
