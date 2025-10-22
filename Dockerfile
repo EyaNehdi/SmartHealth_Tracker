@@ -10,19 +10,21 @@ RUN apt-get update && apt-get install -y \
  && docker-php-ext-install pdo pdo_mysql mbstring exif xml zip gd bcmath \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy entire Laravel project
-COPY . .
+# Copy only composer files first (speeds up rebuilds)
+COPY composer.json composer.lock ./
 
-# Ensure bootstrap/cache exists and has correct permissions
-RUN mkdir -p bootstrap/cache \
- && mkdir -p storage \
- && chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
-
-# Install Composer and project dependencies
+# Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
  && composer install --no-dev --optimize-autoloader
+
+# Now copy the rest of the project
+COPY . .
+
+# Ensure bootstrap/cache & storage exist and have correct permissions
+RUN mkdir -p bootstrap/cache storage \
+ && chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
 
 # Expose PHP-FPM port
 EXPOSE 9000
