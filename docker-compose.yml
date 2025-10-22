@@ -1,25 +1,32 @@
 services:
   app:
-    image: my-laravel-app:latest
+    build: .
     container_name: laravel-app
     restart: unless-stopped
-    ports:
-      - "8081:9000"
-    env_file:
-      - .env
-    depends_on:
-      - db
     volumes:
       - .:/var/www/html
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: laravel-nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
 
   db:
     image: mysql:8.1
     container_name: mysql-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # only root password
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: energix
-      # remove MYSQL_USER and MYSQL_PASSWORD
     ports:
       - "3306:3306"
     volumes:
