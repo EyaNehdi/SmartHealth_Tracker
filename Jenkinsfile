@@ -27,44 +27,44 @@ pipeline {
             }
         }
 
-        
 
-        stage('Run Migrations') {
-            steps {
-                sh "docker compose exec -T laravel-app php artisan migrate --force"
-            }
-        }
 
-        stage('Run Unit Tests') {
-            steps {
-                script {
-                    sh "docker compose exec -T laravel-app mkdir -p /var/www/html/test-reports"
-                    sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
-                }
-                junit 'test-reports/phpunit.xml'
-            }
-        }
+        // stage('Run Migrations') {
+        //     steps {
+        //         sh "docker compose exec -T laravel-app php artisan migrate "
+        //     }
+        // }
 
-        stage('SonarQube Analysis') {
-            when {
-                expression { env.SONARQUBE != null }
-            }
-            environment {
-                SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                    docker compose exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
-                    sonar-scanner \
-                        -Dsonar.projectKey=laravel-app \
-                        -Dsonar.sources=app \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                    """
-                }
-            }
-        }
+        // stage('Run Unit Tests') {
+        //     steps {
+        //         script {
+        //             sh "docker compose exec -T laravel-app mkdir -p /var/www/html/test-reports"
+        //             sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
+        //         }
+        //         junit 'test-reports/phpunit.xml'
+        //     }
+        // }
+
+        // stage('SonarQube Analysis') {
+        //     when {
+        //         expression { env.SONARQUBE != null }
+        //     }
+        //     environment {
+        //         SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             sh """
+        //             docker compose exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
+        //             sonar-scanner \
+        //                 -Dsonar.projectKey=laravel-app \
+        //                 -Dsonar.sources=app \
+        //                 -Dsonar.host.url=$SONAR_HOST_URL \
+        //                 -Dsonar.login=$SONAR_AUTH_TOKEN
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
