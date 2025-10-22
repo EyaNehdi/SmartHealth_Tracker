@@ -5,15 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "8081:9000"
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: energix
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
-      APP_ENV: local
-      APP_DEBUG: true
-      DB_CONNECTION: mysql
+    env_file:
+      - .env
     depends_on:
       - db
     volumes:
