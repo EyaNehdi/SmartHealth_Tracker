@@ -17,18 +17,22 @@ COPY composer.json composer.lock ./
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-# Install dependencies WITHOUT scripts
+# Install dependencies WITHOUT scripts (artisan does not exist yet)
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-scripts
 
 # Copy full Laravel project (artisan now exists)
 COPY . .
+
+# Add entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Ensure bootstrap/cache & storage exist and are writable
 RUN mkdir -p bootstrap/cache storage \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
-# Run artisan commands
-RUN php artisan package:discover --ansi \
- && php artisan optimize:clear
+EXPOSE 9000
 
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]
