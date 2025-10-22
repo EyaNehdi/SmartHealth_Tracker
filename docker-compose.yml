@@ -5,7 +5,7 @@ services:
     build: .
     container_name: laravel-app
     ports:
-      - "8081:8080"
+      - "8081:80"   # ✅ Apache listens on port 80 inside container
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -14,9 +14,9 @@ services:
       DB_PORT: 3306
       DB_DATABASE: energix
       DB_USERNAME: root
-      DB_PASSWORD: rootpassword  # Matches .env
+      DB_PASSWORD: rootpassword
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3

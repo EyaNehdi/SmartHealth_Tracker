@@ -1,23 +1,33 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev curl \
-    && docker-php-ext-install pdo pdo_mysql zip
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel app
+# Copy app source
 COPY . .
 
-# Install dependencies
-RUN composer install --no-interaction --prefer-dist
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Expose port for PHP built-in server
-EXPOSE 8080
+# Install Node.js and npm
+RUN apt-get update && apt-get install -y nodejs npm
 
-# Start Laravel using PHP built-in server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# Install and build assets
+RUN npm install && npm run build
+
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
+
+# Fix permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Configure Apache
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80
