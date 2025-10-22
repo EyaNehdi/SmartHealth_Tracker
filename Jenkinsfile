@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_IMAGE = "my-laravel-app:latest"
         DOCKER_COMPOSE_FILE = "docker-compose.yml"
-        SONARQUBE = "sonar" // Name of SonarQube server in Jenkins
+        SONARQUBE = "sonar"
     }
 
     stages {
@@ -24,6 +24,25 @@ pipeline {
             steps {
                 sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
                 sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
+
+                // **WAIT FOR MYSQL TO BE READY**
+                sh '''
+                echo "Waiting for MySQL to be ready..."
+                timeout 60s bash -c 'until docker compose exec -T mysql-db mysqladmin ping -hlocalhost -P3306 -uroot -prootpassword --silent; do echo "MySQL not ready, waiting..."; sleep 2; done'
+                echo "MySQL is ready!"
+                '''
+            }
+        }
+
+        stage('Generate App Key & Copy Env') {
+            steps {
+                sh '''
+                # Generate app key if needed
+                docker compose exec -T laravel-app php artisan key:generate --no-interaction --force
+
+                # Fix .env permissions
+                docker compose exec -T laravel-app chmod 644 .env
+                '''
             }
         }
 
