@@ -25,22 +25,41 @@ pipeline {
                 sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
                 sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
 
-                // **WAIT FOR MYSQL TO BE READY**
+                // **DEBUG: Show logs**
+                sh "docker compose logs mysql-db"
+
+                // **ROBUST WAIT FOR MYSQL**
                 sh '''
-                echo "Waiting for MySQL to be ready..."
-                timeout 60s bash -c 'until docker compose exec -T mysql-db mysqladmin ping -hlocalhost -P3306 -uroot -prootpassword --silent; do echo "MySQL not ready, waiting..."; sleep 2; done'
-                echo "MySQL is ready!"
+                echo "=== Waiting for MySQL (60s timeout) ==="
+                for i in {1..30}; do
+                    if docker compose ps mysql-db | grep "healthy"; then
+                        echo "✓ MySQL is HEALTHY!"
+                        break
+                    elif ! docker compose ps mysql-db | grep "Up"; then
+                        echo "✗ MySQL container is DOWN!"
+                        docker compose logs mysql-db
+                        exit 1
+                    else
+                        echo "⏳ MySQL starting... ($i/30)"
+                        sleep 2
+                    fi
+                done
+
+                # Final ping test
+                if ! docker compose exec -T mysql-db mysqladmin ping -hlocalhost -uroot -prootpass --silent; then
+                    echo "✗ MySQL ping failed!"
+                    docker compose logs mysql-db
+                    exit 1
+                fi
+                echo "✓ MySQL READY!"
                 '''
             }
         }
 
-        stage('Generate App Key & Copy Env') {
+        stage('Generate App Key') {
             steps {
                 sh '''
-                # Generate app key if needed
                 docker compose exec -T laravel-app php artisan key:generate --no-interaction --force
-
-                # Fix .env permissions
                 docker compose exec -T laravel-app chmod 644 .env
                 '''
             }
@@ -86,7 +105,7 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up containers...'
+            echo 'Cleaning up...'
             sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
         }
     }
