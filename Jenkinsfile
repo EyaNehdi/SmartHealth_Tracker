@@ -25,19 +25,19 @@ pipeline {
                 sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
                 sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
 
-                // **DEBUG: Show logs**
-                sh "docker compose logs mysql-db"
+                // DEBUG: Show logs (now with -f)
+                sh "docker compose -f $DOCKER_COMPOSE_FILE logs mysql-db"
 
-                // **ROBUST WAIT FOR MYSQL**
+                // ROBUST WAIT FOR MYSQL (with -f everywhere)
                 sh '''
                 echo "=== Waiting for MySQL (60s timeout) ==="
                 for i in {1..30}; do
-                    if docker compose ps mysql-db | grep "healthy"; then
+                    if docker compose -f $DOCKER_COMPOSE_FILE ps mysql-db | grep "healthy"; then
                         echo "✓ MySQL is HEALTHY!"
                         break
-                    elif ! docker compose ps mysql-db | grep "Up"; then
+                    elif ! docker compose -f $DOCKER_COMPOSE_FILE ps mysql-db | grep "Up"; then
                         echo "✗ MySQL container is DOWN!"
-                        docker compose logs mysql-db
+                        docker compose -f $DOCKER_COMPOSE_FILE logs mysql-db
                         exit 1
                     else
                         echo "⏳ MySQL starting... ($i/30)"
@@ -45,10 +45,10 @@ pipeline {
                     fi
                 done
 
-                # Final ping test
-                if ! docker compose exec -T mysql-db mysqladmin ping -hlocalhost -uroot -prootpass --silent; then
+                # Final ping test (with -f)
+                if ! docker compose -f $DOCKER_COMPOSE_FILE exec -T mysql-db mysqladmin ping -hlocalhost -uroot -prootpassword --silent; then
                     echo "✗ MySQL ping failed!"
-                    docker compose logs mysql-db
+                    docker compose -f $DOCKER_COMPOSE_FILE logs mysql-db
                     exit 1
                 fi
                 echo "✓ MySQL READY!"
@@ -59,23 +59,23 @@ pipeline {
         stage('Generate App Key') {
             steps {
                 sh '''
-                docker compose exec -T laravel-app php artisan key:generate --no-interaction --force
-                docker compose exec -T laravel-app chmod 644 .env
+                docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app php artisan key:generate --no-interaction --force
+                docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app chmod 644 .env
                 '''
             }
         }
 
         stage('Run Migrations') {
             steps {
-                sh "docker compose exec -T laravel-app php artisan migrate --force"
+                sh "docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app php artisan migrate --force"
             }
         }
 
         stage('Run Unit Tests') {
             steps {
                 script {
-                    sh "docker compose exec -T laravel-app mkdir -p /var/www/html/test-reports"
-                    sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
+                    sh "docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app mkdir -p /var/www/html/test-reports"
+                    sh "docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
                 }
                 junit 'test-reports/phpunit.xml'
             }
@@ -91,7 +91,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                    docker compose exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
+                    docker compose -f $DOCKER_COMPOSE_FILE exec -T laravel-app vendor/bin/phpstan analyse -c phpstan.neon || true
                     sonar-scanner \
                         -Dsonar.projectKey=laravel-app \
                         -Dsonar.sources=app \
