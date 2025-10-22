@@ -8,9 +8,15 @@ pipeline {
     }
 
     stages {
+
         stage('Hello Test') {
             steps {
                 echo 'Hi Jihed'
+            }
+        }
+        stage('Clean Workspace') {
+            steps {
+                deleteDir() // Deletes all workspace files
             }
         }
 

@@ -20,6 +20,7 @@ if [ ! -d "vendor" ]; then
 fi
 
 # Run artisan commands
+php artisan migrate 
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
