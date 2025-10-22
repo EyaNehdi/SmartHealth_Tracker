@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_IMAGE = "my-laravel-app:latest"
         DOCKER_COMPOSE_FILE = "docker-compose.yml"
-        SONARQUBE = "SonarQube" // name of SonarQube server in Jenkins
+        SONARQUBE = "sonnar" // name of SonarQube server in Jenkins
     }
 
     stages {
