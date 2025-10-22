@@ -5,7 +5,7 @@ services:
     build: .
     container_name: laravel-app
     ports:
-      - "8081:8080"   # host:container
+      - "8081:8080"
     depends_on:
       - mysql-db
     environment:

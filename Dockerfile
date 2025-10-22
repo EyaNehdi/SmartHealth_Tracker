@@ -8,17 +8,16 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy Laravel app
 COPY . .
 
-# Install Laravel dependencies
+# Install dependencies
 RUN composer install --no-interaction --prefer-dist
 
-# Expose PHP built-in server port
+# Expose port for PHP built-in server
 EXPOSE 8080
 
-# Start Laravel with PHP built-in server
+# Start Laravel using PHP built-in server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
