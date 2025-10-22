@@ -22,23 +22,35 @@ pipeline {
 
         stage('Start Containers') {
             steps {
-                sh "docker compose -f $DOCKER_COMPOSE_FILE down "
-                sh "docker compose -f $DOCKER_COMPOSE_FILE up  --build"
+                // Stop and remove previous containers
+                sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
+                // Start containers
+                sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
+            }
+        }
+
+        stage('Wait for Laravel + DB') {
+            steps {
+                script {
+                    echo "Waiting for Laravel app to be ready..."
+                    sh """
+                    until docker compose exec -T laravel-app php artisan --version; do
+                        echo 'Waiting 5s for Laravel container...'
+                        sleep 5
+                    done
+                    """
+                }
             }
         }
 
         stage('Run Unit Tests') {
-    steps {
-        script {
-            // Wait until container is running
-            sh "until docker compose exec -T laravel-app php artisan --version; do sleep 5; done"
-            // Run PHPUnit
-            sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
+            steps {
+                script {
+                    sh "docker compose exec -T laravel-app vendor/bin/phpunit --log-junit /var/www/html/test-reports/phpunit.xml || true"
+                }
+                junit 'test-reports/phpunit.xml'
+            }
         }
-        junit 'test-reports/phpunit.xml'
-    }
-}
-
 
         stage('SonarQube Analysis') {
             environment {
@@ -68,7 +80,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up containers...'
-            sh "docker compose -f $DOCKER_COMPOSE_FILE down"
+            sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
         }
     }
 }
