@@ -1,0 +1,45 @@
+/* SmartHealth Tracker - Frontoffice Save Button Styles */
+
+/* Simple save button for meals */
+.meal-save-btn {
+    transition: all 0.2s ease;
+}
+
+.meal-save-btn:hover {
+    background-color: var(--bs-secondary);
+    color: white;
+    border-color: var(--bs-secondary);
+}
+
+.meal-save-btn.saved {
+    color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+
+.meal-save-btn.saved:hover {
+    background-color: var(--bs-danger);
+    color: white;
+    border-color: var(--bs-danger);
+}
+
+/* Simple save button for meal plans */
+.meal-plan-save-btn {
+    transition: all 0.2s ease;
+}
+
+.meal-plan-save-btn:hover {
+    background-color: var(--bs-secondary);
+    color: white;
+    border-color: var(--bs-secondary);
+}
+
+.meal-plan-save-btn.saved {
+    color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+
+.meal-plan-save-btn.saved:hover {
+    background-color: var(--bs-danger);
+    color: white;
+    border-color: var(--bs-danger);
+}
