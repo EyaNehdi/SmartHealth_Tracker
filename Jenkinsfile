@@ -23,7 +23,7 @@ pipeline {
         stage('Start Containers') {
             steps {
                 sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
-                sh "docker compose -f $DOCKER_COMPOSE_FILE up -d --build"
+                sh "docker compose -f $DOCKER_COMPOSE_FILE up  --build"
             }
         }
 
