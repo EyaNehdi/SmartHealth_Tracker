@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  app:
+    image: my-laravel-app:latest   # The image you just built
+    container_name: laravel-app
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: energix
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.1
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: energix
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
