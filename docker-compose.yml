@@ -5,7 +5,7 @@ services:
     build: .
     container_name: laravel-app
     ports:
-      - "8081:80"   # ✅ Apache listens on port 80 inside container
+      - "8081:8000"  # ✅ Apache listens on port 80 inside container
     depends_on:
       mysql-db:
         condition: service_healthy
