@@ -28,16 +28,17 @@ pipeline {
             }
         }
 
-        stage('Start Containers') {
+        stage('Build and Run with Docker Compose') {
             steps {
-                sh "docker compose -f $DOCKER_COMPOSE_FILE down -v"
-                sh "docker compose -f $DOCKER_COMPOSE_FILE up  --build"
+                sh '''
+                    docker compose -f docker-compose.yml down -v --remove-orphans
+                    docker compose -f docker-compose.yml up  --build
+                '''
             }
-        }
 
 
 
-       
+
     }
 
 
