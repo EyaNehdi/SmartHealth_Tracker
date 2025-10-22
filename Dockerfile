@@ -20,7 +20,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 # Install dependencies WITHOUT scripts (artisan does not exist yet)
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-scripts
 
-# Copy full Laravel project (artisan now exists)
+# Copy full Laravel project
 COPY . .
 
 # Add entrypoint script
