@@ -51,6 +51,11 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Terms of Use
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+
 // Route::get('/home', function () {
 //     return view('home');
 // })->name('home');
