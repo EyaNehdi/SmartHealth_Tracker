@@ -24,16 +24,17 @@ fi
 # Run migrations safely
 php artisan migrate || echo "Migration failed or already run"
 
-# If using database cache driver, create cache table if missing
+# Ensure cache table exists if using database cache driver
 php artisan cache:table || true
 
 # Clear caches safely
 php artisan config:clear || true
 php artisan cache:clear || true
+# Skip route cache if duplicates exist
 php artisan route:clear || true
 php artisan view:clear || true
 
-# Optimize without failing on route cache errors
+# Optimize, ignoring route cache errors
 php artisan optimize || true
 
 # Start PHP-FPM
