@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </a>
                                     @else
                                     <li>
-                                        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+                                        <a href="{{ route('login') }}" class="btn btn-secondary">Login</a>
                                     </li>
                                     @endauth
                                 </ul>

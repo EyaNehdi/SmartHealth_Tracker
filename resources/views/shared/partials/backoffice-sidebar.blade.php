@@ -153,6 +153,36 @@
             </ul>
         </li>
 
+            {{-- Activities Management --}}
+@php
+$isActivityActive = request()->routeIs('admin.activities.*');
+@endphp
+
+ <li class="sh-menu__item">
+            <a href="#" class="sh-link {{ $isActivityActive ? 'active' : '' }}" data-target="#activities" aria-expanded="{{ $isActivityActive ? 'true' : 'false' }}">
+                <span class="sh-link__icon"><i class="fas fa-basketball-ball"></i></span>
+                <span class="sh-link__text">activities</span>
+                <span class="sh-link__chev"><i class="fas fa-chevron-down"></i></span>
+            </a>
+            <ul id="activities" class="sh-submenu {{ $isActivityActive ? 'is-open' : '' }}">
+                <li>
+                    <a href="{{ route('admin.activities.index') }}" data-page="admin.activities.index" class="sh-submenu__link {{ request()->routeIs('admin.activities.list') ? 'is-active' : '' }}">
+                        <span class="sh-link__icon"><i class="fas fa-list"></i></span>
+                        <span class="sh-link__text"> List activities </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.activities.create') }}" data-page="admin.activities.create" class="sh-submenu__link {{ request()->routeIs('admin.activities.create') ? 'is-active' : '' }}">
+                        <span class="sh-link__icon"><i class="fas fa-plus"></i></span>
+                        <span class="sh-link__text">Ajouter activities</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+
+
+
         {{-- Events Management --}}
         @php
         $isEventActive = request()->routeIs('admin.events.*');
