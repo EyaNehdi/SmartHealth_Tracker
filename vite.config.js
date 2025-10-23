@@ -14,10 +14,9 @@ export default defineConfig({
             input: [
                 'resources/assets/js/app.js',
                 'resources/assets/css/app.css',
-                ...images, // include all images
                 ...cssFiles,
                 ...jsFiles,
-                ...imageFiles,
+                ...imageFiles, // use imageFiles here
             ],
             refresh: true,
         }),
