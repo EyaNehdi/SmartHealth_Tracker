@@ -4,10 +4,11 @@ set -e
 echo "⏳ Waiting for MySQL to be ready..."
 
 # Wait until MySQL responds to connections
-until mysql -h"${DB_HOST:-mysql-db}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-rootpassword}" -e "SELECT 1;" &>/dev/null; do
-  echo "Waiting for MySQL..."
-  sleep 3
+until mysql -h"${DB_HOST}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" -e "SELECT 1;" &>/dev/null; do
+  echo "⏳ Waiting for MySQL..."
+  sleep 5
 done
+
 
 echo "✅ MySQL is up! Running Laravel commands..."
 
