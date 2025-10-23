@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-
+echo "Waiting for MySQL to be ready..."
+until php -r "new PDO('mysql:host=${DB_HOST};port=${DB_PORT}', '${DB_USERNAME}', '${DB_PASSWORD}');" >/dev/null 2>&1; do
+    sleep 2
+done
 echo "MySQL is ready!"
 
 mkdir -p bootstrap/cache storage
@@ -15,7 +18,7 @@ if [ ! -d "vendor" ]; then
     COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
 fi
 
-php artisan migrate || true
+php artisan migrate --force || true
 php artisan cache:table || true
 php artisan config:clear || true
 php artisan cache:clear || true

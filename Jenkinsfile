@@ -46,8 +46,9 @@ pipeline {
         stage('Build and Run with Docker Compose') {
             steps {
                 sh '''
-                    docker compose -f docker-compose.yml down -v --remove-orphans
-                    docker compose -f docker-compose.yml up -d --build
+                    docker compose down --remove-orphans
+                    docker compose up -d --build
+
                 '''
             }
 
