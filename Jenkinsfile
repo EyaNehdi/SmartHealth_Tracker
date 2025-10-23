@@ -36,8 +36,9 @@ pipeline {
         stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('scanner') {
-            sh 'sonar-scanner'
-        }
+    sh '/opt/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner'
+}
+
     }
 }
 
