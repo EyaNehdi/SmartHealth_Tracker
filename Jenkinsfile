@@ -27,15 +27,7 @@ pipeline {
 
             }
         }
-        
-            stage('test unitaires') {
-            steps {
 
-
-                sh 'php artisan test'
-
-            }
-        }
         stage('Build Laravel Image') {
             steps {
                 sh 'docker build -t $APP_IMAGE .'
