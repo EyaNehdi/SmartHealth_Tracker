@@ -115,6 +115,7 @@ class IARecommendationService
                      ->orWhere('description', 'like', '%renforcement%') // AJOUTÉ
                      ->get();
         }
+        
         elseif ($preference === 'flexibilité') {
             Log::info('🔍 Recherche FLEXIBILITÉ activée');
             return Activity::where('nom', 'like', '%stretching%')
