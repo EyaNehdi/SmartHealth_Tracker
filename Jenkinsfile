@@ -27,16 +27,20 @@ pipeline {
 
             }
         }
+        
+            stage('test unitaires') {
+            steps {
 
+
+                sh 'php artisan test'
+
+            }
+        }
         stage('Build Laravel Image') {
             steps {
                 sh 'docker build -t $APP_IMAGE .'
             }
         }
-
-
-
-
         stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('scanner') {
@@ -57,14 +61,6 @@ pipeline {
             }
 
         }
-        stage('Run Unit Tests in Container') {
-    steps {
-        sh '''
-
-            docker run $APP_IMAGE php artisan test
-        '''
-    }
-}
 
 
 
