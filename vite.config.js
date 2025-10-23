@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
+import glob from 'fast-glob';
+
+const imageFiles = glob.sync('resources/assets/img/**/*.{png,jpg,jpeg,gif,svg}');
 
 export default defineConfig({
     plugins: [
@@ -15,17 +18,17 @@ export default defineConfig({
                 'resources/js/sh-sidebar.js',
                 'resources/js/meal-ingredients.js',
                 'resources/js/meal-plan-form.js',
-                'resources/assets/img/slider/slider_bg01.jpg' // << Add your images here
+                ...imageFiles, // automatically add all images
             ],
             refresh: true,
         }),
     ],
-    css: {
-        devSourcemap: true,
-    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources'),
         },
+    },
+    css: {
+        devSourcemap: true,
     },
 });
