@@ -3,164 +3,127 @@
 namespace App\Services;
 
 use App\Models\Activity;
-use App\Models\UserPreference;
 use Illuminate\Support\Facades\Log;
 
 class IARecommendationService
 {
     private $preferenceMapping = [
-        'relaxation' => ['relaxation', 'détente', 'yoga', 'méditation', 'respiration', 'calme', 'zen'],
-        'cardio' => ['cardio', 'course', 'running', 'vélo', 'endurance', 'aérobic', 'fractionné'],
-        'renforcement musculaire' => ['musculation', 'abdos', 'force', 'poids', 'haltères', 'squat', 'pompes'],
-        'flexibilité' => ['flexibilité', 'étirement', 'stretching', 'souplesse', 'yoga', 'pilates'],
-        'endurance' => ['endurance', 'cardio', 'course', 'vélo', 'natation', 'intervalle', 'résistance']
+        'relaxation' => ['yoga', 'méditation', 'respiration', 'détente', 'relaxation', 'zen', 'calme', 'relaxant', 'douce', 'souplesse'],
+        'cardio' => ['cardio', 'course', 'running', 'vélo', 'endurance', 'aérobic', 'fractionné', 'intense', 'sprint', 'brûlage'],
+        'renforcement musculaire' => ['musculation', 'force', 'poids', 'haltères', 'squat', 'pompes', 'abdos', 'intensif', 'crossfit', 'renforcement'],
+        'flexibilité' => ['flexibilité', 'étirement', 'stretching', 'souplesse', 'yoga', 'pilates', 'postural', 'assouplissement'],
+        'endurance' => ['endurance', 'cardio', 'course', 'vélo', 'natation', 'intervalle', 'résistance', 'longue durée', 'capacité']
     ];
 
     public function getRecommendedActivities($user)
     {
         $userPreferences = $user->preferences()->pluck('tag')->toArray();
         
-        \Log::info('=== DÉBUT DEBUG DÉTAILLÉ ===');
-        \Log::info('Préférence utilisateur: ' . json_encode($userPreferences));
+        Log::info('🎯 === DÉBUT RECHERCHE RECOMMANDATIONS PHP ===');
+        Log::info('👤 Utilisateur: ' . $user->id);
+        Log::info('📋 Préférences: ' . json_encode($userPreferences));
         
         if (empty($userPreferences)) {
-            \Log::info('AUCUNE PRÉFÉRENCE');
+            Log::info('❌ Aucune préférence utilisateur');
             return collect();
         }
 
         $preference = strtolower($userPreferences[0]);
-        $searchTerms = $this->getSearchTerms($preference);
         
-        \Log::info('Préférence: ' . $preference);
-        \Log::info('Termes de recherche: ' . json_encode($searchTerms));
+        Log::info('🔍 Recherche pour: ' . $preference);
         
-        // Afficher TOUTES les activités
+        // Afficher TOUTES les activités pour debug
         $allActivities = Activity::all();
-        \Log::info('=== TOUTES LES ACTIVITÉS EN BASE ===');
+        Log::info('📊 TOTAL activités en base: ' . $allActivities->count());
+        
         foreach ($allActivities as $activity) {
-            \Log::info("ID: {$activity->id} | Nom: '{$activity->nom}'");
+            Log::info("   📋 ID: {$activity->id} | Nom: '{$activity->nom}' | Desc: '{$activity->description}'");
         }
         
-        // Test de recherche pour CHAQUE terme
-        \Log::info('=== TEST RECHERCHE PAR TERME ===');
-        foreach ($searchTerms as $term) {
-            $count = Activity::where('nom', 'like', "%{$term}%")
-                           ->orWhere('description', 'like', "%{$term}%")
-                           ->count();
-            \Log::info("Terme '{$term}': {$count} résultat(s)");
-            
-            // Afficher les activités trouvées pour ce terme
-            $found = Activity::where('nom', 'like', "%{$term}%")
-                           ->orWhere('description', 'like', "%{$term}%")
-                           ->get();
-            foreach ($found as $activity) {
-                \Log::info("   - Trouvé: {$activity->nom} (ID: {$activity->id})");
-            }
-        }
+        // RECHERCHE SIMPLE ET EFFICACE
+        $activities = $this->simpleSearch($preference);
         
-        // Recherche finale
-        $activities = Activity::where(function($query) use ($searchTerms) {
-            foreach ($searchTerms as $term) {
-                $query->orWhere('nom', 'like', '%' . $term . '%')
-                      ->orWhere('description', 'like', '%' . $term . '%');
-            }
-        })->get();
-
-        \Log::info('=== RÉSULTATS FINAUX ===');
-        \Log::info('Nombre d\'activités trouvées: ' . $activities->count());
+        Log::info('✅ === RÉSULTATS FILTRÉS ===');
+        Log::info('🎯 Activités correspondant à "' . $preference . '": ' . $activities->count());
+        
         foreach ($activities as $activity) {
-            \Log::info(" - {$activity->id}: {$activity->nom}");
+            Log::info("   🟢 ID {$activity->id}: {$activity->nom}");
         }
-        \Log::info('=== FIN DEBUG ===');
+        
+        // Afficher les activités EXCLUES
+        $excludedIds = $allActivities->pluck('id')->diff($activities->pluck('id'));
+        $excludedActivities = Activity::whereIn('id', $excludedIds)->get();
+        
+        Log::info('❌ Activités EXCLUES: ' . $excludedActivities->count());
+        foreach ($excludedActivities as $activity) {
+            Log::info("   🔴 ID {$activity->id}: {$activity->nom}");
+        }
+        
+        Log::info('=== FIN RECHERCHE PHP ===');
         
         return $activities;
     }
 
-    // AJOUTEZ CETTE MÉTHODE MANQUANTE
-    private function getSearchTerms($preference)
+    private function simpleSearch($preference)
     {
-        $preference = strtolower($preference);
+        $preference = strtolower(trim($preference));
         
-        // Retourner les termes associés à la préférence
-        if (isset($this->preferenceMapping[$preference])) {
-            return $this->preferenceMapping[$preference];
+        Log::info("🔎 Recherche simple pour: '{$preference}'");
+        
+        // RECHERCHE TRÈS SIMPLE ET EXPLICITE
+        if ($preference === 'relaxation') {
+            Log::info('🔍 Recherche RELAXATION activée');
+            return Activity::where('nom', 'like', '%yoga%')
+                         ->orWhere('nom', 'like', '%méditation%')
+                         ->orWhere('nom', 'like', '%relax%')
+                         ->orWhere('nom', 'like', '%détente%')
+                         ->orWhere('nom', 'like', '%zen%')
+                         ->orWhere('nom', 'like', '%calme%')
+                         ->orWhere('description', 'like', '%yoga%')
+                         ->orWhere('description', 'like', '%méditation%')
+                         ->orWhere('description', 'like', '%relax%')
+                         ->get();
+        } 
+        elseif ($preference === 'cardio') {
+            Log::info('🔍 Recherche CARDIO activée');
+            return Activity::where('nom', 'like', '%cardio%')
+                         ->orWhere('nom', 'like', '%course%')
+                         ->orWhere('nom', 'like', '%running%')
+                         ->orWhere('nom', 'like', '%vélo%')
+                         ->orWhere('nom', 'like', '%endurance%')
+                         ->orWhere('nom', 'like', '%aérobic%')
+                         ->orWhere('description', 'like', '%cardio%')
+                         ->orWhere('description', 'like', '%course%')
+                         ->get();
         }
-        
-        // Si pas de mapping, retourner la préférence elle-même
-        return [$preference];
-    }
-
-    private function callIARecommendation($userPreferences, $activities)
-    {
-        try {
-            Log::info('=== APPEL SYSTÈME IA ===');
-            Log::info('Préférences envoyées à IA: ' . json_encode($userPreferences));
-            Log::info('Nombre d\'activités envoyées: ' . count($activities));
-
-            $process = new \Symfony\Component\Process\Process([
-                'python3',
-                base_path('scripts/ia_recommendations.py'),
-                json_encode($userPreferences),
-                json_encode($activities),
-            ]);
-
-            $process->setTimeout(120); // 2 minutes timeout
-            $process->run();
-
-            $output = $process->getOutput();
-            $errorOutput = $process->getErrorOutput();
-
-            Log::info('Sortie IA: ' . $output);
-            Log::info('Logs IA: ' . $errorOutput);
-
-            if (!$process->isSuccessful()) {
-                Log::error('Erreur système IA : ' . $process->getErrorOutput());
-                return $this->fallbackRecommendation($userPreferences, $activities);
-            }
-
-            $result = json_decode($output, true) ?? [];
-            
-            Log::info('Résultat IA décodé: ' . json_encode($result));
-            Log::info('=== FIN APPEL IA ===');
-            
-            return $result;
-
-        } catch (\Exception $e) {
-            Log::error('Erreur exécution IA: ' . $e->getMessage());
-            return $this->fallbackRecommendation($userPreferences, $activities);
+        elseif ($preference === 'renforcement musculaire' || $preference === 'musculation') {
+            Log::info('🔍 Recherche MUSCULATION activée');
+            return Activity::where('nom', 'like', '%musculation%')
+                         ->orWhere('nom', 'like', '%abdos%')
+                         ->orWhere('nom', 'like', '%pompes%')
+                         ->orWhere('nom', 'like', '%squat%')
+                         ->orWhere('nom', 'like', '%haltères%')
+                         ->orWhere('nom', 'like', '%crossfit%')
+                         ->orWhere('description', 'like', '%musculation%')
+                         ->orWhere('description', 'like', '%force%')
+                         ->get();
         }
-    }
-
-    private function fallbackRecommendation($userPreferences, $activities)
-    {
-        Log::info('=== FALLBACK SEMANTIQUE ===');
-        
-        // Fallback intelligent basé sur la sémantique
-        $preference = strtolower($userPreferences[0]);
-        $semanticMapping = [
-            'relaxation' => ['yoga', 'méditation', 'respiration', 'détente', 'relaxation', 'zen', 'calme'],
-            'cardio' => ['cardio', 'course', 'running', 'vélo', 'endurance', 'aérobic', 'fractionné'],
-            'renforcement musculaire' => ['musculation', 'force', 'poids', 'haltères', 'squat', 'pompes', 'abdos'],
-            'flexibilité' => ['flexibilité', 'étirement', 'stretching', 'souplesse', 'yoga', 'pilates'],
-            'endurance' => ['endurance', 'cardio', 'course', 'vélo', 'natation', 'intervalle', 'résistance']
-        ];
-
-        $searchTerms = $semanticMapping[$preference] ?? [$preference];
-        
-        Log::info('Termes de recherche fallback: ' . implode(', ', $searchTerms));
-        
-        $activityIds = [];
-        foreach ($activities as $activity) {
-            $activityText = strtolower($activity['nom'] . ' ' . $activity['description']);
-            foreach ($searchTerms as $term) {
-                if (strpos($activityText, $term) !== false) {
-                    $activityIds[] = $activity['id'];
-                    break;
-                }
-            }
+        elseif ($preference === 'flexibilité') {
+            Log::info('🔍 Recherche FLEXIBILITÉ activée');
+            return Activity::where('nom', 'like', '%stretching%')
+                         ->orWhere('nom', 'like', '%étirement%')
+                         ->orWhere('nom', 'like', '%souplesse%')
+                         ->orWhere('nom', 'like', '%pilates%')
+                         ->orWhere('description', 'like', '%stretching%')
+                         ->orWhere('description', 'like', '%souplesse%')
+                         ->get();
         }
-
-        Log::info('IDs fallback: ' . json_encode(array_slice($activityIds, 0, 5)));
-        return array_slice($activityIds, 0, 5); // Max 5 recommandations
+        else {
+            Log::info('🔍 Recherche GÉNÉRIQUE activée');
+            // Fallback général
+            return Activity::where('nom', 'like', '%' . $preference . '%')
+                         ->orWhere('description', 'like', '%' . $preference . '%')
+                         ->get();
+        }
     }
 }
