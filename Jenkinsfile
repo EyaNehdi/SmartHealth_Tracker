@@ -59,12 +59,12 @@ pipeline {
             steps {
                 echo 'Running Laravel migrations...'
                 sh """
-                docker exec ${APP_CONTAINER} php artisan migrate --force
-                docker exec ${APP_CONTAINER} php artisan config:clear
-                docker exec ${APP_CONTAINER} php artisan cache:clear
-                docker exec ${APP_CONTAINER} php artisan route:clear
-                docker exec ${APP_CONTAINER} php artisan view:clear
-                docker exec ${APP_CONTAINER} php artisan optimize
+                docker exec ${env.APP_CONTAINER} php artisan migrate --force
+                docker exec ${env.APP_CONTAINER} php artisan config:clear
+                docker exec ${env.APP_CONTAINER} php artisan cache:clear
+                docker exec ${env.APP_CONTAINER} php artisan route:clear
+                docker exec ${env.APP_CONTAINER} php artisan view:clear
+                docker exec ${env.APP_CONTAINER} php artisan optimize
                 """
             }
         }
