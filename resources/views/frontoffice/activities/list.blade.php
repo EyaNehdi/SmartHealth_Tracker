@@ -80,6 +80,10 @@
     <a href="{{ route('activities.statistics') }}" class="btn btn-primary btn-sm">
         📊 Voir Statistiques
     </a>
+
+     <a href="/sport-session" class="btn btn-secondary btn-sm">
+        🤖 Commencer Activité
+    </a>
 </div>
                                 </div>
 
