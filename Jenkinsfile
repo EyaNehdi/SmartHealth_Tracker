@@ -36,11 +36,11 @@ pipeline {
         stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('scanner') {
-    sh '/opt/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner'
-}
-
+            sh '/opt/sonar-scanner/bin/sonar-scanner'
+        }
     }
 }
+
 
 
         stage('Build and Run with Docker Compose') {
