@@ -18,6 +18,13 @@ if [ ! -d "vendor" ]; then
     COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
 fi
 
+if [ -f "package.json" ]; then
+    echo "Installing npm dependencies..."
+    npm install
+
+    echo "Building Vite assets..."
+    npm run build
+fi
 php artisan migrate --force || true
 php artisan cache:table || true
 php artisan config:clear || true
