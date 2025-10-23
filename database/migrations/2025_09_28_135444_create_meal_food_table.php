@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             
             // Enhanced meal tracking fields
-            $table->enum('meal_time', ['breakfast', 'snack', 'lunch', 'dinner'])->nullable();
+            $table->enum('meal_time', config('meal_times.values'))->nullable();
             $table->integer('preparation_time')->nullable()->comment('Preparation time in minutes');
             $table->text('recipe_description')->nullable();
             $table->string('recipe_attachment')->nullable()->comment('File path or external URL');

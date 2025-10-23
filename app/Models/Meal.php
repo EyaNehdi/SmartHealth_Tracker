@@ -52,8 +52,8 @@ class Meal extends Model
 
     public function mealPlans(): BelongsToMany
     {
-        return $this->belongsToMany(MealPlan::class, 'meal_plan_meal', 'meal_id', 'meal_plan_id')
-            ->withPivot('meal_time', 'scheduled_date', 'day_order')
+        return $this->belongsToMany(MealPlan::class, 'meal_plan_assignments', 'meal_id', 'meal_plan_id')
+            ->withPivot('day_number', 'meal_time')
             ->withTimestamps();
     }
 

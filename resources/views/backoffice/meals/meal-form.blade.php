@@ -615,10 +615,11 @@
                                             class="form-control-enhanced @error('meal_time') is-invalid @enderror"
                                             required>
                                             <option value="">Select meal time</option>
-                                            <option value="breakfast" {{ old('meal_time', $meal->meal_time ?? '') == 'breakfast' ? 'selected' : '' }}>Breakfast</option>
-                                            <option value="lunch" {{ old('meal_time', $meal->meal_time ?? '') == 'lunch' ? 'selected' : '' }}>Lunch</option>
-                                            <option value="dinner" {{ old('meal_time', $meal->meal_time ?? '') == 'dinner' ? 'selected' : '' }}>Dinner</option>
-                                            <option value="snack" {{ old('meal_time', $meal->meal_time ?? '') == 'snack' ? 'selected' : '' }}>Snack</option>
+                                            @foreach(config('meal_times.values') as $value)
+                                                <option value="{{ $value }}" {{ old('meal_time', $meal->meal_time ?? '') == $value ? 'selected' : '' }}>
+                                                    {{ config("meal_times.labels.{$value}") }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                         @error('meal_time')
                                         <div class="error-message">
@@ -660,14 +661,14 @@
 
                         <div class="form-group-enhanced">
                             <label for="description" class="form-label-enhanced">
-                                Description
+                                Meal Description
                             </label>
                             <div class="input-wrapper">
                                 <textarea name="description"
                                     id="description"
                                     rows="3"
                                     class="form-control-enhanced @error('description') is-invalid @enderror"
-                                    placeholder="Enter detailed description of the meal...">{{ old('description', $meal->description ?? '') }}</textarea>
+                                    placeholder="Describe the meal, its flavors, benefits, and general information...">{{ old('description', $meal->description ?? '') }}</textarea>
                                 @error('description')
                                 <div class="error-message">
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -677,18 +678,91 @@
                                 </div>
                                 @enderror
                             </div>
+                            <div class="form-hint">General description of the meal, its taste, nutritional benefits, etc.</div>
+                        </div>
+
+                        <div class="form-group-enhanced">
+                            <label for="recipe_description" class="form-label-enhanced">
+                                Recipe Instructions
+                            </label>
+                            <div class="input-wrapper">
+                                <textarea name="recipe_description"
+                                    id="recipe_description"
+                                    rows="6"
+                                    class="form-control-enhanced @error('recipe_description') is-invalid @enderror"
+                                    placeholder="Step-by-step cooking instructions and preparation details...">{{ old('recipe_description', $meal->recipe_description ?? '') }}</textarea>
+                                @error('recipe_description')
+                                <div class="error-message">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 0C3.13 0 0 3.13 0 7C0 10.87 3.13 14 7 14C10.87 14 14 10.87 14 7C14 3.13 10.87 0 7 0ZM7.7 10.5H6.3V9.1H7.7V10.5ZM7.7 7.7H6.3V3.5H7.7V7.7Z" fill="currentColor" />
+                                    </svg>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="form-hint">Detailed cooking steps, techniques, and preparation instructions.</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="recipe_attachment" class="form-label-enhanced">
+                                        Recipe File Attachment
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="file"
+                                            name="recipe_attachment"
+                                            id="recipe_attachment"
+                                            class="form-control-enhanced @error('recipe_attachment') is-invalid @enderror"
+                                            accept=".pdf,.doc,.docx,.txt">
+                                        @error('recipe_attachment')
+                                        <div class="error-message">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7 0C3.13 0 0 3.13 0 7C0 10.87 3.13 14 7 14C10.87 14 14 10.87 14 7C14 3.13 10.87 0 7 0ZM7.7 10.5H6.3V9.1H7.7V10.5ZM7.7 7.7H6.3V3.5H7.7V7.7Z" fill="currentColor" />
+                                            </svg>
+                                            <span>{{ $message }}</span>
+                                        </div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-hint">PDF, DOC, DOCX, TXT files. Max size: 10MB.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="tags" class="form-label-enhanced">
+                                        Tags
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text"
+                                            name="tags"
+                                            id="tags"
+                                            class="form-control-enhanced @error('tags') is-invalid @enderror"
+                                            placeholder="vegan, gluten-free, keto, spicy..."
+                                            value="{{ old('tags', isset($meal) && $meal->tags ? implode(', ', $meal->tags) : '') }}">
+                                        @error('tags')
+                                        <div class="error-message">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7 0C3.13 0 0 3.13 0 7C0 10.87 3.13 14 7 14C10.87 14 14 10.87 14 7C14 3.13 10.87 0 7 0ZM7.7 10.5H6.3V9.1H7.7V10.5ZM7.7 7.7H6.3V3.5H7.7V7.7Z" fill="currentColor" />
+                                            </svg>
+                                            <span>{{ $message }}</span>
+                                        </div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-hint">Comma-separated tags for categorization (e.g., vegan, gluten-free, keto).</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group-enhanced">
                             <label for="notes" class="form-label-enhanced">
-                                Notes
+                                Additional Notes
                             </label>
                             <div class="input-wrapper">
                                 <textarea name="notes"
                                     id="notes"
                                     rows="2"
                                     class="form-control-enhanced @error('notes') is-invalid @enderror"
-                                    placeholder="Any additional notes or special instructions...">{{ old('notes', $meal->notes ?? '') }}</textarea>
+                                    placeholder="Any additional notes, tips, variations, or special considerations...">{{ old('notes', $meal->notes ?? '') }}</textarea>
                                 @error('notes')
                                 <div class="error-message">
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -698,6 +772,7 @@
                                 </div>
                                 @enderror
                             </div>
+                            <div class="form-hint">Extra notes, cooking tips, ingredient substitutions, or serving suggestions.</div>
                         </div>
                     </div>
                 </div>

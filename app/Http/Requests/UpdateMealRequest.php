@@ -26,13 +26,11 @@ class UpdateMealRequest extends FormRequest
             'description' => 'nullable|string',
             'notes' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
-            'meal_time' => 'nullable|in:breakfast,snack,lunch,dinner',
+            'meal_time' => 'nullable|' . config('meal_times.validation_rule'),
             'preparation_time' => 'nullable|integer|min:0|max:1440', // Max 24 hours
             'recipe_description' => 'nullable|string',
             'recipe_attachment' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240', // 10MB max
-            'recipe_url' => 'nullable|url|max:255',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string|max:50',
+            'tags' => 'nullable|string|max:500',
             'food_items' => 'array',
             'food_items.*.food_id' => 'required|exists:food_items,id',
             'food_items.*.quantity' => 'required|numeric|min:0.01',

@@ -10,10 +10,12 @@ export default defineConfig({
                 'resources/css/meals-filters.css',
                 'resources/css/meal-plan-forms.css',
                 'resources/css/frontoffice-save-buttons.css',
+                'resources/css/food-selection.css',
                 'resources/js/app.js',
                 'resources/js/sh-sidebar.js',
                 'resources/js/meal-ingredients.js',
-                'resources/js/meal-plan-form.js'
+                'resources/js/meal-plan-form.js',
+                'resources/js/food-selection.js'
             ],
             refresh: true,
         }),

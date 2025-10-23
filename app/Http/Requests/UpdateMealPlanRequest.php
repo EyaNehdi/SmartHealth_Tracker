@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\MinMealsPerDay;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMealPlanRequest extends FormRequest
@@ -26,10 +27,10 @@ class UpdateMealPlanRequest extends FormRequest
             'description' => 'nullable|string',
             'total_days' => 'required|integer|min:1|max:365',
             'is_active' => 'boolean',
-            'assignments' => 'nullable|array',
+            'assignments' => ['nullable', 'array', new MinMealsPerDay($this->input('total_days', 1))],
             'assignments.*.meal_id' => 'nullable|exists:meals,id',
             'assignments.*.day_number' => 'required|integer|min:1',
-            'assignments.*.meal_time' => 'required|in:breakfast,snack,lunch,dinner',
+            'assignments.*.meal_time' => 'required|' . config('meal_times.validation_rule'),
         ];
     }
     
@@ -40,8 +41,14 @@ class UpdateMealPlanRequest extends FormRequest
     {
         $data = [];
         
-        // Handle is_active checkbox (unchecked checkboxes don't send value)
-        $data['is_active'] = $this->has('is_active') ? true : false;
+        // For frontoffice updates, always keep meal plans active
+        // Only set is_active to false if explicitly provided (backoffice)
+        if ($this->has('is_active')) {
+            $data['is_active'] = $this->boolean('is_active');
+        } else {
+            // If no is_active field provided (frontoffice), keep it active
+            $data['is_active'] = true;
+        }
         
         // Filter out assignments without a meal_id (empty cells)
         if ($this->has('assignments')) {

@@ -126,22 +126,7 @@
                                                         <div class="meal-card-mini p-3 bg-light rounded h-100">
                                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                                 <span class="badge bg-info text-capitalize">
-                                                                    @switch($assignment->meal_time)
-                                                                        @case('breakfast')
-                                                                            Petit-déjeuner
-                                                                            @break
-                                                                        @case('lunch')
-                                                                            Déjeuner
-                                                                            @break
-                                                                        @case('dinner')
-                                                                            Dîner
-                                                                            @break
-                                                                        @case('snack')
-                                                                            Collation
-                                                                            @break
-                                                                        @default
-                                                                            {{ $assignment->meal_time }}
-                                                                    @endswitch
+                                                                    {{ $assignment->meal_time ? config("meal_times.labels.{$assignment->meal_time}") : ucfirst($assignment->meal_time) }}
                                                                 </span>
                                                                 
                                                                 @if($assignment->meal->image)

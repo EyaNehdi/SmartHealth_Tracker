@@ -608,9 +608,9 @@ textarea.form-control-enhanced {
 }
 
 .meal-card {
-    border: 1px solid #e9ecef;
+    border: 2px solid #e9ecef;
     border-radius: 0.75rem;
-    background: #fff;
+    background: transparent;
     transition: all 0.3s ease;
     overflow: hidden;
     position: relative;
@@ -623,38 +623,41 @@ textarea.form-control-enhanced {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #28a745, #20c997);
+    background: transparent;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .meal-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
-    transform: translateY(-4px);
+    border-color: #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
 }
 
 .meal-card:hover::before {
     opacity: 1;
+    background: #667eea;
 }
 
 .meal-card.selected {
     border-color: #28a745;
-    background: #f8fff9;
+    background: transparent;
+    border-width: 2px;
 }
 
 .meal-card.selected::before {
     opacity: 1;
-    background: linear-gradient(90deg, #28a745, #20c997);
+    background: #28a745;
 }
 
 .meal-card-header {
     padding: 1.25rem;
-    border-bottom: 1px solid #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 1rem;
+    background: rgba(248, 249, 250, 0.5);
 }
 
 .meal-info {
@@ -694,6 +697,7 @@ textarea.form-control-enhanced {
 
 .meal-card-body {
     padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .meal-nutrition {
@@ -1089,10 +1093,11 @@ textarea.form-control-enhanced {
 }
 
 .grid-table th {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: #f8f9fa;
     font-weight: 600;
     color: #495057;
     font-size: 0.875rem;
+    border-bottom: 2px solid #dee2e6;
 }
 
 .grid-table td {
@@ -1105,17 +1110,19 @@ textarea.form-control-enhanced {
 }
 
 .day-header {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: white;
+    background: #f8f9fa;
+    color: #495057;
     font-weight: 600;
+    border-right: 2px solid #e9ecef;
 }
 
 .meal-time-header {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
+    background: #e9ecef;
+    color: #495057;
     font-weight: 600;
     writing-mode: vertical-rl;
     text-orientation: mixed;
+    border-bottom: 2px solid #dee2e6;
     min-width: 80px;
 }
 

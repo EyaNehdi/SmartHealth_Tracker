@@ -123,7 +123,7 @@
                                             <div class="day-meal-item">
                                                 <div class="day-meal-info">
                                                     <div class="day-meal-name">{{ $assignment->meal->name }}</div>
-                                                    <div class="day-meal-time">{{ ucfirst($assignment->meal_time) }}</div>
+                                                    <div class="day-meal-time">{{ $assignment->meal_time ? config("meal_times.labels.{$assignment->meal_time}") : ucfirst($assignment->meal_time) }}</div>
                                                     <div class="day-meal-nutrition">
                                                         <small class="text-muted">
                                                             {{ $assignment->meal->total_calories ?? 0 }} cal | 
