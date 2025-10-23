@@ -50,7 +50,7 @@
             <div class="container-fluid p-0">
                 <div class="row gx-0">
                     <div class="col-md-6">
-                        <div class="login__left-side" data-background="{{Vite::asset('resources/assets/img/slider/slider_bg02.jpg')}}">
+                        <div class="login__left-side" data-background="{{Vite::asset('resources/assets/img/slider/jj.jpg')}}">
                             <a href="{{ route('home') }}"><img src="{{Vite::asset('resources/assets/img/logo/logo.svg')}}" alt="logo"></a>
                             <div class="login__left-content">
                                 <p>"SmartHealth Tracker helps me stay motivated and track my fitness journey with ease. The community support is amazing!"</p>

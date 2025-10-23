@@ -10,7 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Challenge;
 use App\Models\Participation;
 use Laravel\Cashier\Billable;
-use App\Models\SportSession;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -23,7 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
 
-
+   
     protected $fillable = [
         'name',
         'email',
@@ -76,10 +75,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Participation::class);
     }
-public function sportSessions()
-{
-    return $this->hasMany(SportSession::class);
-}
     // Dans User.php - ajoutez ces méthodes
 public function preferences()
 {
