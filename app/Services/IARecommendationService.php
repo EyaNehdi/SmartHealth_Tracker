@@ -98,15 +98,22 @@ class IARecommendationService
         }
         elseif ($preference === 'renforcement musculaire' || $preference === 'musculation') {
             Log::info('🔍 Recherche MUSCULATION activée');
-            return Activity::where('nom', 'like', '%musculation%')
-                         ->orWhere('nom', 'like', '%abdos%')
-                         ->orWhere('nom', 'like', '%pompes%')
-                         ->orWhere('nom', 'like', '%squat%')
-                         ->orWhere('nom', 'like', '%haltères%')
-                         ->orWhere('nom', 'like', '%crossfit%')
-                         ->orWhere('description', 'like', '%musculation%')
-                         ->orWhere('description', 'like', '%force%')
-                         ->get();
+          return Activity::where('nom', 'like', '%musculation%')
+                     ->orWhere('nom', 'like', '%abdos%')
+                     ->orWhere('nom', 'like', '%pompes%')
+                     ->orWhere('nom', 'like', '%squat%')
+                     ->orWhere('nom', 'like', '%haltères%')
+                     ->orWhere('nom', 'like', '%crossfit%')
+                     ->orWhere('nom', 'like', '%poids%') // AJOUTÉ
+                     ->orWhere('nom', 'like', '%lever%') // AJOUTÉ
+                     ->orWhere('nom', 'like', '%force%') // AJOUTÉ
+                     ->orWhere('nom', 'like', '%développé%') // AJOUTÉ
+                     ->orWhere('nom', 'like', '%traction%') // AJOUTÉ
+                     ->orWhere('description', 'like', '%musculation%')
+                     ->orWhere('description', 'like', '%force%')
+                     ->orWhere('description', 'like', '%poids%') // AJOUTÉ
+                     ->orWhere('description', 'like', '%renforcement%') // AJOUTÉ
+                     ->get();
         }
         elseif ($preference === 'flexibilité') {
             Log::info('🔍 Recherche FLEXIBILITÉ activée');
