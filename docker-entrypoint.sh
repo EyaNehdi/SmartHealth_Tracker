@@ -1,14 +1,18 @@
 #!/bin/bash
 set -e
 
-# Wait for MySQL
-until mysqladmin ping -h "mysql-db" -u "root" -p"$MYSQL_ROOT_PASSWORD" --silent; do
+echo "Waiting for MySQL to be ready..."
+
+# Wait until MySQL responds
+until mysql -h "${DB_HOST:-mysql-db}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-root}" -e "SELECT 1;" &>/dev/null; do
   echo "Waiting for MySQL..."
   sleep 3
 done
 
-# Run migrations
-php artisan migrate --force
+echo "✅ MySQL is up! Running Laravel commands..."
+
+# Run migrations and optimization
+php artisan migrate --force || true
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
