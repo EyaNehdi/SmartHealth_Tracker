@@ -3,7 +3,8 @@ FROM php:8.2-fpm
 WORKDIR /var/www/html
 
 # Install system dependencies & PHP extensions
-RUN apt-get update && apt-get install -y \default-mysql-client\
+RUN apt-get update && apt-get install -y \
+    default-mysql-client \
     libpng-dev libjpeg62-turbo-dev libwebp-dev libfreetype6-dev \
     libonig-dev libzip-dev libxml2-dev zip unzip git curl npm \
  && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
