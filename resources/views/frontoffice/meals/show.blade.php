@@ -54,8 +54,30 @@
                             <!-- Meal Description -->
                             <div class="meal-description mb-4">
                                 <h3 class="mb-3">Description</h3>
-                                <p class="text-muted">{{ $meal->description }}</p>
+                                <p class="text-muted">{{ $meal->description ?? 'Aucune description disponible.' }}</p>
                             </div>
+
+                            <!-- Tags -->
+                            @if($meal->tags && count($meal->tags) > 0)
+                                <div class="meal-tags mb-4">
+                                    <h3 class="mb-3">Étiquettes</h3>
+                                    <div class="tags-list">
+                                        @foreach($meal->tags as $tag)
+                                            <span class="badge bg-primary me-2 mb-2">{{ $tag }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Notes -->
+                            @if($meal->notes)
+                                <div class="meal-notes mb-4">
+                                    <h3 class="mb-3">Notes supplémentaires</h3>
+                                    <div class="notes-content p-3 bg-light rounded">
+                                        <p class="text-muted mb-0">{{ $meal->notes }}</p>
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- Ingredients -->
                             <div class="meal-ingredients mb-4">
@@ -90,11 +112,11 @@
                             </div>
 
                             <!-- Recipe -->
-                            @if($meal->recipe)
+                            @if($meal->recipe_description)
                                 <div class="meal-recipe mb-4">
                                     <h3 class="mb-3">Instructions de préparation</h3>
                                     <div class="recipe-content p-4 bg-light rounded">
-                                        {!! nl2br(e($meal->recipe)) !!}
+                                        {!! nl2br(e($meal->recipe_description)) !!}
                                     </div>
                                 </div>
                             @endif
@@ -160,7 +182,7 @@
                                         <i class="fas fa-droplet text-info me-3 fa-lg"></i>
                                         <span>Lipides</span>
                                     </div>
-                                    <strong>{{ number_format($meal->total_fats) }}g</strong>
+                                    <strong>{{ number_format($meal->total_fat) }}g</strong>
                                 </div>
                             </div>
 
@@ -171,29 +193,14 @@
                                 <div class="info-item mb-3">
                                     <i class="fas fa-clock text-success me-2"></i>
                                     <strong>Temps de préparation:</strong>
-                                    <span class="d-block ms-4">{{ $meal->preparation_time }} minutes</span>
+                                    <span class="d-block ms-4">{{ $meal->preparation_time ? $meal->preparation_time . ' minutes' : 'Non spécifié' }}</span>
                                 </div>
 
                                 <div class="info-item mb-3">
                                     <i class="fas fa-utensils text-primary me-2"></i>
                                     <strong>Moment du repas:</strong>
-                                    <span class="d-block ms-4 text-capitalize">
-                                        @switch($meal->meal_time)
-                                            @case('breakfast')
-                                                Petit-déjeuner
-                                                @break
-                                            @case('lunch')
-                                                Déjeuner
-                                                @break
-                                            @case('dinner')
-                                                Dîner
-                                                @break
-                                            @case('snack')
-                                                Collation
-                                                @break
-                                            @default
-                                                {{ $meal->meal_time }}
-                                        @endswitch
+                                    <span class="d-block ms-4">
+                                        {{ $meal->meal_time ? config("meal_times.labels.{$meal->meal_time}") : 'Non spécifié' }}
                                     </span>
                                 </div>
 

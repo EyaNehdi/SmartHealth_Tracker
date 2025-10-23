@@ -339,13 +339,18 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: opacity 0.3s ease;
 }
 
+/* ===== CARD CONTAINER - Explicit dimensions for consistency ===== */
 .meal-plan-card {
     border: 1px solid #e0e0e0;
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
     background: white;
-    min-height: 100%;
+    width: 100%; /* Explicit width */
+    min-height: 400px; /* Explicit minimum height */
+    height: auto; /* Allow natural height growth */
+    display: flex;
+    flex-direction: column;
 }
 
 .meal-plan-card:hover {
@@ -353,69 +358,105 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: translateY(-5px);
 }
 
-/* Equal height cards */
+/* ===== GRID LAYOUT - Equal height cards ===== */
 .row.g-4 {
     display: flex;
     flex-wrap: wrap;
+    align-items: stretch; /* Ensure all cards stretch to same height */
 }
 
 .row.g-4 > [class*='col-'] {
     display: flex;
+    margin-bottom: 1.5rem; /* Consistent spacing */
 }
 
+/* ===== CARD HEADER - Fixed height for consistency ===== */
 .meal-plan-card-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    min-height: 200px;
+    height: 200px; /* Fixed height instead of min-height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    position: relative;
 }
 
+.badges-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 24px; /* Reserve space for badge */
+}
+
+/* ===== TITLE - Multi-line truncation with ellipsis ===== */
 .meal-plan-title {
     color: white;
     font-weight: 600;
     font-size: 18px;
-    min-height: 44px; /* Ensure consistent height for 2 lines max */
+    height: 44px; /* Fixed height for 2 lines */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin: 0.5rem 0;
+    line-height: 1.2;
 }
 
+/* ===== DESCRIPTION - Equal height layout, preserve space ===== */
 .meal-plan-description {
     color: rgba(255, 255, 255, 0.9);
     font-size: 14px;
     line-height: 1.5;
+    height: 42px; /* Fixed height - preserves space even for short descriptions */
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 42px; /* 1.5 line-height * 14px font-size * 2 lines */
-    min-height: 42px; /* Keep consistent height */
+    width: 100%;
+    margin: 0;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
+/* ===== CARD BODY - Flexible content area ===== */
 .meal-plan-card-body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    padding: 1rem;
+    min-height: 200px; /* Ensure minimum body height */
 }
 
+/* ===== STATS SECTION - Consistent spacing ===== */
 .meal-plan-stats {
     padding-top: 10px;
     border-top: 1px solid #f0f0f0;
+    min-height: 80px; /* Reserve space for stats */
 }
 
 .stat-row {
     font-size: 14px;
+    margin-bottom: 0.5rem;
 }
 
+.stat-row:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== GOALS SECTION - Handle empty goals ===== */
 .meal-plan-goals {
     padding: 12px;
     background: #f8f9fa;
     border-radius: 8px;
     border-left: 3px solid #3498db;
+    min-height: 60px; /* Reserve space even if no goals */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .meal-plan-goals p {
@@ -425,7 +466,34 @@ document.addEventListener('DOMContentLoaded', function() {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 36px; /* 1.5 line-height * 12px small font * 2 lines */
+    margin: 0;
+}
+
+/* ===== ACTIONS SECTION - Fixed bottom positioning ===== */
+.meal-plan-actions {
+    margin-top: auto; /* Push to bottom */
+    padding-top: 1rem;
+}
+
+/* ===== RESPONSIVE DESIGN - Mobile optimization ===== */
+@media (max-width: 768px) {
+    .meal-plan-card {
+        min-height: 350px; /* Slightly smaller on mobile */
+    }
+    
+    .meal-plan-card-header {
+        height: 180px; /* Adjust header height for mobile */
+    }
+    
+    .meal-plan-title {
+        font-size: 16px;
+        height: 40px;
+    }
+    
+    .meal-plan-description {
+        font-size: 13px;
+        height: 39px;
+    }
 }
 
 .sidebar {

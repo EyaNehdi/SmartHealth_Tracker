@@ -56,11 +56,11 @@
                             <ul class="list-group list-group-flush shadow-sm rounded">
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Meal Time:</strong>
-                                    <span class="badge bg-info">{{ ucfirst($meal->meal_time ?? 'Not specified') }}</span>
+                                    <span class="badge bg-info">{{ $meal->meal_time ? config("meal_times.labels.{$meal->meal_time}") : 'Not specified' }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Preparation Time:</strong>
-                                    <span>{{ $meal->formatted_preparation_time }}</span>
+                                    <span>{{ $meal->preparation_time ? $meal->preparation_time . ' minutes' : 'Not specified' }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Total Calories:</strong>

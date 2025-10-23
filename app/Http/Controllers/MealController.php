@@ -73,6 +73,13 @@ class MealController extends Controller
 
         $data['created_by'] = Auth::id();
 
+        if (!empty($data['tags'])) {
+            $data['tags'] = array_map('trim', explode(',', $data['tags']));
+        } else {
+            $data['tags'] = [];
+        }
+
+
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('meal_images', 'public');
         }
@@ -113,6 +120,13 @@ class MealController extends Controller
         $meal = Meal::findOrFail($id);
 
         $data = $request->validated();
+
+        if (!empty($data['tags'])) {
+            $data['tags'] = array_map('trim', explode(',', $data['tags']));
+        } else {
+            $data['tags'] = [];
+        }
+
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('meal_images', 'public');
@@ -165,7 +179,7 @@ class MealController extends Controller
     public function addIngredient(Request $request, $id)
     {
         $meal = Meal::findOrFail($id);
-        
+
         $request->validate([
             'food_item_id' => 'required|exists:food_items,id',
             'quantity' => 'required|numeric|min:0.1',
@@ -204,9 +218,9 @@ class MealController extends Controller
     public function removeIngredient($mealId, $foodItemId)
     {
         $meal = Meal::findOrFail($mealId);
-        
+
         $meal->foodItems()->detach($foodItemId);
-        
+
         // Update nutritional totals
         $meal->updateNutritionalTotals();
 
@@ -226,7 +240,7 @@ class MealController extends Controller
     public function ingredientsList($id)
     {
         $meal = Meal::with('foodItems')->findOrFail($id);
-        
+
         return view('backoffice.meals.partials.ingredients-list', compact('meal'));
     }
 
@@ -259,7 +273,7 @@ class MealController extends Controller
     public function frontShow($id)
     {
         $meal = Meal::with('foodItems')->findOrFail($id);
-        
+
         return view('frontoffice.meals.show', compact('meal'));
     }
 
@@ -273,6 +287,13 @@ class MealController extends Controller
     {
         $data = $request->validated();
         $data['created_by'] = Auth::id();
+
+        if (!empty($data['tags'])) {
+            $data['tags'] = array_map('trim', explode(',', $data['tags']));
+        } else {
+            $data['tags'] = [];
+        }
+
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('meal_images', 'public');
@@ -312,6 +333,13 @@ class MealController extends Controller
         $meal = Meal::where('created_by', Auth::id())->findOrFail($id);
         $data = $request->validated();
 
+        if (!empty($data['tags'])) {
+            $data['tags'] = array_map('trim', explode(',', $data['tags']));
+        } else {
+            $data['tags'] = [];
+        }
+
+
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('meal_images', 'public');
         }
@@ -344,7 +372,7 @@ class MealController extends Controller
         $meal = Meal::where('created_by', Auth::id())->findOrFail($id);
         $meal->foodItems()->detach();
         $meal->delete();
-        
+
         return redirect()->route('meals.front.index')->with('success', 'Meal deleted successfully!');
     }
 
@@ -352,7 +380,7 @@ class MealController extends Controller
     public function saveMeal(Request $request, $id)
     {
         $meal = Meal::findOrFail($id);
-        
+
         $saved = \App\Models\SavedMeal::firstOrCreate([
             'user_id' => Auth::id(),
             'meal_id' => $id,

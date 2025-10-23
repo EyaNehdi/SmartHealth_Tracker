@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FoodItem extends Model
 {
+    use HasFactory;
     protected $table = 'food_items';
 
     protected $fillable = [
@@ -23,8 +25,7 @@ class FoodItem extends Model
     public function meals()
     {
         return $this->belongsToMany(Meal::class, 'meal_food', 'food_id', 'meal_id')
-                    ->withPivot('quantity', 'unit')
-                    ->withTimestamps();
+                    ->withPivot('quantity', 'unit');
     }
 
     // Accessor for formatted nutritional information

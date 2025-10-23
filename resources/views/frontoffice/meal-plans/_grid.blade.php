@@ -12,7 +12,6 @@
                     <div class="meal-plan-card-header position-relative">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="badges-group">
-                                <span class="badge bg-success mb-1">Actif</span>
                                 @auth
                                     @if($mealPlan->created_by == Auth::id())
                                         <span class="badge bg-success">
