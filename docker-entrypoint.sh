@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Waiting for MySQL (${DB_HOST}:${DB_PORT}) to be ready..."
-until mysqladmin ping -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" --silent; do
-  sleep 3
-done
+
 echo "MySQL is ready!"
 
 mkdir -p bootstrap/cache storage
