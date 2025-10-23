@@ -27,6 +27,15 @@ pipeline {
 
             }
         }
+        stage('Install PHP') {
+    steps {
+        sh '''
+            sudo apt-get update
+            sudo apt-get install -y php php-mbstring php-xml composer
+            composer install
+        '''
+    }
+}
             stage('test unitaires') {
             steps {
 
