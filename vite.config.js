@@ -15,12 +15,20 @@ export default defineConfig({
                 'resources/js/sh-sidebar.js',
                 'resources/js/meal-ingredients.js',
                 'resources/js/meal-plan-form.js',
-                'resources/js/food-selection.js'
+                'resources/js/food-selection.js',
+                'resources/assets/img/**/*', // Inclure toutes les images
             ],
             refresh: true,
         }),
     ],
     css: {
         devSourcemap: true,
-    }
+    },
+build: {
+        rollupOptions: {
+            output: {
+                assetFileNames: 'assets/[name].[ext]', // Copier les images dans public/build/assets
+            },
+        },
+    },
 });
