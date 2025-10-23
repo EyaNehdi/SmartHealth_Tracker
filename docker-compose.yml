@@ -1,0 +1,33 @@
+services:
+  app:
+    image: my-laravel-app:latest
+    container_name: laravel-app
+    restart: unless-stopped
+    ports:
+      - "8081:9000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: energix
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.1
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # only root password
+      MYSQL_DATABASE: energix
+      # remove MYSQL_USER and MYSQL_PASSWORD
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

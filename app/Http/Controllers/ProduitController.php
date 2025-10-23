@@ -117,13 +117,45 @@ public function storeFront(Request $request)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nom' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'prix' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'categorie_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // max 2Mo
-        ]);
+    'nom' => [
+        'required',
+        'string',
+        'min:2',
+        'max:255',
+        'regex:/^[^\d\W].*/', // ne commence pas par chiffre ou symbole
+    ],
+    'description' => [
+        'required',
+        'string',
+        'min:5',
+        'regex:/^[^\d\W].*/', // ne commence pas par chiffre ou symbole
+    ],
+    'prix' => 'required|numeric|min:0',
+    'stock' => 'required|integer|min:0',
+    'categorie_id' => 'required|exists:categories,id',
+    'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048', // max 2Mo
+], [
+    'nom.required' => 'Le nom du produit est obligatoire.',
+    'nom.min' => 'Le nom doit contenir au moins 2 caractères.',
+    'nom.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+    'nom.regex' => 'Le nom ne peut pas commencer par un chiffre ou un symbole.',
+    'description.required' => 'La description est obligatoire.',
+    'description.min' => 'La description doit contenir au moins 5 caractères.',
+    'description.regex' => 'La description ne peut pas commencer par un chiffre ou un symbole.',
+    'prix.required' => 'Le prix est obligatoire.',
+    'prix.numeric' => 'Le prix doit être un nombre.',
+    'prix.min' => 'Le prix doit être positif.',
+    'stock.required' => 'Le stock est obligatoire.',
+    'stock.integer' => 'Le stock doit être un entier.',
+    'stock.min' => 'Le stock doit être au moins 0.',
+    'categorie_id.required' => 'La catégorie est obligatoire.',
+    'categorie_id.exists' => 'La catégorie sélectionnée est invalide.',
+    'image.required' => 'L’image du produit est obligatoire.',
+    'image.image' => 'Le fichier doit être une image.',
+    'image.mimes' => 'Le format de l’image doit être jpg, jpeg, png ou gif.',
+    'image.max' => 'La taille de l’image ne doit pas dépasser 2 Mo.',
+]);
+
 
         // Gestion de l'image
         if ($request->hasFile('image')) {

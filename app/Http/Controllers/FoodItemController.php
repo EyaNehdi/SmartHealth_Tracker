@@ -10,22 +10,48 @@ use Illuminate\Http\Request;
 class FoodItemController extends Controller
 {
     // For JSON API
-    public function apiIndex()
+    public function index()
     {
-        $foods = FoodItem::all();
+        $foods = FoodItem::with('meals')->get();
         return response()->json($foods);
     }
 
-    // For Blade view display
-    public function foodList()
+    public function show($id)
     {
-        $foods = FoodItem::all();
+        $food = FoodItem::with('meals')->findOrFail($id);
+        return response()->json($food);
+    }
+
+    // For Blade view display
+    public function foodList(Request $request)
+    {
+        $foods = FoodItem::query()
+            ->search($request->get('search'))
+            ->byCaloriesRange($request->get('calories_min'), $request->get('calories_max'))
+            ->byProteinRange($request->get('protein_min'), $request->get('protein_max'))
+            ->byFatRange($request->get('fat_min'), $request->get('fat_max'))
+            ->byCarbsRange($request->get('carbs_min'), $request->get('carbs_max'))
+            ->orderBy('name', 'asc')
+            ->paginate(12)
+            ->appends($request->query());
+        
+        // Handle AJAX requests
+        if ($request->ajax()) {
+            return view('backoffice.food.partials.food-grid', compact('foods'));
+        }
+        
         return view('backoffice.food.food-list', compact('foods'));
     }
 
     public function store(StoreFoodRequest $request)
     {
         $data = $request->validated();
+
+        // Handle serving type - use custom_serving_type if provided, otherwise use serving_type
+        if (!empty($data['custom_serving_type'])) {
+            $data['serving_type'] = $data['custom_serving_type'];
+        }
+        unset($data['custom_serving_type']);
 
         // Check if image uploaded
         if ($request->hasFile('image')) {
@@ -34,7 +60,15 @@ class FoodItemController extends Controller
         }
 
         $food = FoodItem::create($data);
-        return redirect()->route('admin.food.list')->with('success', 'Food item added successfully.');
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Food item created successfully',
+                'data' => $food->load('meals')
+            ], 201);
+        }
+        
+        return redirect()->route('admin.food.show', $food->id)->with('success', 'Food item created successfully!');
     }
     public function showView($id)
     {
@@ -55,6 +89,12 @@ class FoodItemController extends Controller
         $food = FoodItem::findOrFail($id);
 
         $validatedData = $request->validated();
+
+        // Handle serving type - use custom_serving_type if provided, otherwise use serving_type
+        if (!empty($validatedData['custom_serving_type'])) {
+            $validatedData['serving_type'] = $validatedData['custom_serving_type'];
+        }
+        unset($validatedData['custom_serving_type']);
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('food_images', 'public');

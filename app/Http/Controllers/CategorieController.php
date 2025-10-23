@@ -32,12 +32,16 @@ class CategorieController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'description' => 'nullable|string',
+        ], [
+            'nom.required' => '⚠️ Le nom de la catégorie est obligatoire.',
+            'nom.max' => '⚠️ Le nom de la catégorie ne peut pas dépasser 255 caractères.',
+            'description.string' => '⚠️ La description doit être du texte valide.',
         ]);
 
         Categorie::create($validated);
 
         return redirect()->route('admin.categories.list')
-                         ->with('success', 'Catégorie créée avec succès ✅');
+                         ->with('success', '✅ Catégorie créée avec succès !');
     }
 
     /**
@@ -61,15 +65,33 @@ class CategorieController extends Controller
      */
     public function update(Request $request, Categorie $categorie)
     {
-        $validated = $request->validate([
-            'nom' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+    $validated = $request->validate([
+    'nom' => ['required', 'string', 'min:2', 'max:255', function($attribute, $value, $fail) {
+        if (preg_match('/^[\d\W]/', $value)) {
+            $fail('⚠️ Le nom ne peut pas commencer par un chiffre ou un symbole.');
+        }
+    }],
+    'description' => ['required', 'string', 'min:5', function($attribute, $value, $fail) {
+        if (preg_match('/^[\d\W]/', $value)) {
+            $fail('⚠️ La description ne peut pas commencer par un chiffre ou un symbole.');
+        }
+    }],
+], [
+    'nom.required' => '⚠️ Le nom de la catégorie est obligatoire.',
+    'nom.min' => '⚠️ Le nom doit contenir au moins 2 caractères.',
+    'nom.max' => '⚠️ Le nom ne peut pas dépasser 255 caractères.',
+    'description.required' => '⚠️ La description est obligatoire.',
+    'description.min' => '⚠️ La description doit contenir au moins 5 caractères.',
+    'description.string' => '⚠️ La description doit être du texte valide.',
+]);
+
+
+
 
         $categorie->update($validated);
 
         return redirect()->route('admin.categories.list')
-                         ->with('success', 'Catégorie mise à jour avec succès ✏️');
+                         ->with('success', '✏️ Catégorie mise à jour avec succès !');
     }
 
     /**
@@ -80,6 +102,6 @@ class CategorieController extends Controller
         $categorie->delete();
 
         return redirect()->route('admin.categories.list')
-                         ->with('success', 'Catégorie supprimée avec succès 🗑️');
+                         ->with('success', '🗑️ Catégorie supprimée avec succès !');
     }
 }

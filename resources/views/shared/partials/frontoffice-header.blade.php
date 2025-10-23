@@ -32,8 +32,16 @@
 
                                     <li><a href="{{ route('produits.index') }}" class="section-link">Magasin</a></li>
 
-
                                     <li><a href="{{ route('events.front') }}" class="section-link">Event</a></li>
+
+                                    <li class="menu-item-has-children">
+                                        <a href="#">Nutrition</a>
+                                        <ul class="sub-menu">
+                                            <li><a href="{{ route('meals.front.index') }}">Voir les repas</a></li>
+                                            <li><a href="{{ route('meal-plans.front.index') }}">Voir les plans de repas</a></li>
+                                        </ul>
+                                    </li>
+
                                     <li><a href="{{ route('contact') }}" class="section-link">CONTACT</a></li>
                                 </ul>
                             </div>

@@ -89,4 +89,14 @@ public function getPreferenceTags()
 // Créer une migration pour la table user_preferences
 // php artisan make:migration create_user_preferences_table
 
+    // Meal-related relationships
+    public function meals()
+    {
+        return $this->hasMany(Meal::class, 'created_by');
+    }
+
+    public function mealPlans()
+    {
+        return $this->hasMany(MealPlan::class, 'created_by');
+    }
 }
