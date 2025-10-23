@@ -18,7 +18,16 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        // Liste des préférences prédéfinies
+        $preferences = [
+            'Relaxation',
+            'Cardio',
+            'Renforcement musculaire',
+            'Flexibilité',
+            'Endurance',
+        ];
+        
+        return view('auth.register', compact('preferences'));
     }
 
     /**
@@ -32,6 +41,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'preference' => $request->preference,
         ]);
 
         event(new Registered($user));

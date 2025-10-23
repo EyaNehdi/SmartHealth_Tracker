@@ -27,6 +27,7 @@ class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', 'min:2'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', 'min:8', 'regex:/^(?=.*\d).+$/'],
+            'preference' => ['required', 'string', 'in:Relaxation,Cardio,Renforcement musculaire,Flexibilité,Endurance'],
             'terms_accepted' => ['required', 'accepted'],
         ];
     }
@@ -56,6 +57,10 @@ class RegisterRequest extends FormRequest
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'password.regex' => 'Le mot de passe doit contenir au moins un chiffre.',
             
+            'preference.required' => 'La préférence d\'activité est obligatoire.',
+            'preference.string' => 'La préférence doit être une chaîne de caractères.',
+            'preference.in' => 'La préférence sélectionnée n\'est pas valide.',
+            
             'terms_accepted.required' => 'Vous devez accepter les conditions d\'utilisation.',
             'terms_accepted.accepted' => 'Vous devez accepter les conditions d\'utilisation.',
         ];
@@ -73,6 +78,7 @@ class RegisterRequest extends FormRequest
             'email' => 'adresse email',
             'password' => 'mot de passe',
             'password_confirmation' => 'confirmation du mot de passe',
+            'preference' => 'préférence d\'activité',
             'terms_accepted' => 'conditions d\'utilisation',
         ];
     }

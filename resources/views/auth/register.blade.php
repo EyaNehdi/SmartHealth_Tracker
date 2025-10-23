@@ -130,6 +130,22 @@
             @enderror
         </div>
 
+        <!-- Activity Preference -->
+        <div class="mb-3">
+            <label for="preference" class="form-label">{{ __('Préférence d\'activité') }}</label>
+            <select id="preference" name="preference" class="form-control @error('preference') is-invalid @enderror">
+                <option value="">{{ __('Choisir une préférence') }}</option>
+                @foreach ($preferences as $preference)
+                    <option value="{{ $preference }}" {{ old('preference') == $preference ? 'selected' : '' }}>{{ $preference }}</option>
+                @endforeach
+            </select>
+            @error('preference')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
                                 <div class="account__check">
                                     <div class="account__check-remember">
                                         <input type="checkbox" class="form-check-input @error('terms_accepted') is-invalid @enderror" value="1" id="terms-check" name="terms_accepted">
@@ -197,6 +213,27 @@
             
             // Listen for checkbox changes
             termsCheckbox.addEventListener('change', toggleRegisterButton);
+            
+            // Handle form submission to prevent double submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                if (registerBtn.disabled) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Disable button to prevent double submission
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = 'Creating Account...';
+            });
+            
+            // Refresh CSRF token if needed
+            if (window.Laravel && window.Laravel.csrfToken) {
+                const metaToken = document.querySelector('meta[name="csrf-token"]');
+                if (metaToken) {
+                    metaToken.setAttribute('content', window.Laravel.csrfToken);
+                }
+            }
         });
     </script>
 </body>
