@@ -26,6 +26,9 @@
     @vite(['resources/assets/css/tg-cursor.css'])
     @vite(['resources/assets/css/main.css'])
 
+    <!-- Frontoffice Styles Stack -->
+    @stack('frontoffice-styles')
+
     <!-- Custom CSS for footer text visibility -->
     <style>
         /* Fix footer text visibility */

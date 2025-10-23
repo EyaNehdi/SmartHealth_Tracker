@@ -5,11 +5,14 @@ use App\Models\CategoryActivity;
 use App\Models\Activity;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Stripe\Stripe;
 use Stripe\Exception\AuthenticationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminActivityPaidMail;
 use App\Models\Comment;
 
 class ActivityController extends Controller
@@ -47,85 +50,74 @@ class ActivityController extends Controller
         return view('backoffice.Activity.list', compact('activities', 'categories'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nom' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[A-Za-z\s\-]+$/',
-            ],
-            'description' => 'required|string',
-            'date_debut' => 'required|date',
-            'date_fin' => [
-                'required',
-                'date',
-                'after_or_equal:date_debut',
-            ],
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-            'support_pdf' => 'nullable|file|mimes:pdf|max:10000',
-            'support_video' => 'nullable|file|mimes:mp4,avi,mov|max:50000',
-            'prix' => 'required|numeric|min:0',
-            'equipments' => 'required|array|min:1',
-            'equipments.*' => 'exists:equipments,id',
-            'equipment_comment' => 'required|string',
-        ], [
-            'nom.required' => 'Le nom de l\'activité est requis.',
-            'nom.regex' => 'Le nom doit contenir uniquement des lettres, espaces ou tirets.',
-            'description.required' => 'La description est requise.',
-            'date_debut.required' => 'La date de début est requise.',
-            'date_fin.required' => 'La date de fin est requise.',
-            'date_fin.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début.',
-            'prix.required' => 'Le prix est requis.',
-            'prix.numeric' => 'Le prix doit être un nombre.',
-            'prix.min' => 'Le prix doit être un nombre positif ou zéro.',
-            'equipments.required' => 'Au moins un équipement est requis.',
-            'equipments.min' => 'Au moins un équipement est requis.',
-            'equipments.*.exists' => 'Un ou plusieurs équipements sélectionnés sont invalides.',
-            'equipment_comment.required' => 'Le commentaire sur les équipements est requis.',
-            'image.mimes' => 'L\'image doit être au format JPG, PNG ou JPEG.',
-            'image.max' => 'L\'image ne doit pas dépasser 2MB.',
-            'support_pdf.mimes' => 'Le fichier doit être un PDF.',
-            'support_pdf.max' => 'Le PDF ne doit pas dépasser 10MB.',
-            'support_video.mimes' => 'La vidéo doit être au format MP4, AVI ou MOV.',
-            'support_video.max' => 'La vidéo ne doit pas dépasser 50MB.',
-        ]);
 
-        $activity = new Activity;
-        $activity->nom = $request->nom;
-        $activity->description = $request->description;
-        $activity->date_debut = $request->date_debut;
-        $activity->date_fin = $request->date_fin;
-        $activity->prix = $request->prix;
-        $activity->user_id = Auth::id();
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nom' => [
+            'required',
+            'string',
+            'max:255',
+            'regex:/^[A-Za-z\s\-]+$/',
+        ],
+        'description' => 'required|string',
+        'date_debut' => 'required|date',
+        'date_fin' => [
+            'required',
+            'date',
+            'after_or_equal:date_debut',
+        ],
+        'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        'support_pdf' => 'nullable|file|mimes:pdf|max:10000',
+        'support_video' => 'nullable|file|mimes:mp4,avi,mov|max:50000',
+        'prix' => 'required|numeric|min:0',
+        'equipments' => 'required|array|min:1',
+        'equipments.*' => 'exists:equipments,id',
+        'equipment_comment' => 'required|string',
+    ], [
+        // Messages d'erreur
+    ]);
 
-        if ($request->hasFile('image')) {
-            $activity->image = $request->file('image')->store('activities/images', 'public');
-        }
-        if ($request->hasFile('support_pdf')) {
-            $activity->support_pdf = $request->file('support_pdf')->store('activities/pdfs', 'public');
-        }
-        if ($request->hasFile('support_video')) {
-            $activity->support_video = $request->file('support_video')->store('activities/videos', 'public');
-        }
+    $activity = new Activity;
+    $activity->nom = $request->nom;
+    $activity->description = $request->description;
+    $activity->date_debut = $request->date_debut;
+    $activity->date_fin = $request->date_fin;
+    $activity->prix = $request->prix;
+    $activity->user_id = Auth::id();
 
-        $activity->save();
-
-        $activity->equipments()->attach($request->equipments, [
-            'commentaire' => $request->equipment_comment,
-        ]);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Activité ajoutée avec succès !',
-                'activity' => $activity->load('equipments'),
-            ]);
-        }
-
-        return redirect()->route('admin.activities.index')->with('success', 'Activité ajoutée avec succès !');
+    if ($request->hasFile('image')) {
+        Log::info('Image upload attempt for activity', ['file' => $request->file('image')->getClientOriginalName()]);
+        $path = $request->file('image')->store('activities/images', 'public');
+        Log::info('Image stored at', ['path' => $path]);
+        $activity->image = $path;
+    } else {
+        Log::info('No image file provided for activity');
     }
+
+    if ($request->hasFile('support_pdf')) {
+        $activity->support_pdf = $request->file('support_pdf')->store('activities/pdfs', 'public');
+    }
+    if ($request->hasFile('support_video')) {
+        $activity->support_video = $request->file('support_video')->store('activities/videos', 'public');
+    }
+
+    $activity->save();
+
+    $activity->equipments()->attach($request->equipments, [
+        'commentaire' => $request->equipment_comment,
+    ]);
+
+    if ($request->expectsJson()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Activité ajoutée avec succès !',
+            'activity' => $activity->load('equipments'),
+        ]);
+    }
+
+    return redirect()->route('admin.activities.index')->with('success', 'Activité ajoutée avec succès !');
+}
 
     public function edit(Activity $activity)
     {
@@ -346,6 +338,9 @@ class ActivityController extends Controller
             return redirect()->route('activities.front')->with('error', 'Erreur de vérification du paiement.');
         }
 
+        $adminEmail = 'jihedhorchani@gmail.com'; // <-- change cette adresse
+    Mail::to($adminEmail)->send(new AdminActivityPaidMail($activity, $user));
+
         return redirect()->route('activities.front')->with('error', 'Paiement échoué.');
     }
 
@@ -430,5 +425,23 @@ public function storeComment(Request $request, Activity $activity)
     ]);
 
     return redirect()->back()->with('success', 'Commentaire et note ajoutés !');
+}
+public function recommended(Request $request)
+{
+    $user = Auth::user();
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Connectez-vous pour voir les recommandations.');
+    }
+
+    if ($user->preferences->count() === 0) {
+        return redirect()->route('preferences.create')
+                         ->with('info', 'Veuillez définir vos préférences pour obtenir des recommandations personnalisées.');
+    }
+
+    // Utiliser IARecommendationService
+    $recommendationService = new \App\Services\IARecommendationService();
+    $activities = $recommendationService->getRecommendedActivities($user);
+
+    return view('frontoffice.activities.recommended', compact('activities', 'user'));
 }
 }

@@ -122,6 +122,20 @@
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
+        <div class="mb-3">
+                            <label for="preference" class="form-label">{{ __('Préférence d\'activité') }}</label>
+                            <select id="preference" name="preference" class="form-control @error('preference') is-invalid @enderror" required>
+                                <option value="">{{ __('Choisir une préférence') }}</option>
+                                @foreach ($preferences as $preference)
+                                    <option value="{{ $preference }}" {{ old('preference') == $preference ? 'selected' : '' }}>{{ $preference }}</option>
+                                @endforeach
+                            </select>
+                            @error('preference')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
 
                                 <div class="account__check">
                                     <div class="account__check-remember">
