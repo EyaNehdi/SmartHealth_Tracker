@@ -3,22 +3,18 @@ import laravel from 'laravel-vite-plugin';
 import path from 'path';
 import glob from 'fast-glob';
 
+// automatically include all CSS, JS, and images
+const cssFiles = glob.sync('resources/assets/css/**/*.css');
+const jsFiles = glob.sync('resources/assets/js/**/*.js');
 const imageFiles = glob.sync('resources/assets/img/**/*.{png,jpg,jpeg,gif,svg}');
 
 export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/css/app.css',
-                'resources/css/sh-sidebar.css',
-                'resources/css/meals-filters.css',
-                'resources/css/meal-plan-forms.css',
-                'resources/css/frontoffice-save-buttons.css',
-                'resources/js/app.js',
-                'resources/js/sh-sidebar.js',
-                'resources/js/meal-ingredients.js',
-                'resources/js/meal-plan-form.js',
-                ...imageFiles, // automatically add all images
+                ...cssFiles,
+                ...jsFiles,
+                ...imageFiles,
             ],
             refresh: true,
         }),
