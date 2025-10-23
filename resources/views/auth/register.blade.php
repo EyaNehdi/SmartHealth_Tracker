@@ -87,65 +87,77 @@
         @csrf
 
         <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        <div class="mb-3">
+            <label for="name" class="form-label">{{ __('Name') }}</label>
+            <input id="name" class="form-control @error('name') is-invalid @enderror" type="text" name="name" value="{{ old('name') }}" autofocus autocomplete="name" />
+            @error('name')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
         </div>
 
         <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-3">
+            <label for="email" class="form-label">{{ __('Email') }}</label>
+            <input id="email" class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email') }}" autocomplete="username" />
+            @error('email')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="mb-3">
+            <label for="password" class="form-label">{{ __('Password') }}</label>
+            <input id="password" class="form-control @error('password') is-invalid @enderror" type="password" name="password" autocomplete="new-password" />
+            @error('password')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
         <div class="mb-3">
-                            <label for="preference" class="form-label">{{ __('Préférence d\'activité') }}</label>
-                            <select id="preference" name="preference" class="form-control @error('preference') is-invalid @enderror" required>
-                                <option value="">{{ __('Choisir une préférence') }}</option>
-                                @foreach ($preferences as $preference)
-                                    <option value="{{ $preference }}" {{ old('preference') == $preference ? 'selected' : '' }}>{{ $preference }}</option>
-                                @endforeach
-                            </select>
-                            @error('preference')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
+            <label for="password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
+            <input id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" type="password" name="password_confirmation" autocomplete="new-password" />
+            @error('password_confirmation')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
+        <!-- Activity Preference -->
+        <div class="mb-3">
+            <label for="preference" class="form-label">{{ __('Préférence d\'activité') }}</label>
+            <select id="preference" name="preference" class="form-control @error('preference') is-invalid @enderror">
+                <option value="">{{ __('Choisir une préférence') }}</option>
+                @foreach ($preferences as $preference)
+                    <option value="{{ $preference }}" {{ old('preference') == $preference ? 'selected' : '' }}>{{ $preference }}</option>
+                @endforeach
+            </select>
+            @error('preference')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
 
                                 <div class="account__check">
                                     <div class="account__check-remember">
-                                        <input type="checkbox" class="form-check-input" value="" id="terms-check">
-                                        <label for="terms-check" class="form-check-label">I read and accept the <a href="contact.html">terms of use</a></label>
+                                        <input type="checkbox" class="form-check-input @error('terms_accepted') is-invalid @enderror" value="1" id="terms-check" name="terms_accepted">
+                                        <label for="terms-check" class="form-check-label">I read and accept the <a href="{{ route('terms') }}" target="_blank">terms of use</a></label>
+                                        @error('terms_accepted')
+                                            <div class="text-danger mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
-                                   <x-primary-button class="tg-btn tg-btn-three black-btn">
+                                   <button type="submit" class="tg-btn tg-btn-three black-btn" id="register-btn" disabled>
                 {{ __('Register') }}
-            </x-primary-button>
+            </button>
 
                             </form>
                             <div class="account__switch">
@@ -178,6 +190,52 @@
     @vite(['resources/assets/js/sal.js'])
     @vite(['resources/assets/js/ajax-form.js'])
     @vite(['resources/assets/js/main.js'])
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const termsCheckbox = document.getElementById('terms-check');
+            const registerBtn = document.getElementById('register-btn');
+            
+            function toggleRegisterButton() {
+                if (termsCheckbox.checked) {
+                    registerBtn.disabled = false;
+                    registerBtn.style.opacity = '1';
+                    registerBtn.style.cursor = 'pointer';
+                } else {
+                    registerBtn.disabled = true;
+                    registerBtn.style.opacity = '0.5';
+                    registerBtn.style.cursor = 'not-allowed';
+                }
+            }
+            
+            // Initial state
+            toggleRegisterButton();
+            
+            // Listen for checkbox changes
+            termsCheckbox.addEventListener('change', toggleRegisterButton);
+            
+            // Handle form submission to prevent double submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                if (registerBtn.disabled) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Disable button to prevent double submission
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = 'Creating Account...';
+            });
+            
+            // Refresh CSRF token if needed
+            if (window.Laravel && window.Laravel.csrfToken) {
+                const metaToken = document.querySelector('meta[name="csrf-token"]');
+                if (metaToken) {
+                    metaToken.setAttribute('content', window.Laravel.csrfToken);
+                }
+            }
+        });
+    </script>
 </body>
 
 
