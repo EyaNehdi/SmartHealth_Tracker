@@ -35,17 +35,7 @@ pipeline {
         }
 
 
-        stage('Run Unit Tests in Container') {
-    steps {
-        sh '''
-            docker build -t $APP_IMAGE .
-            docker run --rm \
-                -v $PWD:/var/www/html \
-                -w /var/www/html \
-                $APP_IMAGE php artisan test
-        '''
-    }
-}
+
 
         stage('SonarQube Analysis') {
     steps {
@@ -67,6 +57,17 @@ pipeline {
             }
 
         }
+        stage('Run Unit Tests in Container') {
+    steps {
+        sh '''
+            docker build -t $APP_IMAGE .
+            docker run --rm \
+                -v $PWD:/var/www/html \
+                -w /var/www/html \
+                $APP_IMAGE php artisan test
+        '''
+    }
+}
 
 
 
