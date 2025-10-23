@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_IMAGE = "my-laravel-app:latest"
         DOCKER_COMPOSE_FILE = "docker-compose.yml"
-        SONARQUBE = "sonar" // Name of SonarQube server in Jenkins
+        SONARQUBE = "sonnar" // Name of SonarQube server in Jenkins
     }
 
     stages {
@@ -33,6 +33,14 @@ pipeline {
                 sh 'docker build -t $APP_IMAGE .'
             }
         }
+        stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('sonnar') {
+            sh 'sonar-scanner'
+        }
+    }
+}
+
 
         stage('Build and Run with Docker Compose') {
             steps {
@@ -43,15 +51,9 @@ pipeline {
             }
 
         }
-        stage('Run Laravel Migrations') {
-            steps {
-                sh '''
-                    echo "⏳ Running migrations inside Laravel container..."
-                    docker exec laravel-app php artisan migrate --force
-                '''
-            }
 
-        }
+
+
 
     }
 
