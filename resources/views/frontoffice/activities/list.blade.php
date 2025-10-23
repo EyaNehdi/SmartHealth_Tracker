@@ -56,13 +56,31 @@
                             <!-- Grande carte blanche englobante -->
                             <div class="card p-4 shadow-sm bg-white">
                                 <div class="row mb-3">
-                                    <div class="col-12 d-flex justify-content-between align-items-center">
-                                        <p class="mb-0">Affichage de {{ count($activities) }} activité(s)</p>
-                                        <!-- Bouton pour les statistiques -->
-                                        <a href="{{ route('activities.statistics') }}" class="btn btn-primary btn-sm">
-                                             📊 Voir Statistiques
-                                        </a>
-                                    </div>
+                              {{-- Dans votre vue actuelle --}}
+<div class="col-12 d-flex justify-content-between align-items-center">
+    <p class="mb-0">Affichage de {{ count($activities) }} activité(s)</p>
+    
+    <!-- Bouton amélioré pour les recommandations -->
+    @auth
+        @if(Auth::user()->preferences->count() > 0)
+            <a href="{{ route('activities.recommended') }}" class="btn btn-warning btn-sm">
+                🌟 Activités Recommandées 
+            </a>
+        @else
+            <a href="{{ route('preferences.create') }}" class="btn btn-outline-warning btn-sm">
+                ⚙️ Définir mes préférences
+            </a>
+        @endif
+    @else
+        <a href="{{ route('login') }}" class="btn btn-outline-warning btn-sm">
+            🔐 Se connecter pour les recommandations
+        </a>
+    @endauth
+
+    <a href="{{ route('activities.statistics') }}" class="btn btn-primary btn-sm">
+        📊 Voir Statistiques
+    </a>
+</div>
                                 </div>
 
                                 <div class="row g-4">

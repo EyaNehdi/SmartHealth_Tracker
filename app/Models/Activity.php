@@ -11,6 +11,7 @@ class Activity extends Model
     protected $fillable = [
         'nom',
         'description',
+        'tags',
         'date_debut',
         'date_fin',
         'duree',

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 use Stripe\Stripe;
 use Stripe\Exception\AuthenticationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminActivityPaidMail;
 use App\Models\Comment;
 
 class ActivityController extends Controller
@@ -346,6 +348,9 @@ class ActivityController extends Controller
             return redirect()->route('activities.front')->with('error', 'Erreur de vérification du paiement.');
         }
 
+        $adminEmail = 'jihedhorchani@gmail.com'; // <-- change cette adresse
+    Mail::to($adminEmail)->send(new AdminActivityPaidMail($activity, $user));
+
         return redirect()->route('activities.front')->with('error', 'Paiement échoué.');
     }
 
@@ -430,5 +435,23 @@ public function storeComment(Request $request, Activity $activity)
     ]);
 
     return redirect()->back()->with('success', 'Commentaire et note ajoutés !');
+}
+public function recommended(Request $request)
+{
+    $user = Auth::user();
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Connectez-vous pour voir les recommandations.');
+    }
+
+    if ($user->preferences->count() === 0) {
+        return redirect()->route('preferences.create')
+                         ->with('info', 'Veuillez définir vos préférences pour obtenir des recommandations personnalisées.');
+    }
+
+    // Utiliser IARecommendationService
+    $recommendationService = new \App\Services\IARecommendationService();
+    $activities = $recommendationService->getRecommendedActivities($user);
+
+    return view('frontoffice.activities.recommended', compact('activities', 'user'));
 }
 }

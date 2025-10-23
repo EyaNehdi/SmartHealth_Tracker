@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'preference',
     ];
 
     /**
@@ -74,5 +75,18 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Participation::class);
     }
+    // Dans User.php - ajoutez ces méthodes
+public function preferences()
+{
+    return $this->hasMany(UserPreference::class);
+}
+
+public function getPreferenceTags()
+{
+    return $this->preferences()->pluck('tag')->toArray();
+}
+
+// Créer une migration pour la table user_preferences
+// php artisan make:migration create_user_preferences_table
 
 }

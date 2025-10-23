@@ -12,6 +12,8 @@ use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
 use App\Http\Controllers\PanierController;
+use App\Http\Controllers\PreferenceController;
+
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\CartController;
 
@@ -135,6 +137,10 @@ Route::get('/activities/{activity}/checkout/success', [ActivityController::class
 Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
 Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
 Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/preferences', [PreferenceController::class, 'create'])->name('preferences.create');
+Route::post('/preferences', [PreferenceController::class, 'store'])->name('preferences.store');
+Route::get('/activities/recommended', [ActivityController::class, 'recommended'])->name('activities.recommended');
+
 // User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::get('/participations/create', [ParticipationController::class, 'create'])->name('participations.create');
