@@ -38,12 +38,19 @@ pipeline {
             steps {
                 sh '''
                     docker compose -f docker-compose.yml down -v --remove-orphans
-                    docker compose -f docker-compose.yml up  --build
+                    docker compose -f docker-compose.yml up -d --build
                 '''
             }
 
         }
-        
+        stage('Run Laravel Migrations') {
+            steps {
+                sh '''
+                    echo "⏳ Running migrations inside Laravel container..."
+                    docker exec laravel-app php artisan migrate --force
+                '''
+            }
+
 
 
     }

@@ -1,33 +1,41 @@
 #!/bin/bash
 set -e
 
-echo "⏳ Waiting for MySQL to be ready..."
-
-# Wait until MySQL responds to connections
-until mysql -h"${DB_HOST}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" -e "SELECT 1;" &>/dev/null; do
-  echo "⏳ Waiting for MySQL..."
-  sleep 5
+echo "Waiting for MySQL to be ready..."
+until php -r "new PDO('mysql:host=${DB_HOST};port=${DB_PORT}', '${DB_USERNAME}', '${DB_PASSWORD}');" >/dev/null 2>&1; do
+  sleep 2
 done
+echo "MySQL is ready!"
 
+# Ensure Laravel directories exist and permissions are correct
+mkdir -p bootstrap/cache storage
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
 
-echo "✅ MySQL is up! Running Laravel commands..."
+# Add Git safe directory to avoid ownership warnings
+git config --global --add safe.directory /var/www/html
 
-# Move to Laravel app directory (important in multi-stage builds)
-cd /var/www/html || exit 1
+# Install composer dependencies if vendor is missing
+if [ ! -d "vendor" ]; then
+    echo "Running composer install..."
+    COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+fi
 
-# Ensure storage permissions
-chmod -R 777 storage bootstrap/cache
+# Run migrations safely
+php artisan migrate || true
 
-# Run migrations & optimization
-php artisan migrate --force || {
-  echo "⚠️ Migration failed — skipping to continue container startup"
-}
+# Ensure cache table exists if using database cache driver
+php artisan cache:table || true
 
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
-php artisan optimize
+# Clear caches safely
+php artisan config:clear || true
+php artisan cache:clear || true
+# Skip route cache if duplicates exist
+php artisan route:clear || true
+php artisan view:clear || true
 
-echo "🚀 Starting PHP-FPM..."
-exec php-fpm
+# Optimize, ignoring route cache errors
+php artisan optimize || true
+
+# Start PHP-FPM
+exec "$@"
