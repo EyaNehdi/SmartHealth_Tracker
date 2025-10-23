@@ -56,7 +56,7 @@
             <div class="container-fluid p-0">
                 <div class="row gx-0">
                     <div class="col-md-6">
-                        <div class="login__left-side" data-background="{{Vite::asset('resources/assets/img/slider/slider_bg02.jpg')}}">
+                        <div class="login__left-side" data-background="{{Vite::asset('resources/assets/img/slider/jj.jpg')}}">
                             <a href="index-2.html"><img src="{{Vite::asset('resources/assets/img/logo/logo.svg')}}" alt="logo"></a>
                             <div class="login__left-content">
                                 <p>“This software simplifies the website building process, making it a breeze to manage our
