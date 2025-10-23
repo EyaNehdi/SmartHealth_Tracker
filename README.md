@@ -1,98 +1,117 @@
-# 🌿 ENERGIX
+# Comprehensive CI/CD Pipeline Documentation
 
-ENERGIX est une plateforme dédiée à la promotion des bonnes pratiques de santé et de bien-être au quotidien. Elle aide les **étudiants** et les **enseignants** à mieux comprendre leurs habitudes de vie et à suivre leurs progrès dans une démarche de **prévention** et d’**amélioration de la qualité de vie**.
+This markdown file details the end-to-end stages of the Jenkins pipeline for your Laravel project and includes placeholders for result screenshots. You can directly copy-paste this into your documentation and replace the placeholder images with your actual result files as needed.
 
-## 🎯 Objectifs du projet
+---
 
-- Encourager un mode de vie sain à travers des activités quotidiennes.
-- Suivre l’évolution des habitudes personnelles (alimentation, activité physique, sommeil, etc.).
-- Sensibiliser la communauté éducative au bien-être.
-- Proposer des défis motivants et collectifs.
-- Promouvoir l’accompagnement et l’auto-évaluation.
+## Pipeline Overview
 
-## ✅ Fonctionnalités principales
 
-- 👤 Gestion des utilisateurs (étudiants, enseignants)
-- 🏆 Challenges de bien-être
-- 🍽️ Suivi alimentaire
-- 🏃 Activités physiques
-- 🧘 Équipements et outils utilisés
-- 📊 Suivi des participants et de leurs progrès
+graph TD
+    A[Hello Test] --> B[Clean Workspace]
+    B --> C[Git Checkout]
+    C --> D[Build Laravel Image]
+    D --> E[SonarQube Analysis]
+    E --> F[Build & Run with Docker Compose]
+    
 
-## 🗂️ Modèles / Tables principales
+---
 
-Le système repose sur les tables suivantes :
+## Stage Details
 
-### 1. `challenges`
-Contient les défis proposés aux participants.
+### 1. Hello Test
 
-Exemples :
-- Marcher 10 000 pas par jour
-- Boire 2L d'eau
-- Méditation de 10 minutes
+- **Purpose:**  
+  Simple sanity check and greeting for pipeline verification.
+- **Command executed:**  
+  `echo 'Hi Jihed'`
+- **Notes:**  
+  Useful for logging initiation and testing of pipeline triggers.
 
-### 2. `food`
-Gère les habitudes alimentaires.
+---
 
-Exemples de champs :
-- Nom de l’aliment / repas
-- Nombre de calories
-- Date / heure de consommation
+### 2. Clean Workspace
 
-### 3. `activity`
-Enregistre les activités physiques.
+- **Purpose:**  
+  Ensures a clean build environment by deleting all files in the workspace.
+- **Command executed:**  
+  `deleteDir()`
+- **Notes:**  
+  Prevents errors due to leftover artifacts from previous builds.
 
-Exemples :
-- Type d’activité (marche, course, yoga…)
-- Durée
-- Intensité
+---
 
-### 4. `equipements`
-Liste et gestion des équipements utilisés dans les activités.
+### 3. Git Checkout
 
-Exemples :
-- Tapis de yoga
-- Haltères
-- Vélo d’appartement
-- Montre connectée
+- **Purpose:**  
+  Checks out the application source code from the designated development branch.
+- **Branch:**  
+  `devops`
+- **Repository URL:**  
+  `https://github.com/EyaNehdi/SmartHealth_Tracker.git`
+- **Notes:**  
+  Ensures the pipeline acts on the most recent code base.
 
-### 5. `participants`
-Associe les utilisateurs aux défis ou activités.
+---
 
-Exemples de champs :
-- Utilisateur
-- Challenge/activité
-- Progression
-- Statut
+### 4. Build Laravel Image
 
-## 🏗️ Technologies (à adapter selon ton stack)
+- **Purpose:**  
+  Builds the Laravel Docker image for deployment.
+- **Command executed:**  
+  `docker build -t $APP_IMAGE .`
+- **Image name:**  
+  `my-laravel-app:latest`
+- **Notes:**  
+  Containerizes the Laravel app, making deployment and environment management consistent.
 
-Exemple si ton projet utilise Laravel :
+---
 
-- **Backend** : Laravel 12 / PHP 8+
-- **Base de données** : MySQL ou SQLite
-- **Frontend** : Blade / Vue.js / React (selon ton projet)
-- **Authentification** : Laravel Breeze / Jetstream / Sanctum
-- **Style** : TailwindCSS / Bootstrap (selon ton choix)
+### 5. SonarQube Analysis
 
-## ⚙️ Installation (exemple Laravel)
+- **Purpose:**  
+  Performs static code quality analysis using SonarQube.
+- **Environment:**  
+  SonarQube server named `sonnar` in Jenkins.
+- **Command executed:**  
+  `/opt/sonar-scanner/bin/sonar-scanner` (run in SonarQube environment)
+- **Expected Result:**  
+  Quality gate results, code coverage, bug count, and maintainability scores.
+- **Screenshot Placeholder:**  
+  ![SonarQube Dashboard Result](sonarqube.png)
+  - *Reference:* [SonarQube Dashboard](http://192.168.33.10:9000/dashboard?id=energix-laravel&codeScope=overall)
 
-```bash
-# 1. Cloner le projet
-git clone <url-du-repo>
-cd energix
+---
 
-# 2. Installer les dépendances
-composer install
-npm install
-npm run dev
+### 6. Build and Run with Docker Compose
 
-# 3. Configurer l'environnement
-cp .env.example .env
-php artisan key:generate
+- **Purpose:**  
+  Builds containers and starts all services as defined in `docker-compose.yml`.
+- **Commands executed:**
 
-# 4. Configurer la base de données dans .env puis lancer les migrations
-php artisan migrate --seed
 
-# 5. Démarrer le serveur
-php artisan serve
+docker compose down --remove-orphans
+docker compose up -d --build
+
+- **Notes:**  
+Stops any running containers, removes unused ones, builds all services, and launches them in detached mode.
+- **Screenshot Placeholder:**  
+![Jenkins Pipeline Overview](pipeline.png)
+- *Add:* Jenkins pipeline result indicating success for each stage
+
+---
+
+## Docker Containers Verification
+
+After the pipeline completes, validate running containers:
+
+- **Command Used:**
+
+
+docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+
+
+- **Sample Output Placeholder:**  
+![Docker PS Command Output](dockerpsresult.png)
+
+---
