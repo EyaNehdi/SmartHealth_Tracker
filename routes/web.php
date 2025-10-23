@@ -100,18 +100,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/mes-repas/{id}/modifier', [MealController::class, 'frontEdit'])->name('meals.front.edit');
     Route::put('/mes-repas/{id}', [MealController::class, 'frontUpdate'])->name('meals.front.update');
     Route::delete('/mes-repas/{id}', [MealController::class, 'frontDestroy'])->name('meals.front.destroy');
-    
+
     // Save/Unsave Meals
     Route::post('/repas/{id}/sauvegarder', [MealController::class, 'saveMeal'])->name('meals.save');
     Route::delete('/repas/{id}/retirer', [MealController::class, 'unsaveMeal'])->name('meals.unsave');
-    
+
     // Meal Plan Management
     Route::get('/mes-plans-de-repas/creer', [MealPlanController::class, 'frontCreate'])->name('meal-plans.front.create');
     Route::post('/mes-plans-de-repas', [MealPlanController::class, 'frontStore'])->name('meal-plans.front.store');
     Route::get('/mes-plans-de-repas/{id}/modifier', [MealPlanController::class, 'frontEdit'])->name('meal-plans.front.edit');
     Route::put('/mes-plans-de-repas/{id}', [MealPlanController::class, 'frontUpdate'])->name('meal-plans.front.update');
     Route::delete('/mes-plans-de-repas/{id}', [MealPlanController::class, 'frontDestroy'])->name('meal-plans.front.destroy');
-    
+
     // Save/Unsave Meal Plans
     Route::post('/plans-de-repas/{id}/sauvegarder', [MealPlanController::class, 'saveMealPlan'])->name('meal-plans.save');
     Route::delete('/plans-de-repas/{id}/retirer', [MealPlanController::class, 'unsaveMealPlan'])->name('meal-plans.unsave');
@@ -159,7 +159,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
-    Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
+    // Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
     Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
     Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
     Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
