@@ -28,7 +28,7 @@
                                         </ul>
                                     </li>
 
-                                    <li><a href="activities/front" class="section-link">Activities</a></li>
+                                    <li><a href="{{ route('activities.front') }}" class="section-link">Activities</a></li>
 
                                     <li><a href="{{ route('produits.index') }}" class="section-link">Magasin</a></li>
 

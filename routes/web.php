@@ -12,6 +12,8 @@ use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
 use App\Http\Controllers\PanierController;
+use App\Http\Controllers\PreferenceController;
+
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\CartController;
 
@@ -158,16 +160,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/challenges/{challenge}', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
 
 
-    Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
-    Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
-    Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
-    Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
-    Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
-    Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
-    Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
-    Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store');
-    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-    // User Participations Management
+Route::get('/activities/front', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/activities', [ActivityController::class, 'frontIndex'])->name('activities.front');
+Route::get('/detail/{activity}', [ActivityController::class, 'detail'])->name('activities.detail');
+Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])->name('activities.like');
+Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
+Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
+Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
+Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/preferences', [PreferenceController::class, 'create'])->name('preferences.create');
+Route::post('/preferences', [PreferenceController::class, 'store'])->name('preferences.store');
+Route::get('/activities/recommended', [ActivityController::class, 'recommended'])->name('activities.recommended');
+
+// User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::get('/participations/create', [ParticipationController::class, 'create'])->name('participations.create');
     Route::post('/participations', [ParticipationController::class, 'store'])->name('participations.store');
