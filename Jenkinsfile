@@ -27,28 +27,26 @@ pipeline {
 
             }
         }
-        stage('Install PHP') {
-    steps {
-        sh '''
-            sudo apt-get update
-            sudo apt-get install -y php php-mbstring php-xml composer
-            composer install
-        '''
-    }
-}
-            stage('test unitaires') {
-            steps {
 
-
-                sh 'php artisan test'
-
-            }
-        }
         stage('Build Laravel Image') {
             steps {
                 sh 'docker build -t $APP_IMAGE .'
             }
         }
+
+
+        stage('Run Unit Tests in Container') {
+    steps {
+        sh '''
+            docker build -t $APP_IMAGE .
+            docker run --rm \
+                -v $PWD:/var/www/html \
+                -w /var/www/html \
+                $APP_IMAGE php artisan test
+        '''
+    }
+}
+
         stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('scanner') {
