@@ -43,6 +43,31 @@ pipeline {
             }
 
         }
+         stage('Wait for MySQL') {
+            steps {
+                echo 'Waiting for MySQL to be ready...'
+                sh '''
+                until docker exec mysql-db mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1;" &>/dev/null; do
+                  echo "Waiting for MySQL..."
+                  sleep 5
+                done
+                '''
+            }
+        }
+
+        stage('Run Migrations') {
+            steps {
+                echo 'Running Laravel migrations...'
+                sh """
+                docker exec ${APP_CONTAINER} php artisan migrate --force
+                docker exec ${APP_CONTAINER} php artisan config:clear
+                docker exec ${APP_CONTAINER} php artisan cache:clear
+                docker exec ${APP_CONTAINER} php artisan route:clear
+                docker exec ${APP_CONTAINER} php artisan view:clear
+                docker exec ${APP_CONTAINER} php artisan optimize
+                """
+            }
+        }
 
 
     }
