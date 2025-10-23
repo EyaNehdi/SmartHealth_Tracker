@@ -22,7 +22,7 @@ if [ ! -d "vendor" ]; then
 fi
 
 # Run migrations safely
-php artisan migrate || echo "Migration failed or already run"
+php artisan migrate || true
 
 # Ensure cache table exists if using database cache driver
 php artisan cache:table || true
