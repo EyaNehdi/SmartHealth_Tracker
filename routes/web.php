@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SportSessionController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES (No Authentication Required)
@@ -167,7 +168,7 @@ Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])-
 Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
 Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
 Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
-Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
+Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store');
 Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
 Route::get('/preferences', [PreferenceController::class, 'create'])->name('preferences.create');
 Route::post('/preferences', [PreferenceController::class, 'store'])->name('preferences.store');
@@ -201,9 +202,14 @@ Route::get('/activities/recommended', [ActivityController::class, 'recommended']
     Route::get('/challenges/{id}/messages', [MessageController::class, 'getMessages'])->name('challenges.messages')->middleware('auth');
     Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
 
-    // Contact route
-    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+// Contact route
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+
+Route::get('/sport-session', [SportSessionController::class, 'create']);
+    Route::post('/sport-session', [SportSessionController::class, 'store']);
+
 });
 
 /*

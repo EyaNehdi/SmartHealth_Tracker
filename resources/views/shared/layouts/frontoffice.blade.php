@@ -11,7 +11,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
+
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -279,7 +279,8 @@
 @vite(['resources/assets/js/ajax-form.js'])
 @vite(['resources/assets/js/main.js'])
 @vite(['resources/js/group_chat.js'])
-
+@vite(['resources/js/pose.js'])
+    <!-- Local pose.js -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -351,16 +352,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function addMessage(content, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
-        
+
         const messageP = document.createElement('p');
         messageP.textContent = content;
         messageP.style.margin = '0';
         messageP.style.fontSize = '14px';
         messageP.style.lineHeight = '1.4';
-        
+
         messageDiv.appendChild(messageP);
         chatMessages.appendChild(messageDiv);
-        
+
         // Scroll vers le bas
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
