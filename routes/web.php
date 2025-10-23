@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SportSessionController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES (No Authentication Required)
@@ -115,7 +116,7 @@ Route::get('/upcoming-events', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Management
-   
+
 
     // User Challenges Management
     Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
@@ -133,7 +134,7 @@ Route::post('/activities/{activity}/like', [ActivityController::class, 'like'])-
 Route::get('/activities/{activity}/checkout', [ActivityController::class, 'createCheckoutSession'])->name('activities.checkout');
 Route::get('/activities/{activity}/checkout/success', [ActivityController::class, 'checkoutSuccess'])->name('activities.checkout.success');
 Route::get('/activities/front/statistics', [ActivityController::class, 'statistics'])->name('activities.statistics');
-Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store'); 
+Route::post('/activities/{activity}/comments', [ActivityController::class, 'storeComment'])->name('activities.comments.store');
 Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
 // User Participations Management
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
@@ -166,6 +167,11 @@ Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->n
 // Contact route
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+
+Route::get('/sport-session', [SportSessionController::class, 'create']);
+    Route::post('/sport-session', [SportSessionController::class, 'store']);
+
 });
 
 /*
@@ -236,7 +242,7 @@ Route::prefix('admin')
         Route::delete('/categories/{categorie}', [CategorieController::class, 'destroy'])->name('categories.destroy');
 
         // Alternative Category Routes (Legacy) - Admin specific
-       
+
 
         /*
         |--------------------------------------------------------------------------
@@ -257,7 +263,7 @@ Route::prefix('admin')
         */
         Route::resource('events', EventController::class);
         Route::get('events/create', [EventController::class, 'create'])->name('events.create');
-       
+
         /*
         |--------------------------------------------------------------------------
         | EVENT TYPES MANAGEMENT
